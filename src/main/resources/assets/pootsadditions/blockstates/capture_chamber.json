@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "pootsadditions:block/capture_chamber" },
+    "facing=east": { "model": "pootsadditions:block/capture_chamber", "y": 90 },
+    "facing=south": { "model": "pootsadditions:block/capture_chamber", "y": 180 },
+    "facing=west": { "model": "pootsadditions:block/capture_chamber", "y": 270 }
+  }
+}

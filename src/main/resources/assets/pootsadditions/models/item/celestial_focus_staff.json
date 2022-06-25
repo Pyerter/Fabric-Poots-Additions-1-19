@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "pootsadditions:item/celestial_focus_staff_sapphire"
+  }
+}

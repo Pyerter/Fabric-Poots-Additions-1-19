@@ -1,0 +1,17 @@
+{
+  "type": "pootsadditions:tridi",
+  "ingredients": [
+    {
+      "item": "pootsadditions:sapphire_star"
+    },
+    {
+      "item": "minecraft:dragon_egg"
+    }
+  ],
+  "output": {
+    "item": "minecraft:dragon_egg",
+    "count": 2
+  },
+  "cookTime": 100,
+  "energyCost": 50
+}

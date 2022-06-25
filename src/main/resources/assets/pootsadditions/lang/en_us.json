@@ -1,0 +1,28 @@
+{
+  "item.pootsadditions.sapphire_dust": "Sapphire Dust",
+  "item.pootsadditions.starmetal_alloy_ingot": "Sapphire Alloy",
+  "item.pootsadditions.starmetal_compound_mix": "Starmetal Compound",
+  "item.pootsadditions.sapphire_star": "Sapphire Star",
+  "item.pootsadditions.sapphire_star_base": "Sapphire Star Base",
+
+  "item.pootsadditions.celestial_focus_staff": "Celestial Focus Staff",
+
+  "item.pootsadditions.starmetal_sword": "Starmetal Sword",
+  "item.pootsadditions.starmetal_shovel": "Starmetal Shovel",
+  "item.pootsadditions.starmetal_pickaxe": "Starmetal Pickaxe",
+  "item.pootsadditions.starmetal_axe": "Starmetal Axe",
+  "item.pootsadditions.starmetal_hoe": "Starmetal Hoe",
+
+  "item.pootsadditions.makeshift_core": "Makeshift Core",
+
+  "block.pootsadditions.spiral_cube_block": "Spiral Cube",
+  "block.pootsadditions.sapphire_dust_ore": "Sapphire Dust Ore",
+  "block.pootsadditions.deepslate_sapphire_dust_ore": "Deepslate Sapphire Dust Ore",
+
+  "block.pootsadditions.tridi": "Tridiminiumobulator",
+  "block.pootsadditions.capture_chamber": "Capture Chamber",
+
+  "item.pootsadditions.bobcat_spawn_egg": "Bobcat Spawn Egg",
+
+  "itemGroup.pootsadditions.sapphire": "Sapphire"
+}

@@ -12,6 +12,7 @@ import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -22,7 +23,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
+import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.block.ModBlockTags;
+import net.pyerter.pootsadditions.item.StackDependentAttributeModifierItem;
 
 import java.util.List;
 import java.util.Map;
@@ -30,8 +33,11 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public abstract class AbstractEngineeredTool extends Item implements Vanishable {
-    public static final int DAMAGE_DECREMENT = 1;
+public abstract class AbstractEngineeredTool extends Item implements Vanishable, StackDependentAttributeModifierItem {
+    public static final String ATTRIBUTES_UPDATED_NBT_ID = "pootsadditions.attributesUpdated";
+    public static final String PREVIOUSLY_WORKING_NBT_ID = "pootsadditions.previouslyWorking";
+
+    public static final int DAMAGE_INCREMENT = 1;
     protected List<TagKey<Block>> effectiveBlocksList;
 
     /**
@@ -47,7 +53,9 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable 
     protected float miningSpeed;
     protected float attackDamage;
     protected float attackSpeed;
+    protected Multimap<EntityAttribute, EntityAttributeModifier> unsuitableAttributeModifiers;
     protected Multimap<EntityAttribute, EntityAttributeModifier> attributeModifiers;
+    protected boolean attributesUpdated = false;
     /* Instance variables */
 
     Map<Block, Block> STRIPPED_BLOCKS = (new ImmutableMap.Builder()).put(Blocks.OAK_WOOD, Blocks.STRIPPED_OAK_WOOD).put(Blocks.OAK_LOG, Blocks.STRIPPED_OAK_LOG).put(Blocks.DARK_OAK_WOOD, Blocks.STRIPPED_DARK_OAK_WOOD).put(Blocks.DARK_OAK_LOG, Blocks.STRIPPED_DARK_OAK_LOG).put(Blocks.ACACIA_WOOD, Blocks.STRIPPED_ACACIA_WOOD).put(Blocks.ACACIA_LOG, Blocks.STRIPPED_ACACIA_LOG).put(Blocks.BIRCH_WOOD, Blocks.STRIPPED_BIRCH_WOOD).put(Blocks.BIRCH_LOG, Blocks.STRIPPED_BIRCH_LOG).put(Blocks.JUNGLE_WOOD, Blocks.STRIPPED_JUNGLE_WOOD).put(Blocks.JUNGLE_LOG, Blocks.STRIPPED_JUNGLE_LOG).put(Blocks.SPRUCE_WOOD, Blocks.STRIPPED_SPRUCE_WOOD).put(Blocks.SPRUCE_LOG, Blocks.STRIPPED_SPRUCE_LOG).put(Blocks.WARPED_STEM, Blocks.STRIPPED_WARPED_STEM).put(Blocks.WARPED_HYPHAE, Blocks.STRIPPED_WARPED_HYPHAE).put(Blocks.CRIMSON_STEM, Blocks.STRIPPED_CRIMSON_STEM).put(Blocks.CRIMSON_HYPHAE, Blocks.STRIPPED_CRIMSON_HYPHAE).put(Blocks.MANGROVE_WOOD, Blocks.STRIPPED_MANGROVE_WOOD).put(Blocks.MANGROVE_LOG, Blocks.STRIPPED_MANGROVE_LOG).build();
@@ -62,16 +70,23 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable 
 
     protected AbstractEngineeredTool(float attackDamage, float attackSpeed, ToolMaterial material, List<TagKey<Block>> effectiveBlocks, Settings settings) {
         super(settings.maxDamageIfAbsent(material.getDurability()));
+
         this.settings = settings;
         this.material = material;
         effectiveBlocksList = effectiveBlocks;
         this.miningSpeed = material.getMiningSpeedMultiplier();
         this.attackDamage = attackDamage + material.getAttackDamage();
         this.attackSpeed = attackSpeed;
+
         ImmutableMultimap.Builder<EntityAttribute, EntityAttributeModifier> builder = ImmutableMultimap.builder();
         builder.put(EntityAttributes.GENERIC_ATTACK_DAMAGE, new EntityAttributeModifier(ATTACK_DAMAGE_MODIFIER_ID, "Tool modifier", (double)this.attackDamage, EntityAttributeModifier.Operation.ADDITION));
         builder.put(EntityAttributes.GENERIC_ATTACK_SPEED, new EntityAttributeModifier(ATTACK_SPEED_MODIFIER_ID, "Tool modifier", (double)attackSpeed, EntityAttributeModifier.Operation.ADDITION));
         this.attributeModifiers = builder.build();
+
+        ImmutableMultimap.Builder<EntityAttribute, EntityAttributeModifier> unsuitableBuilder = ImmutableMultimap.builder();
+        unsuitableBuilder.put(EntityAttributes.GENERIC_ATTACK_DAMAGE, new EntityAttributeModifier(ATTACK_DAMAGE_MODIFIER_ID, "Tool modifier", (double)-attackDamage, EntityAttributeModifier.Operation.ADDITION));
+        unsuitableBuilder.put(EntityAttributes.GENERIC_ATTACK_SPEED, new EntityAttributeModifier(ATTACK_SPEED_MODIFIER_ID, "Tool modifier", (double)5, EntityAttributeModifier.Operation.ADDITION));
+        this.unsuitableAttributeModifiers = unsuitableBuilder.build();
     }
 
     protected AbstractEngineeredTool(float attackDamage, float attackSpeed, ToolMaterial material, Settings settings) {
@@ -133,17 +148,89 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable 
         return true;
     }
 
-    private boolean tryDamageItem(ItemStack stack,LivingEntity miner) {
+    private boolean tryDamageItem(ItemStack stack, LivingEntity miner) {
         if (willNotBreak(stack)) {
-            stack.damage(DAMAGE_DECREMENT, miner, (e) -> { e.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND); });
+            stack.damage(DAMAGE_INCREMENT, miner, (e) -> { e.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND); });
+            setPreviouslyWorking(stack, true);
+            if (!willNotBreak(stack)) {
+                setAttributesUpdated(stack, true);
+                setPreviouslyWorking(stack, false);
+                onItemNoLongerSuitable(stack, miner);
+            }
             return true;
         }
         return false;
     }
 
+    public void onItemNoLongerSuitable(ItemStack stack, LivingEntity miner) {
+        PootsAdditions.logInfo("No longer suitable!");
+    }
 
     public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot slot) {
         return slot == EquipmentSlot.MAINHAND ? this.attributeModifiers : super.getAttributeModifiers(slot);
+    }
+
+    public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
+        // Reset the value of attributes updated, since the most recent update was applied
+        setAttributesUpdated(stack, false);
+        if (willNotBreak(stack))
+            return slot == EquipmentSlot.MAINHAND ? this.attributeModifiers : super.getAttributeModifiers(slot);
+        else
+            return slot == EquipmentSlot.MAINHAND ? this.unsuitableAttributeModifiers : super.getAttributeModifiers(slot);
+    }
+
+    @Override
+    public boolean getNeedsAttributeRefresh(EquipmentSlot slot, ItemStack stack) {
+        return getAttributesUpdated(stack);
+    }
+
+    @Override
+    public void setToRefreshAttributes(EquipmentSlot slot, ItemStack stack) {
+        setAttributesUpdated(stack, true);
+    }
+
+    public boolean getBooleanNbt(ItemStack stack, String id, boolean defaultBoolean) {
+        if (stack.hasNbt()) {
+            NbtCompound nbt = stack.getNbt();
+            if (nbt.contains(id)) {
+                return nbt.getBoolean(id);
+            } else {
+                nbt.putBoolean(id, defaultBoolean);
+                return defaultBoolean;
+            }
+        } else {
+            NbtCompound nbt = new NbtCompound();
+            nbt.putBoolean(id, defaultBoolean);
+            stack.setNbt(nbt);
+            return defaultBoolean;
+        }
+    }
+
+    public boolean setBooleanNbt(ItemStack stack, String id, boolean value) {
+        if (stack.hasNbt()) {
+            stack.getNbt().putBoolean(id, value);
+        } else {
+            NbtCompound nbt = new NbtCompound();
+            nbt.putBoolean(id, value);
+            stack.setNbt(nbt);
+        }
+        return value;
+    }
+
+    public boolean getAttributesUpdated(ItemStack stack) {
+        return getBooleanNbt(stack, ATTRIBUTES_UPDATED_NBT_ID, false);
+    }
+
+    public boolean setAttributesUpdated(ItemStack stack, boolean updated) {
+        return setBooleanNbt(stack, ATTRIBUTES_UPDATED_NBT_ID, updated);
+    }
+
+    public boolean getPreviouslyWorking(ItemStack stack) {
+        return getBooleanNbt(stack, PREVIOUSLY_WORKING_NBT_ID, true);
+    }
+
+    public boolean setPreviouslyWorking(ItemStack stack, boolean working) {
+        return setBooleanNbt(stack, PREVIOUSLY_WORKING_NBT_ID, working);
     }
 
     public float getAttackDamage() {
@@ -164,7 +251,8 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable 
     }
 
     public boolean willNotBreak(ItemStack stack) {
-        return stack.getDamage() + DAMAGE_DECREMENT < stack.getMaxDamage();
+        boolean wontBreak = stack.getDamage() + DAMAGE_INCREMENT < stack.getMaxDamage();
+        return wontBreak;
     }
     /* Mining Tool Methods */
 
@@ -317,6 +405,8 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable 
     /* Hoe Item Methods */
 
     /** Damaging Item Methods **/
+
+
 
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {

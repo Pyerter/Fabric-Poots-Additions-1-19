@@ -80,7 +80,7 @@ public class MakeshiftCore extends Item {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        tooltip.add(MutableText.of(new LiteralTextContent("Core Charge: " + stack.getNbt().getInt(CHARGE_NBT_ID))).formatted(Formatting.AQUA));
+        tooltip.add(MutableText.of(new LiteralTextContent("Core Charge: " + getCharge(stack))).formatted(Formatting.AQUA));
         tooltip.add(MutableText.of(new LiteralTextContent("\"1.21 Gigawatts!\"")).formatted(Formatting.ITALIC));
     }
 

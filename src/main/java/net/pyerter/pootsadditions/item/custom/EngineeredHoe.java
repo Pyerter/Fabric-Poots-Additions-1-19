@@ -14,6 +14,9 @@ public class EngineeredHoe extends AbstractEngineeredTool {
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
+        if (anitcipatedUseOnBlockResult(context) == ActionResult.FAIL)
+            return ActionResult.PASS;
+
         return super.useHoeActionOnBlock(context);
     }
 }

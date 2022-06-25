@@ -78,19 +78,19 @@ public class ModItems {
             new EngineeredHoe(-4, 0f, ToolMaterials.IRON,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 
-    public static final Item ENGINEERED_GOLD_SWORD = registerItem("engineered_gold_sword",
+    public static final Item ENGINEERED_GOLDEN_SWORD = registerItem("engineered_golden_sword",
             new EngineeredSword(3, 1f, ToolMaterials.GOLD,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
-    public static final Item ENGINEERED_GOLD_SHOVEL = registerItem("engineered_gold_shovel",
+    public static final Item ENGINEERED_GOLDEN_SHOVEL = registerItem("engineered_golden_shovel",
             new EngineeredShovel(1.5f, -3f, ToolMaterials.GOLD,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
-    public static final Item ENGINEERED_GOLD_PICKAXE = registerItem("engineered_gold_pickaxe",
+    public static final Item ENGINEERED_GOLDEN_PICKAXE = registerItem("engineered_golden_pickaxe",
             new EngineeredPickaxe(1, -2.8f, ToolMaterials.GOLD,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
-    public static final Item ENGINEERED_GOLD_AXE = registerItem("engineered_gold_axe",
+    public static final Item ENGINEERED_GOLDEN_AXE = registerItem("engineered_golden_axe",
             new EngineeredAxe(6, -3f, ToolMaterials.GOLD,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
-    public static final Item ENGINEERED_GOLD_HOE = registerItem("engineered_gold_hoe",
+    public static final Item ENGINEERED_GOLDEN_HOE = registerItem("engineered_golden_hoe",
             new EngineeredHoe(-4, 0f, ToolMaterials.GOLD,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 

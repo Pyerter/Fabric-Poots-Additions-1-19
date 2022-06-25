@@ -4,6 +4,7 @@ import com.google.common.collect.*;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.*;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
@@ -29,13 +30,25 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public abstract class AbstractEngineeredTool extends ToolItem implements Vanishable {
+public abstract class AbstractEngineeredTool extends Item implements Vanishable {
     public static final int DAMAGE_DECREMENT = 1;
     protected List<TagKey<Block>> effectiveBlocksList;
 
-    protected final float miningSpeed;
-    protected final float attackDamage;
-    protected final Multimap<EntityAttribute, EntityAttributeModifier> attributeModifiers;
+    /**
+     * Notice that these instance variables are not final. That implies that these can change
+     * over the lifespan of this item.
+     * In most instances, these should not be changed. The exception is when a multi-tool is desired,
+     * and upgrading this multi-tool's tier and stats may be useful.
+     */
+    protected Settings settings;
+
+    protected ToolMaterial material;
+
+    protected float miningSpeed;
+    protected float attackDamage;
+    protected float attackSpeed;
+    protected Multimap<EntityAttribute, EntityAttributeModifier> attributeModifiers;
+    /* Instance variables */
 
     Map<Block, Block> STRIPPED_BLOCKS = (new ImmutableMap.Builder()).put(Blocks.OAK_WOOD, Blocks.STRIPPED_OAK_WOOD).put(Blocks.OAK_LOG, Blocks.STRIPPED_OAK_LOG).put(Blocks.DARK_OAK_WOOD, Blocks.STRIPPED_DARK_OAK_WOOD).put(Blocks.DARK_OAK_LOG, Blocks.STRIPPED_DARK_OAK_LOG).put(Blocks.ACACIA_WOOD, Blocks.STRIPPED_ACACIA_WOOD).put(Blocks.ACACIA_LOG, Blocks.STRIPPED_ACACIA_LOG).put(Blocks.BIRCH_WOOD, Blocks.STRIPPED_BIRCH_WOOD).put(Blocks.BIRCH_LOG, Blocks.STRIPPED_BIRCH_LOG).put(Blocks.JUNGLE_WOOD, Blocks.STRIPPED_JUNGLE_WOOD).put(Blocks.JUNGLE_LOG, Blocks.STRIPPED_JUNGLE_LOG).put(Blocks.SPRUCE_WOOD, Blocks.STRIPPED_SPRUCE_WOOD).put(Blocks.SPRUCE_LOG, Blocks.STRIPPED_SPRUCE_LOG).put(Blocks.WARPED_STEM, Blocks.STRIPPED_WARPED_STEM).put(Blocks.WARPED_HYPHAE, Blocks.STRIPPED_WARPED_HYPHAE).put(Blocks.CRIMSON_STEM, Blocks.STRIPPED_CRIMSON_STEM).put(Blocks.CRIMSON_HYPHAE, Blocks.STRIPPED_CRIMSON_HYPHAE).put(Blocks.MANGROVE_WOOD, Blocks.STRIPPED_MANGROVE_WOOD).put(Blocks.MANGROVE_LOG, Blocks.STRIPPED_MANGROVE_LOG).build();
     Map<Block, BlockState> PATH_STATES = Maps.newHashMap((new ImmutableMap.Builder()).put(Blocks.GRASS_BLOCK, Blocks.DIRT_PATH.getDefaultState()).put(Blocks.DIRT, Blocks.DIRT_PATH.getDefaultState()).put(Blocks.PODZOL, Blocks.DIRT_PATH.getDefaultState()).put(Blocks.COARSE_DIRT, Blocks.DIRT_PATH.getDefaultState()).put(Blocks.MYCELIUM, Blocks.DIRT_PATH.getDefaultState()).put(Blocks.ROOTED_DIRT, Blocks.DIRT_PATH.getDefaultState()).build());
@@ -48,10 +61,13 @@ public abstract class AbstractEngineeredTool extends ToolItem implements Vanisha
     }
 
     protected AbstractEngineeredTool(float attackDamage, float attackSpeed, ToolMaterial material, List<TagKey<Block>> effectiveBlocks, Settings settings) {
-        super(material, settings);
+        super(settings.maxDamageIfAbsent(material.getDurability()));
+        this.settings = settings;
+        this.material = material;
         effectiveBlocksList = effectiveBlocks;
         this.miningSpeed = material.getMiningSpeedMultiplier();
         this.attackDamage = attackDamage + material.getAttackDamage();
+        this.attackSpeed = attackSpeed;
         ImmutableMultimap.Builder<EntityAttribute, EntityAttributeModifier> builder = ImmutableMultimap.builder();
         builder.put(EntityAttributes.GENERIC_ATTACK_DAMAGE, new EntityAttributeModifier(ATTACK_DAMAGE_MODIFIER_ID, "Tool modifier", (double)this.attackDamage, EntityAttributeModifier.Operation.ADDITION));
         builder.put(EntityAttributes.GENERIC_ATTACK_SPEED, new EntityAttributeModifier(ATTACK_SPEED_MODIFIER_ID, "Tool modifier", (double)attackSpeed, EntityAttributeModifier.Operation.ADDITION));
@@ -59,16 +75,35 @@ public abstract class AbstractEngineeredTool extends ToolItem implements Vanisha
     }
 
     protected AbstractEngineeredTool(float attackDamage, float attackSpeed, ToolMaterial material, Settings settings) {
-        super(material, settings);
-        effectiveBlocksList = List.of();
-        this.miningSpeed = material.getMiningSpeedMultiplier();
-        this.attackDamage = attackDamage + material.getAttackDamage();
+        this(attackDamage, attackSpeed, material, List.of(), settings);
+    }
+
+    protected AbstractEngineeredTool(AbstractEngineeredTool tool) {
+        this(tool.attackDamage, tool.attackSpeed, tool.material, tool.effectiveBlocksList, tool.settings);
+    }
+
+    public void resetAttributeModifiers() {
         ImmutableMultimap.Builder<EntityAttribute, EntityAttributeModifier> builder = ImmutableMultimap.builder();
         builder.put(EntityAttributes.GENERIC_ATTACK_DAMAGE, new EntityAttributeModifier(ATTACK_DAMAGE_MODIFIER_ID, "Tool modifier", (double)this.attackDamage, EntityAttributeModifier.Operation.ADDITION));
         builder.put(EntityAttributes.GENERIC_ATTACK_SPEED, new EntityAttributeModifier(ATTACK_SPEED_MODIFIER_ID, "Tool modifier", (double)attackSpeed, EntityAttributeModifier.Operation.ADDITION));
         this.attributeModifiers = builder.build();
     }
 
+    /** ToolItem methods **/
+    public ToolMaterial getMaterial() {
+        return this.material;
+    }
+
+    public int getEnchantability() {
+        return this.material.getEnchantability();
+    }
+
+    public boolean canRepair(ItemStack stack, ItemStack ingredient) {
+        return this.material.getRepairIngredient().test(ingredient) || super.canRepair(stack, ingredient);
+    }
+    /* ToolItem methods */
+
+    /** Mining Tool methods **/
     public List<TagKey<Block>> getEffectiveBlocksList() {
         return effectiveBlocksList;
     }
@@ -87,18 +122,23 @@ public abstract class AbstractEngineeredTool extends ToolItem implements Vanisha
     }
 
     public boolean postHit(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-        if (willNotBreak(stack))
-            stack.damage(DAMAGE_DECREMENT, attacker, (e) -> { e.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND); });
-        return true;
+        return tryDamageItem(stack, attacker);
     }
 
     public boolean postMine(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity miner) {
         if (!world.isClient && state.getHardness(world, pos) != 0.0F) {
-            if (willNotBreak(stack))
-                stack.damage(DAMAGE_DECREMENT, miner, (e) -> { e.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND); });
+            tryDamageItem(stack, miner);
         }
 
         return true;
+    }
+
+    private boolean tryDamageItem(ItemStack stack,LivingEntity miner) {
+        if (willNotBreak(stack)) {
+            stack.damage(DAMAGE_DECREMENT, miner, (e) -> { e.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND); });
+            return true;
+        }
+        return false;
     }
 
 
@@ -126,6 +166,22 @@ public abstract class AbstractEngineeredTool extends ToolItem implements Vanisha
     public boolean willNotBreak(ItemStack stack) {
         return stack.getDamage() + DAMAGE_DECREMENT < stack.getMaxDamage();
     }
+    /* Mining Tool Methods */
+
+    /** Extended Item Tool **/
+
+    @Override
+    public ActionResult useOnBlock(ItemUsageContext context) {
+        return anitcipatedUseOnBlockResult(context) == ActionResult.SUCCESS ? ActionResult.PASS : ActionResult.PASS;
+    }
+
+    public ActionResult anitcipatedUseOnBlockResult(ItemUsageContext context) {
+        if (willNotBreak(context.getStack()))
+            return ActionResult.SUCCESS;
+        else
+            return ActionResult.FAIL;
+    }
+    /* Extended Item Tool */
 
     /** Axe Item Methods **/
     public ActionResult useAxeActionOnBlock(ItemUsageContext context) {
@@ -161,9 +217,7 @@ public abstract class AbstractEngineeredTool extends ToolItem implements Vanisha
             world.setBlockState(blockPos, (BlockState)optional4.get(), 11);
             world.emitGameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Emitter.of(playerEntity, (BlockState)optional4.get()));
             if (playerEntity != null) {
-                itemStack.damage(1, playerEntity, (p) -> {
-                    p.sendToolBreakStatus(context.getHand());
-                });
+                tryDamageItem(itemStack, playerEntity);
             }
 
             return ActionResult.success(world.isClient);
@@ -207,9 +261,7 @@ public abstract class AbstractEngineeredTool extends ToolItem implements Vanisha
                     world.setBlockState(blockPos, blockState3, 11);
                     world.emitGameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Emitter.of(playerEntity, blockState3));
                     if (playerEntity != null) {
-                        context.getStack().damage(1, playerEntity, (p) -> {
-                            p.sendToolBreakStatus(context.getHand());
-                        });
+                        tryDamageItem(context.getStack(), playerEntity);
                     }
                 }
 
@@ -237,9 +289,7 @@ public abstract class AbstractEngineeredTool extends ToolItem implements Vanisha
                 if (!world.isClient) {
                     consumer.accept(context);
                     if (playerEntity != null) {
-                        context.getStack().damage(1, playerEntity, (p) -> {
-                            p.sendToolBreakStatus(context.getHand());
-                        });
+                        tryDamageItem(context.getStack(), playerEntity);
                     }
                 }
 
@@ -265,4 +315,13 @@ public abstract class AbstractEngineeredTool extends ToolItem implements Vanisha
         };
     }
     /* Hoe Item Methods */
+
+    /** Damaging Item Methods **/
+
+    @Override
+    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
+        super.inventoryTick(stack, world, entity, slot, selected);
+    }
+
+    /* Damaging Item Methods */
 }

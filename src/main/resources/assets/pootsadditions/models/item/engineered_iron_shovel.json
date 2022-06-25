@@ -1,0 +1,7 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "item/iron_shovel",
+    "layer1": "pootsadditions:item/engineered_shovel_layer_1"
+  }
+}

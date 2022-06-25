@@ -15,6 +15,9 @@ public class EngineeredShovel extends AbstractEngineeredTool {
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
+        if (anitcipatedUseOnBlockResult(context) == ActionResult.FAIL)
+            return ActionResult.PASS;
+
         return super.useShovelActionOnBlock(context);
     }
 }

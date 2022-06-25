@@ -1,0 +1,7 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "pootsadditions:item/starmetal_hoe",
+    "layer1": "pootsadditions:item/engineered_hoe_layer_1"
+  }
+}

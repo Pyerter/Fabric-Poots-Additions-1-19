@@ -14,6 +14,9 @@ public class EngineeredAxe extends AbstractEngineeredTool {
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
+        if (anitcipatedUseOnBlockResult(context) == ActionResult.FAIL)
+            return ActionResult.PASS;
+
         return super.useAxeActionOnBlock(context);
     }
 }

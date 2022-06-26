@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.*;
 import net.minecraft.screen.slot.Slot;
+import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.block.entity.TridiBlockEntity;
 import net.pyerter.pootsadditions.screen.slot.ModFuelSlot;
 import net.pyerter.pootsadditions.screen.slot.ModResultSlot;
@@ -30,6 +31,8 @@ public class TridiScreenHandler extends ScreenHandler {
         this.inventory = inventory;
         inventory.onOpen(playerInventory.player);
         this.propertyDelegate = propertyDelegate;
+
+        PootsAdditions.logInfo("Tridi screen handler sync id: " + syncId);
 
         // add slots
         this.addSlot(new Slot(inventory, 0, 18, 50));

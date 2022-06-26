@@ -4,7 +4,8 @@
   "package": "net.pyerter.pootsadditions.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "ModLivingEntityMixin"
+    "ModLivingEntityMixin",
+    "ModServerPlayerEntityPautschScreenMixin"
   ],
   "client": [
     "ExampleMixin"

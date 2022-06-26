@@ -145,6 +145,9 @@ public class ModItems {
     public static final Item MAKESHIFT_CORE = registerItem("makeshift_core",
             new MakeshiftCore(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).fireproof().maxCount(1)));
 
+    public static final Item PAUTSCH_ITEM = registerItem("pautsch_item",
+            new PautschItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).fireproof().maxCount(1)));
+
 
     public static final Item BOBCAT_SPAWN_EGG = registerItem("bobcat_spawn_egg",
             new SpawnEggItem(ModEntities.BOBCAT, 0x000000, 0xa8925e,

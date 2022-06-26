@@ -6,4 +6,8 @@ public class Util {
         value = Math.min(value, max);
         return value;
     }
+
+    public static boolean isNullOrBlank(String s) {
+        return s == null || s.isBlank();
+    }
 }

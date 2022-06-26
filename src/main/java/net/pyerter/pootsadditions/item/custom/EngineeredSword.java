@@ -10,6 +10,8 @@ import net.pyerter.pootsadditions.block.ModBlockTags;
 public class EngineeredSword extends AbstractEngineeredTool {
     public EngineeredSword(float attackDamage, float attackSpeed, ToolMaterial material, Settings settings) {
         super(attackDamage, attackSpeed, material, ModBlockTags.SWORD_MINEABLE, settings);
+
+        super.registerTool(this, material, ToolType.SWORD);
     }
 
     @Override

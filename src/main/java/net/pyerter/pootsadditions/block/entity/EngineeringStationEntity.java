@@ -1,0 +1,256 @@
+package net.pyerter.pootsadditions.block.entity;
+
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventories;
+import net.minecraft.item.*;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.PropertyDelegate;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.LiteralTextContent;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Pair;
+import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.pyerter.pootsadditions.PootsAdditions;
+import net.pyerter.pootsadditions.item.ModItems;
+import net.pyerter.pootsadditions.item.ModToolMaterials;
+import net.pyerter.pootsadditions.item.custom.AbstractEngineeredTool;
+import net.pyerter.pootsadditions.item.custom.AbstractEngineersItem;
+import net.pyerter.pootsadditions.item.custom.MakeshiftCore;
+import net.pyerter.pootsadditions.item.inventory.ImplementedInventory;
+import net.pyerter.pootsadditions.screen.handlers.EngineeringStationScreenHandler;
+import net.pyerter.pootsadditions.util.Util;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.Optional;
+
+public class EngineeringStationEntity extends BlockEntity implements NamedScreenHandlerFactory, ImplementedInventory {
+    private static final String DISPLAY_NAME = "Engineering Station";
+    private static List<ToolMaterial> materials = null;
+    private static final List<Item> ENGINEERS_ITEMS = List.of(ModItems.ENGINEERS_BLUPRINT);
+    public static List<ToolMaterial> getMaterials() { if(materials == null) materials = updateToolMaterials(); return materials; }
+    public static final int ENGINEERING_STATION_INVENTORY_SIZE = 4;
+    private final DefaultedList<ItemStack> inventory =
+            DefaultedList.ofSize(ENGINEERING_STATION_INVENTORY_SIZE, ItemStack.EMPTY);
+
+    protected final PropertyDelegate propertyDelegate;
+    private int hammered = 0;
+    private int successfulBuild = 0;
+    private ItemStack resultingStack = ItemStack.EMPTY;
+
+    public static final int HAMMERS_PER_CRAFT = 2;
+
+    public EngineeringStationEntity(BlockPos pos, BlockState state) {
+        super(ModBlockEntities.ENGINEERING_STATION, pos, state);
+
+        this.propertyDelegate = new PropertyDelegate() {
+            @Override
+            public int get(int index) {
+                switch (index) {
+                    case 0: return EngineeringStationEntity.this.hammered;
+                    case 1: return EngineeringStationEntity.this.successfulBuild;
+                    default: return 0;
+                }
+            }
+
+            @Override
+            public void set(int index, int value) {
+                switch (index) {
+                    case 0: EngineeringStationEntity.this.hammered = value; break;
+                    case 1: EngineeringStationEntity.this.successfulBuild = value; break;
+                }
+            }
+
+            @Override
+            public int size() {
+                return 2;
+            }
+        };
+    }
+
+    @Override
+    public DefaultedList<ItemStack> getItems() {
+        return inventory;
+    }
+
+    @Override
+    public Text getDisplayName() {
+        return MutableText.of(new LiteralTextContent(DISPLAY_NAME));
+    }
+
+    @Nullable
+    @Override
+    public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
+        return new EngineeringStationScreenHandler(syncId, inv, this, this.propertyDelegate, this);
+    }
+
+    @Override
+    protected void writeNbt(NbtCompound nbt) {
+        super.writeNbt(nbt);
+        Inventories.writeNbt(nbt, inventory);
+        nbt.putInt("engineering_station.hammered", hammered);
+        nbt.putInt("engineering_station.successfulBuild", successfulBuild);
+        nbt.put("engineering_station.resulting_stack", resultingStack.writeNbt(new NbtCompound()));
+    }
+
+    @Override
+    public void readNbt(NbtCompound nbt) {
+        Inventories.readNbt(nbt, inventory);
+        super.readNbt(nbt);
+        hammered = nbt.getInt("engineering_station.hammered");
+        successfulBuild = nbt.getInt("engineering_station.successfulBuild");
+        resultingStack = ItemStack.fromNbt(nbt.getCompound("engineering_station.resulting_stack"));
+    }
+
+    // Left boolean: if can hammer
+    // Right boolean: if result was made
+    // Left boolean implies right boolean
+    public Pair<Boolean, Boolean> hammerIt() {
+        PootsAdditions.logInfo("Trying to hammer!");
+        Pair<Optional<ItemStack>, Boolean[]> craftingResult = getCraftingResult();
+        if (!craftingResult.getLeft().isPresent()) {
+            resetHammeredProgress();
+            return new Pair<>(false, false);
+        }
+
+        hammered++;
+        PootsAdditions.logInfo("Hammering!");
+        world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_ANVIL_PLACE, SoundCategory.BLOCKS, 1f, 1f, 0);
+        if (hammered >= HAMMERS_PER_CRAFT) {
+            craftResult(craftingResult.getLeft().get(), craftingResult.getRight());
+            resetHammeredProgress();
+            successfulBuild = 1;
+            // world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_ANVIL_USE, SoundCategory.BLOCKS, 1f, 1f, 0);
+            return new Pair<>(true, true);
+        }
+        return new Pair<>(true, false);
+    }
+
+    public boolean craftResult(ItemStack stack, Boolean[] usedSlots) {
+        if (stack == null || stack.isEmpty() || usedSlots.length != 4)
+            return false;
+
+        for (int i = 0; i < 4; i++) {
+            inventory.get(i).decrement(1);
+        }
+
+        inventory.set(2, stack);
+        return true;
+    }
+
+    public void resetHammeredProgress() {
+        hammered = 0;
+        successfulBuild--;
+    }
+
+    public static void tick(World world, BlockPos pos, BlockState state, EngineeringStationEntity entity) {
+        // nada
+    }
+
+    public Pair<Optional<ItemStack>, Boolean[]> getCraftingResult() {
+        // TODO: check if the tool in the tool slot is craftable with the engineers item
+        // TODO: check if the engineers tool in the middle is augmentable with mats or augments
+        Optional<ItemStack> resultingStack;
+
+        resultingStack = canEngineerTool(getToolSlot(), getEngineeringSlot());
+        if (resultingStack.isPresent())
+            return new Pair(resultingStack, new Boolean[]{true, false, true, false});
+
+        return new Pair<>(Optional.empty(), null);
+    }
+
+    public static Optional<ItemStack> canEngineerTool(ItemStack toolStack, ItemStack engineerStack) {
+        PootsAdditions.logInfo("Checking if can engineer tool.");
+        ToolMaterial mat = getToolMaterial(toolStack);
+        AbstractEngineeredTool.ToolType toolType = AbstractEngineeredTool.getToolType(toolStack);
+        if (mat == null || toolType == AbstractEngineeredTool.ToolType.NADA)
+            return Optional.empty();
+
+        AbstractEngineersItem.ENGINEERS_CRAFT_TYPE craftType = AbstractEngineersItem.tryGetEngineersCraftType(engineerStack);
+        switch (craftType) {
+            case ENGINEERIFY:
+                AbstractEngineeredTool resultTool = AbstractEngineeredTool.getRegisteredTool(mat, toolType);
+                return resultTool != null ? Optional.of(new ItemStack(resultTool)) : Optional.empty();
+            default: return Optional.empty();
+        }
+    }
+
+    public static boolean acceptsQuickTransfer(ItemStack itemStack) {
+        return false;
+    }
+
+    /** Slot 0: Tool slot is the left slot **/
+    public static boolean acceptsQuickTransferToolSlot(ItemStack itemStack) {
+        return itemStack.getItem() instanceof ToolItem;
+    }
+    /** Slot 0: Tool slot is the left slot **/
+    public ItemStack getToolSlot() {
+        return inventory.get(0);
+    }
+
+    /** Slot 1: Augment slot is the right slot **/
+    public static boolean acceptsQuickTransferAugmentSlot(ItemStack itemStack) {
+        return false;
+    }
+    /** Slot 1: Augment slot is the right slot **/
+    public ItemStack getAugmentSlot() {
+        return inventory.get(1);
+    }
+
+    /** Slot 2: Engineering Slot is the bottom slot **/
+    public static boolean acceptsQuickTransferEngineeringSlot(ItemStack itemStack) {
+        return itemStack.getItem() instanceof AbstractEngineeredTool || ENGINEERS_ITEMS.contains(itemStack.getItem());
+    }
+    /** Slot 2: Engineering Slot is the bottom slot **/
+    public ItemStack getEngineeringSlot() {
+        return inventory.get(2);
+    }
+
+    /** Slot 3: Materials slot is the top slot **/
+    public static boolean acceptsQuickTransferMaterialSlot(ItemStack itemStack) {
+        return false;
+    }
+    /** Slot 3: Materials slot is the top slot **/
+    public ItemStack getMaterialSlot() {
+        return inventory.get(3);
+    }
+
+    public static boolean acceptsQuickTransfer(ItemStack itemStack, Integer i) {
+        switch (i) {
+            case 0: return acceptsQuickTransferToolSlot(itemStack);
+            case 1: return acceptsQuickTransferAugmentSlot(itemStack);
+            case 2: return acceptsQuickTransferEngineeringSlot(itemStack);
+            case 3: return acceptsQuickTransferMaterialSlot(itemStack);
+            default: return false;
+        }
+    }
+
+    public static ToolMaterial getToolMaterial(ItemStack itemStack) {
+        if (itemStack != null && !itemStack.isEmpty() && itemStack.getItem() instanceof ToolItem) {
+            ToolMaterial mat = ((ToolItem)itemStack.getItem()).getMaterial();
+            return mat;
+        }
+        return null;
+    }
+
+    public static List<ToolMaterial> updateToolMaterials() {
+        List<ToolMaterial> mats = List.of(ToolMaterials.values());
+
+        // TODO: figure out how to implement a tool material finder to be compatible with other mods
+        // Loop through Modded tool material instances provided in a JSON and add?
+        List<ToolMaterial> modMats = List.of(ModToolMaterials.values());
+        mats.addAll(modMats);
+
+        mats.sort((a, b) -> { return a.getMiningLevel() - b.getMiningLevel(); });
+        return mats;
+    }
+}

@@ -10,6 +10,8 @@ import net.minecraft.util.ActionResult;
 public class EngineeredAxe extends AbstractEngineeredTool {
     public EngineeredAxe(float attackDamage, float attackSpeed, ToolMaterial material, Settings settings) {
         super(attackDamage, attackSpeed, material, BlockTags.AXE_MINEABLE, settings);
+
+        super.registerTool(this, material, ToolType.AXE);
     }
 
     @Override

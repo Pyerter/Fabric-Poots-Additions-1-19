@@ -142,6 +142,9 @@ public class ModItems {
             new EngineeredHoe(-4, 0f, ModToolMaterials.STARMETAL,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 
+    public static final Item ENGINEERS_BLUPRINT = registerItem("engineers_blueprint",
+            new EngineersBlueprintItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).maxCount(1)));
+
     public static final Item MAKESHIFT_CORE = registerItem("makeshift_core",
             new MakeshiftCore(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).fireproof().maxCount(1)));
 

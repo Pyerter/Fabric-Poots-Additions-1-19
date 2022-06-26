@@ -1,6 +1,7 @@
 package net.pyerter.pootsadditions.block.entity;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -12,6 +13,8 @@ public class ModBlockEntities {
 
     public static BlockEntityType<CaptureChamberEntity> CAPTURE_CHAMBER;
 
+    public static BlockEntityType<EngineeringStationEntity> ENGINEERING_STATION;
+
     public static void registerAllBlockEntities() {
         TRIDI = Registry.register(Registry.BLOCK_ENTITY_TYPE,
                 new Identifier(PootsAdditions.MOD_ID, "tridi"),
@@ -20,5 +23,9 @@ public class ModBlockEntities {
         CAPTURE_CHAMBER = Registry.register(Registry.BLOCK_ENTITY_TYPE,
                 new Identifier(PootsAdditions.MOD_ID, "capture_chamber"),
                 FabricBlockEntityTypeBuilder.create(CaptureChamberEntity::new, ModBlocks.CAPTURE_CHAMBER).build(null));
+
+        ENGINEERING_STATION = Registry.register(Registry.BLOCK_ENTITY_TYPE,
+                new Identifier(PootsAdditions.MOD_ID, "engineering_station"),
+                FabricBlockEntityTypeBuilder.create(EngineeringStationEntity::new, ModBlocks.ENGINEERING_STATION).build(null));
     }
 }

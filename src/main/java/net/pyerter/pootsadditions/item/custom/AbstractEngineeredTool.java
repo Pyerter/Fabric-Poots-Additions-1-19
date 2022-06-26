@@ -27,15 +27,25 @@ import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.block.ModBlockTags;
 import net.pyerter.pootsadditions.item.StackDependentAttributeModifierItem;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public abstract class AbstractEngineeredTool extends Item implements Vanishable, StackDependentAttributeModifierItem {
     public static final String ATTRIBUTES_UPDATED_NBT_ID = "pootsadditions.attributesUpdated";
     public static final String PREVIOUSLY_WORKING_NBT_ID = "pootsadditions.previouslyWorking";
+
+    public static final Map<net.minecraft.util.Pair<ToolMaterial, ToolType>, AbstractEngineeredTool> materialToToolDictionary = new HashMap<>();
+    public static final List<net.minecraft.util.Pair<ToolMaterial, ToolType>> toolTypePairs = new ArrayList<>();
+
+    public enum ToolType {
+        AXE,
+        HOE,
+        PICKAXE,
+        SHOVEL,
+        SWORD,
+        NADA
+    }
 
     public static final int DAMAGE_INCREMENT = 1;
     protected List<TagKey<Block>> effectiveBlocksList;
@@ -60,7 +70,7 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
 
     Map<Block, Block> STRIPPED_BLOCKS = (new ImmutableMap.Builder()).put(Blocks.OAK_WOOD, Blocks.STRIPPED_OAK_WOOD).put(Blocks.OAK_LOG, Blocks.STRIPPED_OAK_LOG).put(Blocks.DARK_OAK_WOOD, Blocks.STRIPPED_DARK_OAK_WOOD).put(Blocks.DARK_OAK_LOG, Blocks.STRIPPED_DARK_OAK_LOG).put(Blocks.ACACIA_WOOD, Blocks.STRIPPED_ACACIA_WOOD).put(Blocks.ACACIA_LOG, Blocks.STRIPPED_ACACIA_LOG).put(Blocks.BIRCH_WOOD, Blocks.STRIPPED_BIRCH_WOOD).put(Blocks.BIRCH_LOG, Blocks.STRIPPED_BIRCH_LOG).put(Blocks.JUNGLE_WOOD, Blocks.STRIPPED_JUNGLE_WOOD).put(Blocks.JUNGLE_LOG, Blocks.STRIPPED_JUNGLE_LOG).put(Blocks.SPRUCE_WOOD, Blocks.STRIPPED_SPRUCE_WOOD).put(Blocks.SPRUCE_LOG, Blocks.STRIPPED_SPRUCE_LOG).put(Blocks.WARPED_STEM, Blocks.STRIPPED_WARPED_STEM).put(Blocks.WARPED_HYPHAE, Blocks.STRIPPED_WARPED_HYPHAE).put(Blocks.CRIMSON_STEM, Blocks.STRIPPED_CRIMSON_STEM).put(Blocks.CRIMSON_HYPHAE, Blocks.STRIPPED_CRIMSON_HYPHAE).put(Blocks.MANGROVE_WOOD, Blocks.STRIPPED_MANGROVE_WOOD).put(Blocks.MANGROVE_LOG, Blocks.STRIPPED_MANGROVE_LOG).build();
     Map<Block, BlockState> PATH_STATES = Maps.newHashMap((new ImmutableMap.Builder()).put(Blocks.GRASS_BLOCK, Blocks.DIRT_PATH.getDefaultState()).put(Blocks.DIRT, Blocks.DIRT_PATH.getDefaultState()).put(Blocks.PODZOL, Blocks.DIRT_PATH.getDefaultState()).put(Blocks.COARSE_DIRT, Blocks.DIRT_PATH.getDefaultState()).put(Blocks.MYCELIUM, Blocks.DIRT_PATH.getDefaultState()).put(Blocks.ROOTED_DIRT, Blocks.DIRT_PATH.getDefaultState()).build());
-    Map<Block, Pair<Predicate<ItemUsageContext>, Consumer<ItemUsageContext>>> TILLING_ACTIONS = Maps.newHashMap(ImmutableMap.of(Blocks.GRASS_BLOCK, Pair.of(HoeItem::canTillFarmland, createTillAction(Blocks.FARMLAND.getDefaultState())), Blocks.DIRT_PATH, Pair.of(HoeItem::canTillFarmland, createTillAction(Blocks.FARMLAND.getDefaultState())), Blocks.DIRT, Pair.of(HoeItem::canTillFarmland, createTillAction(Blocks.FARMLAND.getDefaultState())), Blocks.COARSE_DIRT, Pair.of(HoeItem::canTillFarmland, createTillAction(Blocks.DIRT.getDefaultState())), Blocks.ROOTED_DIRT, Pair.of((itemUsageContext) -> {
+    Map<Block, com.mojang.datafixers.util.Pair<Predicate<ItemUsageContext>, Consumer<ItemUsageContext>>> TILLING_ACTIONS = Maps.newHashMap(ImmutableMap.of(Blocks.GRASS_BLOCK, Pair.of(HoeItem::canTillFarmland, createTillAction(Blocks.FARMLAND.getDefaultState())), Blocks.DIRT_PATH, Pair.of(HoeItem::canTillFarmland, createTillAction(Blocks.FARMLAND.getDefaultState())), Blocks.DIRT, Pair.of(HoeItem::canTillFarmland, createTillAction(Blocks.FARMLAND.getDefaultState())), Blocks.COARSE_DIRT, Pair.of(HoeItem::canTillFarmland, createTillAction(Blocks.DIRT.getDefaultState())), Blocks.ROOTED_DIRT, Pair.of((itemUsageContext) -> {
         return true;
     }, createTillAndDropAction(Blocks.DIRT.getDefaultState(), Items.HANGING_ROOTS))));
 
@@ -95,6 +105,44 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
 
     protected AbstractEngineeredTool(AbstractEngineeredTool tool) {
         this(tool.attackDamage, tool.attackSpeed, tool.material, tool.effectiveBlocksList, tool.settings);
+    }
+
+    protected static void registerTool(AbstractEngineeredTool tool, ToolMaterial mat, ToolType toolType) {
+        Optional<net.minecraft.util.Pair<ToolMaterial, ToolType>> typePair = toolTypePairs.stream().filter(p -> { return p.getLeft().equals(mat) && p.getRight().equals(toolType); }).findFirst();
+        if (typePair.isPresent() && !materialToToolDictionary.containsKey(typePair))
+            materialToToolDictionary.put(typePair.get(), tool);
+        else {
+            net.minecraft.util.Pair<ToolMaterial, ToolType> newTypePair = new net.minecraft.util.Pair<>(mat, toolType);
+            toolTypePairs.add(newTypePair);
+            materialToToolDictionary.put(newTypePair, tool);
+        }
+    }
+
+    public static ToolType getToolType(ItemStack itemStack) {
+        if (itemStack == null || itemStack.isEmpty())
+            return ToolType.NADA;
+
+        Item item = itemStack.getItem();
+        if (item instanceof AxeItem)
+            return ToolType.AXE;
+        else if (item instanceof ShovelItem)
+            return ToolType.SHOVEL;
+        else if (item instanceof  SwordItem)
+            return ToolType.SWORD;
+        else if (item instanceof HoeItem)
+            return ToolType.HOE;
+        else if (item instanceof PickaxeItem)
+            return ToolType.PICKAXE;
+
+        return ToolType.NADA;
+    }
+
+    public static AbstractEngineeredTool getRegisteredTool(ToolMaterial mat, ToolType toolType) {
+        Optional<net.minecraft.util.Pair<ToolMaterial, ToolType>> typePair = toolTypePairs.stream().filter(p -> { return p.getLeft() == mat && p.getRight() == toolType; }).findFirst();
+        if (typePair.isPresent())
+            return materialToToolDictionary.containsKey(typePair.get()) ? materialToToolDictionary.get(typePair.get()) : null;
+        else
+            return null;
     }
 
     public void resetAttributeModifiers() {

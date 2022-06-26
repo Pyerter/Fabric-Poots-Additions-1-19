@@ -49,6 +49,8 @@
   "item.pootsadditions.engineered_netherite_axe": "Engineered Netherite Axe",
   "item.pootsadditions.engineered_netherite_hoe": "Engineered Netherite Hoe",
 
+  "item.pootsadditions.engineers_blueprint": "Engineer's Blueprint",
+
   "item.pootsadditions.makeshift_core": "Makeshift Core",
 
   "item.pootsadditions.pautsch_item": "Pautsch",
@@ -59,6 +61,7 @@
 
   "block.pootsadditions.tridi": "Tridiminiumobulator",
   "block.pootsadditions.capture_chamber": "Capture Chamber",
+  "block.pootsadditions.engineering_station": "Engineering Station",
 
   "item.pootsadditions.bobcat_spawn_egg": "Bobcat Spawn Egg",
 

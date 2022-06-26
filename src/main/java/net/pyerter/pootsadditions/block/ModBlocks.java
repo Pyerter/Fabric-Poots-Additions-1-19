@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.block.custom.CaptureChamberBlock;
+import net.pyerter.pootsadditions.block.custom.EngineeringStationBlock;
 import net.pyerter.pootsadditions.block.custom.TridiBlock;
 import net.pyerter.pootsadditions.block.entity.CaptureChamberEntity;
 import net.pyerter.pootsadditions.item.ModItemGroup;
@@ -35,6 +36,9 @@ public class ModBlocks {
 
     public static final Block CAPTURE_CHAMBER = registerBlock("capture_chamber",
             new CaptureChamberBlock(FabricBlockSettings.of(Material.METAL).nonOpaque()), ModItemGroup.SAPPHIRE);
+
+    public static final Block ENGINEERING_STATION = registerBlock("engineering_station",
+            new EngineeringStationBlock(FabricBlockSettings.of(Material.METAL).nonOpaque()), ModItemGroup.SAPPHIRE);
 
     private static Block registerBlock(String name, Block block, ItemGroup tab) {
         registerBlockItem(name, block, tab);

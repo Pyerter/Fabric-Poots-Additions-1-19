@@ -32,8 +32,6 @@ public class TridiScreenHandler extends ScreenHandler {
         inventory.onOpen(playerInventory.player);
         this.propertyDelegate = propertyDelegate;
 
-        PootsAdditions.logInfo("Tridi screen handler sync id: " + syncId);
-
         // add slots
         this.addSlot(new Slot(inventory, 0, 18, 50));
         this.addSlot(new Slot(inventory, 1, 42, 50));

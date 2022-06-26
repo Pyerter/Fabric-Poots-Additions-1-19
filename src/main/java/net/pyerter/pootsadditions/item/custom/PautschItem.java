@@ -5,6 +5,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
@@ -12,21 +13,24 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 import net.pyerter.pootsadditions.PootsAdditions;
+import net.pyerter.pootsadditions.item.ModItems;
 import net.pyerter.pootsadditions.item.inventory.INbtInventory;
 import net.pyerter.pootsadditions.item.inventory.ImplementedInventory;
-import net.pyerter.pootsadditions.mixin.ModServerPlayerEntityPautschScreenMixin;
 import net.pyerter.pootsadditions.screen.handlers.NbtItemNamedScreenHandlerFactory;
 import net.pyerter.pootsadditions.screen.handlers.PautschItemScreenHandler;
 import net.pyerter.pootsadditions.util.IModServerPlayerEntityPautschScreenOpener;
 import net.pyerter.pootsadditions.util.InventoryUtil;
 import org.jetbrains.annotations.Nullable;
 
-public class PautschItem extends Item implements INbtInventory, NbtItemNamedScreenHandlerFactory, NamedScreenHandlerFactory {
+import java.util.List;
+
+public class PautschItem extends Item implements INbtInventory, NamedScreenHandlerFactory {
     public static final String ITEM_INVENTORY_NBT_ID = "pootsadditions.pautsch_inventory";
     public static final Integer PAUTSCH_INVENTORY_SIZE = 27;
 
@@ -90,6 +94,11 @@ public class PautschItem extends Item implements INbtInventory, NbtItemNamedScre
     }
 
     @Override
+    public ActionResult useOnBlock(ItemUsageContext context) {
+        return super.useOnBlock(context);
+    }
+
+    @Override
     public Text getDisplayName() {
         return MutableText.of(new LiteralTextContent("Pautsch Inventory"));
     }
@@ -102,9 +111,12 @@ public class PautschItem extends Item implements INbtInventory, NbtItemNamedScre
     }
 
     @Nullable
-    @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player, ItemStack stack) {
         PootsAdditions.logInfo("Creating menu!");
         return new PautschItemScreenHandler(syncId, inv, stack, this);
+    }
+
+    public static boolean acceptsQuickTransfer(ItemStack itemStack) {
+        return !(itemStack.getItem() instanceof PautschItem);
     }
 }

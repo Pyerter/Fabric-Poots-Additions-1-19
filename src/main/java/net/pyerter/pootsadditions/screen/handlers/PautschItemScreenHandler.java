@@ -10,6 +10,7 @@ import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 import net.pyerter.pootsadditions.PootsAdditions;
@@ -18,13 +19,13 @@ import net.pyerter.pootsadditions.item.ModItems;
 import net.pyerter.pootsadditions.item.custom.PautschItem;
 import net.pyerter.pootsadditions.screen.slot.ModFuelSlot;
 import net.pyerter.pootsadditions.screen.slot.ModResultSlot;
+import net.pyerter.pootsadditions.screen.slot.PautschSlot;
 import org.jetbrains.annotations.Nullable;
 
 public class PautschItemScreenHandler extends ScreenHandler {
     private final Inventory inventory;
     private final ItemStack pautschStack;
     private final PautschItem pautschItem;
-    private final World world;
 
     public PautschItemScreenHandler(int syncId, PlayerInventory playerInventory) {
         this(syncId, playerInventory, new SimpleInventory(PautschItem.PAUTSCH_INVENTORY_SIZE), (playerInventory.player.getMainHandStack()), (PautschItem)ModItems.PAUTSCH_ITEM);
@@ -35,15 +36,12 @@ public class PautschItemScreenHandler extends ScreenHandler {
     }
 
     public PautschItemScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, ItemStack pautschStack, PautschItem pautschItem) {
-        super(ModScreenHandlers.TRIDI_SCREEN_HANDLER, syncId);
+        super(ModScreenHandlers.PAUTSCH_ITEM_SCREEN_HANDLER, syncId);
         checkSize(inventory, PautschItem.PAUTSCH_INVENTORY_SIZE);
         this.inventory = inventory;
         this.pautschStack = pautschStack;
         this.pautschItem = pautschItem;
-        this.world = playerInventory.player.world;
         inventory.onOpen(playerInventory.player);
-
-        PootsAdditions.logInfo("SyncID: " + syncId);
 
         // add slots
         // 9 x 3 grid
@@ -62,21 +60,28 @@ public class PautschItemScreenHandler extends ScreenHandler {
         int offsetY = 18;
         int cols = 9;
         int rows = 3;
+
+        DefaultedList<ItemStack> stacks = pautschItem.getFullInventory(pautschStack);
+
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
-                this.addSlot(new Slot(inventory, row * 9 + col, startX + col * offsetX, starY + row * offsetY));
+                int index = row * 9 + col;
+                inventory.setStack(index, stacks.get(index));
+                this.addSlot(new PautschSlot(inventory, index, startX + col * offsetX, starY + row * offsetY));
             }
         }
     }
 
     @Override
     public void close(PlayerEntity player) {
-        updatePautschInventory();
+        if (player instanceof ServerPlayerEntity)
+            updatePautschInventory();
+
         super.close(player);
     }
 
     public void updatePautschInventory() {
-        if (pautschItem == null || pautschStack == null || world.isClient())
+        if (pautschItem == null || pautschStack == null)
             return;
 
         DefaultedList<ItemStack> invList = DefaultedList.ofSize(PautschItem.PAUTSCH_INVENTORY_SIZE, ItemStack.EMPTY);
@@ -95,16 +100,14 @@ public class PautschItemScreenHandler extends ScreenHandler {
             ItemStack itemStack2 = slot.getStack();
             itemStack = itemStack2.copy();
             // if index corresponds to player inventory
-            if (index >= 27) {
-                if (index >= 27 && index < 54) {
-                    if (!this.insertItem(itemStack2, 54, 63, false)) {
+            if (index >= PautschItem.PAUTSCH_INVENTORY_SIZE) {
+                if (PautschItem.acceptsQuickTransfer(itemStack2)) {
+                    if (!this.insertItem(itemStack2, 0, PautschItem.PAUTSCH_INVENTORY_SIZE, false)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (index >= 54 && index < 63 && !this.insertItem(itemStack2, 27, 54, false)) {
-                    return ItemStack.EMPTY;
                 }
                 // finally, try to quick transfer from the primary slots of machine to inventory
-            } else if (!this.insertItem(itemStack2, 27, 63, false)) {
+            } else if (!this.insertItem(itemStack2, PautschItem.PAUTSCH_INVENTORY_SIZE, PautschItem.PAUTSCH_INVENTORY_SIZE + 36, false)) {
                 return ItemStack.EMPTY;
             }
 

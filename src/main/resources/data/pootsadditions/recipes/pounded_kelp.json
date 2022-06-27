@@ -1,0 +1,13 @@
+{
+  "type": "pootsadditions:engineering_station_refine",
+  "ingredients": [
+    {
+      "item": "minecraft:kelp"
+    }
+  ],
+  "output": {
+    "item": "pootsadditions:pounded_kelp",
+    "count": 2
+  },
+  "hammer_cost": 1
+}

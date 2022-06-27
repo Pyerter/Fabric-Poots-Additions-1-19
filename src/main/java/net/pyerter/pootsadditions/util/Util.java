@@ -1,5 +1,7 @@
 package net.pyerter.pootsadditions.util;
 
+import java.util.ArrayList;
+
 public class Util {
     public static int clamp(int value, int min, int max) {
         value = Math.max(value, min);
@@ -18,5 +20,13 @@ public class Util {
 
     public static boolean pointInRectangleByCorners(double x, double y, int rectX, int rectY, int rectX2, int rectY2) {
         return pointInRectangle(x, y, rectX, rectY, rectX2 - rectX + 1, rectY2 - rectY + 1);
+    }
+
+    public static <T> ArrayList<T> arrayListOf(T ... args) {
+        ArrayList<T> list = new ArrayList<>();
+        for (T arg: args) {
+            list.add(arg);
+        }
+        return list;
     }
 }

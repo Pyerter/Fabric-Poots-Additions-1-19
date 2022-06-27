@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.block.Material;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.item.*;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Rarity;
 import net.pyerter.pootsadditions.PootsAdditions;
 import net.minecraft.util.Identifier;
@@ -154,6 +155,14 @@ public class ModItems {
             new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
     public static final Item COPPER_WIRE_ITEM = registerItem("copper_wire_item",
             new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
+    public static final Item POUNDED_KELP = registerItem("pounded_kelp_item",
+            new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
+    public static final Item STICKY_SLUDGE_ITEM = registerItem("sticky_sludge_item",
+            new DescriptiveItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).maxCount(256),
+                    DescriptiveItem.DescriptionBuilder.start().add("It's uncomfortably", Formatting.GRAY)
+                            .add("STICKY...", Formatting.DARK_GREEN, Formatting.ITALIC).build()));
+    public static final Item PYRIFERA_INSULATION_GOO = registerItem("pyrifera_insulation_goo",
+            new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).recipeRemainder(STICKY_SLUDGE_ITEM)));
 
     public static final Item MAKESHIFT_CORE = registerItem("makeshift_core",
             new MakeshiftCore(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).fireproof().maxCount(1)));

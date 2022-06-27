@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "S": {
+      "item": "pootsadditions:screw_item"
+    },
+    "T": {
+      "item": "minecraft:cobblestone"
+    },
+    "P": {
+      "item": "pootsadditions:pyrifera_insulation_goo"
+    },
+    "C": {
+      "item": "pootsadditions:copper_wire_item"
+    }
+  },
+  "pattern": [
+    "SCS",
+    "PCP",
+    "ICI"
+  ],
+  "result": {
+    "item": "pootsadditions:capture_chamber"
+  }
+}

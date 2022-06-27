@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "S": {
+      "item": "pootsadditions:screw_item"
+    },
+    "G": {
+      "item": "minecraft:glass_pane"
+    },
+    "P": {
+      "item": "pootsadditions:pyrifera_insulation_goo"
+    },
+    "C": {
+      "item": "pootsadditions:copper_wire_item"
+    }
+  },
+  "pattern": [
+    "SCS",
+    "GCG",
+    "IPI"
+  ],
+  "result": {
+    "item": "pootsadditions:makeshift_core"
+  }
+}

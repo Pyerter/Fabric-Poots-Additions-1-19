@@ -142,10 +142,19 @@ public class ModItems {
             new EngineeredHoe(-4, 0f, ModToolMaterials.STARMETAL,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 
+    // TODO: make this item not be consumed in recipes
+    public static final Item ENGINEERS_TRUSTY_HAMMER = registerItem("engineers_trusty_hammer",
+            new EngineersTrustyHammer(6, 0f, new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
+
     public static final Item ENGINEERS_BLUPRINT = registerItem("engineers_blueprint",
             new EngineersBlueprintItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).maxCount(1)));
     public static final Item ENGINEERS_REPAIR_KIT = registerItem("engineers_repair_kit",
             new EngineersRepairKit(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).maxCount(16)));
+
+    public static final Item SCREW_ITEM = registerItem("screw_item",
+            new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
+    public static final Item COPPER_WIRE_ITEM = registerItem("copper_wire_item",
+            new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 
     public static final Item MAKESHIFT_CORE = registerItem("makeshift_core",
             new MakeshiftCore(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).fireproof().maxCount(1)));

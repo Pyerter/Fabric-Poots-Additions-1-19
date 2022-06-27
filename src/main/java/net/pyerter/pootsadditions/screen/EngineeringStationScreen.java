@@ -116,7 +116,10 @@ public class EngineeringStationScreen extends HandledScreen<EngineeringStationSc
         if (hammerClicked) {
             PootsAdditions.logInfo("Clicking hammer!");
             Pair<Boolean, Boolean> successStatus = handler.tryHammer();
-            this.client.interactionManager.clickButton(((EngineeringStationScreenHandler)this.handler).syncId, 0);
+            if (hasShiftDown())
+                this.client.interactionManager.clickButton(((EngineeringStationScreenHandler)this.handler).syncId, 1);
+            else
+                this.client.interactionManager.clickButton(((EngineeringStationScreenHandler)this.handler).syncId, 0);
             holdingMouse = true;
             return successStatus.getLeft();
         }

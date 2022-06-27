@@ -116,10 +116,14 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
         resultingStack = ItemStack.fromNbt(nbt.getCompound("engineering_station.resulting_stack"));
     }
 
+    public Pair<Boolean, Boolean> hammerIt() {
+        return hammerIt(false);
+    }
+
     // Left boolean: if can hammer
     // Right boolean: if result was made
     // Left boolean implies right boolean
-    public Pair<Boolean, Boolean> hammerIt() {
+    public Pair<Boolean, Boolean> hammerIt(boolean stackCraft) {
         PootsAdditions.logInfo("Trying to hammer!");
         Pair<Optional<ItemStack>, Boolean[]> craftingResult = getCraftingResult();
         if (!craftingResult.getLeft().isPresent()) {
@@ -127,15 +131,26 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
             return new Pair<>(false, false);
         }
 
+        boolean shouldStackCraft = stackCraft && !craftingResult.getRight()[0] &&
+                !craftingResult.getRight()[1] && !craftingResult.getRight()[2] &&
+                craftingResult.getRight()[3];
+
         hammered++;
         PootsAdditions.logInfo("Hammering!");
-        world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_ANVIL_PLACE, SoundCategory.BLOCKS, 1f, 1f, 0);
         if (hammered >= HAMMERS_PER_CRAFT) {
-            craftResult(craftingResult.getLeft().get(), craftingResult.getRight());
+            if (shouldStackCraft) {
+                craftResultMax(craftingResult.getLeft().get(), craftingResult.getRight());
+                world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_ANVIL_USE, SoundCategory.BLOCKS, 1f, 1f, 0);
+            } else {
+                craftResult(craftingResult.getLeft().get(), craftingResult.getRight());
+                world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_ANVIL_PLACE, SoundCategory.BLOCKS, 1f, 1f, 0);
+            }
             resetHammeredProgress();
             successfulBuild = 1;
             // world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_ANVIL_USE, SoundCategory.BLOCKS, 1f, 1f, 0);
             return new Pair<>(true, true);
+        } else {
+            world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_ANVIL_PLACE, SoundCategory.BLOCKS, 1f, 1f, 0);
         }
         return new Pair<>(true, false);
     }
@@ -153,6 +168,36 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
             inventory.set(2, stack);
         else if (inventory.get(2).isItemEqual(stack))
             inventory.get(2).increment(stack.getCount());
+        return true;
+    }
+
+    public boolean craftResultMax(ItemStack stack, Boolean[] usedSlots) {
+        if (stack == null || stack.isEmpty() || usedSlots.length != 4)
+            return false;
+
+        Optional<EngineeringStationRefineRecipe> recipe = hasRefineRecipe(this);
+        if (!recipe.isPresent() || !recipe.get().getOutput().isItemEqual(stack))
+            return false;
+
+        ItemStack recipeResult = recipe.get().getOutput();
+        int maxStackCount = recipeResult.getMaxCount();
+        int repeatTimes = maxStackCount / recipeResult.getCount();
+        for (int i = 0; i < 4; i++) {
+            if (usedSlots[i])
+                repeatTimes = Math.min(repeatTimes, inventory.get(i).getCount());
+        }
+        stack.setCount(stack.getCount() * repeatTimes);
+
+        for (int i = 0; i < 4; i++) {
+            if (usedSlots[i])
+                inventory.get(i).decrement(repeatTimes);
+        }
+
+        if (inventory.get(2).isEmpty())
+            inventory.set(2, stack);
+        else if (inventory.get(2).isItemEqual(stack))
+            inventory.get(2).increment(stack.getCount());
+
         return true;
     }
 

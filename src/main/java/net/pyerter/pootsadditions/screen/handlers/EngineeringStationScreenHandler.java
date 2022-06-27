@@ -101,9 +101,13 @@ public class EngineeringStationScreenHandler extends ScreenHandler {
     }
 
     public Pair<Boolean, Boolean> tryHammer() {
+        return tryHammer(false);
+    }
+
+    public Pair<Boolean, Boolean> tryHammer(boolean stackCraft) {
         PootsAdditions.logInfo("Trying hammer?");
         if (station != null) {
-            return station.hammerIt();
+            return station.hammerIt(stackCraft);
         } else {
             PootsAdditions.logInfo("It's null!");
             return new Pair<>(false, false);
@@ -128,6 +132,8 @@ public class EngineeringStationScreenHandler extends ScreenHandler {
     @Override
     public boolean onButtonClick(PlayerEntity player, int id) {
         if (id == 0 && tryHammer().getLeft())
+            return true;
+        else if (id == 1 && tryHammer(true).getLeft())
             return true;
         return super.onButtonClick(player, id);
     }

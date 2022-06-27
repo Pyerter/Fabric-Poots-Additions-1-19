@@ -210,8 +210,20 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
         return false;
     }
 
+    public boolean tryRepairItem(ItemStack stack) {
+        stack.setDamage(0);
+        setAttributesUpdated(stack, true);
+        setPreviouslyWorking(stack, true);
+        onItemNowSuitable(stack);
+        return true;
+    }
+
     public void onItemNoLongerSuitable(ItemStack stack, LivingEntity miner) {
         PootsAdditions.logInfo("No longer suitable!");
+    }
+
+    public void onItemNowSuitable(ItemStack stack) {
+        PootsAdditions.logInfo("Item now suitable!");
     }
 
     public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot slot) {

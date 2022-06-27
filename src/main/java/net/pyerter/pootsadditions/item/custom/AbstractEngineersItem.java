@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 public abstract class AbstractEngineersItem extends Item {
     public enum ENGINEERS_CRAFT_TYPE {
         ENGINEERIFY,
+        REPAIR,
         NADA
     }
 

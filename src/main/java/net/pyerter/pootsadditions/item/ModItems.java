@@ -144,6 +144,8 @@ public class ModItems {
 
     public static final Item ENGINEERS_BLUPRINT = registerItem("engineers_blueprint",
             new EngineersBlueprintItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).maxCount(1)));
+    public static final Item ENGINEERS_REPAIR_KIT = registerItem("engineers_repair_kit",
+            new EngineersRepairKit(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).maxCount(16)));
 
     public static final Item MAKESHIFT_CORE = registerItem("makeshift_core",
             new MakeshiftCore(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).fireproof().maxCount(1)));

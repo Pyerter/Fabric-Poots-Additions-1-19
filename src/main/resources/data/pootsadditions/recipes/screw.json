@@ -1,15 +1,13 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "pootsadditions:engineering_station_refine",
   "ingredients": [
     {
       "item": "minecraft:iron_ingot"
-    },
-    {
-      "item": "pootsadditions:engineers_trusty_hammer"
     }
   ],
-  "result": {
+  "output": {
     "item": "pootsadditions:screw_item",
     "count": 4
-  }
+  },
+  "hammer_cost": 1
 }

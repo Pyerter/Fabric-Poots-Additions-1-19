@@ -142,9 +142,8 @@ public class ModItems {
             new EngineeredHoe(-4, 0f, ModToolMaterials.STARMETAL,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 
-    // TODO: make this item not be consumed in recipes
     public static final Item ENGINEERS_TRUSTY_HAMMER = registerItem("engineers_trusty_hammer",
-            new EngineersTrustyHammer(6, 0f, new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
+            new EngineersTrustyHammer(3, -2f, new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 
     public static final Item ENGINEERS_BLUPRINT = registerItem("engineers_blueprint",
             new EngineersBlueprintItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).maxCount(1)));

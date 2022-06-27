@@ -5,6 +5,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.NamedScreenHandlerFactory;
@@ -24,21 +25,25 @@ import net.pyerter.pootsadditions.item.ModItems;
 import net.pyerter.pootsadditions.item.ModToolMaterials;
 import net.pyerter.pootsadditions.item.custom.AbstractEngineeredTool;
 import net.pyerter.pootsadditions.item.custom.AbstractEngineersItem;
+import net.pyerter.pootsadditions.item.custom.EngineersTrustyHammer;
 import net.pyerter.pootsadditions.item.custom.MakeshiftCore;
 import net.pyerter.pootsadditions.item.inventory.ImplementedInventory;
+import net.pyerter.pootsadditions.recipe.EngineeringStationRefineRecipe;
 import net.pyerter.pootsadditions.screen.handlers.EngineeringStationScreenHandler;
 import net.pyerter.pootsadditions.util.Util;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class EngineeringStationEntity extends BlockEntity implements NamedScreenHandlerFactory, ImplementedInventory {
     private static final String DISPLAY_NAME = "Engineering Station";
     private static List<ToolMaterial> materials = null;
-    private static final List<Item> ENGINEERS_ITEMS = List.of(ModItems.ENGINEERS_BLUPRINT);
     public static List<ToolMaterial> getMaterials() { if(materials == null) materials = updateToolMaterials(); return materials; }
-    public static final int ENGINEERING_STATION_INVENTORY_SIZE = 4;
+    private static final List<Item> ENGINEERS_ITEMS = List.of(ModItems.ENGINEERS_BLUPRINT);
+    public static final List<Item> acceptedRefiningMaterials = new ArrayList<>();
+    public static final int ENGINEERING_STATION_INVENTORY_SIZE = 5;
     private final DefaultedList<ItemStack> inventory =
             DefaultedList.ofSize(ENGINEERING_STATION_INVENTORY_SIZE, ItemStack.EMPTY);
 
@@ -140,10 +145,14 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
             return false;
 
         for (int i = 0; i < 4; i++) {
-            inventory.get(i).decrement(1);
+            if (usedSlots[i])
+                inventory.get(i).decrement(1);
         }
 
-        inventory.set(2, stack);
+        if (inventory.get(2).isEmpty())
+            inventory.set(2, stack);
+        else if (inventory.get(2).isItemEqual(stack))
+            inventory.get(2).increment(stack.getCount());
         return true;
     }
 
@@ -165,6 +174,10 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
         if (resultingStack.isPresent())
             return new Pair(resultingStack, new Boolean[]{true, false, true, false});
 
+        Optional<EngineeringStationRefineRecipe> refineRecipe = hasRefineRecipe(this);
+        if (refineRecipe.isPresent())
+            return new Pair(Optional.of(refineRecipe.get().getOutput()), new Boolean[]{false, false, false, true});
+
         return new Pair<>(Optional.empty(), null);
     }
 
@@ -182,6 +195,29 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
                 return resultTool != null ? Optional.of(new ItemStack(resultTool)) : Optional.empty();
             default: return Optional.empty();
         }
+    }
+
+    private static Optional<EngineeringStationRefineRecipe> hasRefineRecipe(EngineeringStationEntity entity) {
+        World world = entity.world;
+        SimpleInventory inventory = new SimpleInventory(entity.inventory.size());
+        for (int i = 0; i < inventory.size(); i++) { inventory.setStack(i, entity.getStack(i)); }
+
+        Optional<EngineeringStationRefineRecipe> match = world.getRecipeManager()
+                .getFirstMatch(EngineeringStationRefineRecipe.Type.INSTANCE, inventory, world);
+
+        if (match.isPresent() && canInsertAmountIntoOutputSlot(inventory)
+                && canInsertItemIntoOutputSlot(inventory, match.get().getOutput())) {
+            return match;
+        }
+        return Optional.empty();
+    }
+
+    private static boolean canInsertItemIntoOutputSlot(SimpleInventory inventory, ItemStack output) {
+        return inventory.getStack(2).getItem() == output.getItem() || inventory.getStack(2).isEmpty();
+    }
+
+    private static boolean canInsertAmountIntoOutputSlot(SimpleInventory inventory) {
+        return inventory.getStack(2).getMaxCount() > inventory.getStack(2).getCount();
     }
 
     public static boolean acceptsQuickTransfer(ItemStack itemStack) {
@@ -217,11 +253,20 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
 
     /** Slot 3: Materials slot is the top slot **/
     public static boolean acceptsQuickTransferMaterialSlot(ItemStack itemStack) {
-        return false;
+        return acceptedRefiningMaterials.contains(itemStack.getItem());
     }
     /** Slot 3: Materials slot is the top slot **/
     public ItemStack getMaterialSlot() {
         return inventory.get(3);
+    }
+
+    /** Slot 4: Hammer slot is the far left slot **/
+    public static boolean acceptsQuickTransferHammerSlot(ItemStack itemStack) {
+        return itemStack.getItem() instanceof EngineersTrustyHammer;
+    }
+    /** Slot 4: Hammer slot is the far left slot **/
+    public ItemStack getHammerSlot() {
+        return inventory.get(4);
     }
 
     public static boolean acceptsQuickTransfer(ItemStack itemStack, Integer i) {
@@ -230,6 +275,7 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
             case 1: return acceptsQuickTransferAugmentSlot(itemStack);
             case 2: return acceptsQuickTransferEngineeringSlot(itemStack);
             case 3: return acceptsQuickTransferMaterialSlot(itemStack);
+            case 4: return acceptsQuickTransferHammerSlot(itemStack);
             default: return false;
         }
     }

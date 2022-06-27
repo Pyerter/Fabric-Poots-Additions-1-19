@@ -48,6 +48,7 @@ public class EngineeringStationScreenHandler extends ScreenHandler {
         this.addSlot(new PickySlot(inventory, 1, 102, 32, pickyPredicate, 1)); // right slot
         this.addSlot(new PickySlot(inventory, 2, 78, 53, pickyPredicate, 2)); // bottom slot
         this.addSlot(new PickySlot(inventory, 3, 78, 11, pickyPredicate, 3)); // top slot
+        this.addSlot(new PickySlot(inventory, 4, 19, 32, pickyPredicate, 4)); // far left slot
 
         addPlayerInventory(playerInventory);
         addPlayerHotbar(playerInventory);
@@ -64,18 +65,22 @@ public class EngineeringStationScreenHandler extends ScreenHandler {
             ItemStack itemStack2 = slot.getStack();
             itemStack = itemStack2.copy();
             // if index corresponds to player inventory
-            if (index != 3 && index != 2 && index != 1 && index != 0) {
-                if (this.insertItem(itemStack2, 0, 4, false)) {
+            if (index >= EngineeringStationEntity.ENGINEERING_STATION_INVENTORY_SIZE) {
+                // try inserting into the last slot (hammer) first, then the first 4 slots
+                if (this.insertItem(itemStack2, EngineeringStationEntity.ENGINEERING_STATION_INVENTORY_SIZE - 1, EngineeringStationEntity.ENGINEERING_STATION_INVENTORY_SIZE, false)
+                || this.insertItem(itemStack2, 0, EngineeringStationEntity.ENGINEERING_STATION_INVENTORY_SIZE - 1, false)) {
                     // :)
-                } else if (index >= 4 && index < 31) {
-                    if (!this.insertItem(itemStack2, 31, 40, false)) {
+                } else if (index >= EngineeringStationEntity.ENGINEERING_STATION_INVENTORY_SIZE && index < EngineeringStationEntity.ENGINEERING_STATION_INVENTORY_SIZE + 27) {
+                    if (!this.insertItem(itemStack2, EngineeringStationEntity.ENGINEERING_STATION_INVENTORY_SIZE + 27, EngineeringStationEntity.ENGINEERING_STATION_INVENTORY_SIZE + 36, false)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (index >= 31 && index < 40 && !this.insertItem(itemStack2, 4, 31, false)) {
+                } else if (index >= EngineeringStationEntity.ENGINEERING_STATION_INVENTORY_SIZE + 27 &&
+                        index < EngineeringStationEntity.ENGINEERING_STATION_INVENTORY_SIZE + 36 &&
+                        !this.insertItem(itemStack2, EngineeringStationEntity.ENGINEERING_STATION_INVENTORY_SIZE, EngineeringStationEntity.ENGINEERING_STATION_INVENTORY_SIZE + 27, false)) {
                     return ItemStack.EMPTY;
                 }
             // finally, try to quick transfer from the primary slots of machine to inventory
-            } else if (!this.insertItem(itemStack2, 4, 40, false)) {
+            } else if (!this.insertItem(itemStack2, EngineeringStationEntity.ENGINEERING_STATION_INVENTORY_SIZE, EngineeringStationEntity.ENGINEERING_STATION_INVENTORY_SIZE + 36, false)) {
                 return ItemStack.EMPTY;
             }
 

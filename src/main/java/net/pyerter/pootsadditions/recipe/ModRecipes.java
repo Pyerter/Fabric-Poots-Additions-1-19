@@ -8,9 +8,13 @@ public class ModRecipes {
     public static void registerRecipes() {
         Registry.register(Registry.RECIPE_SERIALIZER, new Identifier(PootsAdditions.MOD_ID, TridiRecipe.Serializer.ID),
                 TridiRecipe.Serializer.INSTANCE);
-
         Registry.register(Registry.RECIPE_TYPE, new Identifier(PootsAdditions.MOD_ID, TridiRecipe.Type.ID),
                 TridiRecipe.Type.INSTANCE);
+
+        Registry.register(Registry.RECIPE_SERIALIZER, new Identifier(PootsAdditions.MOD_ID, EngineeringStationRefineRecipe.Serializer.ID),
+                EngineeringStationRefineRecipe.Serializer.INSTANCE);
+        Registry.register(Registry.RECIPE_TYPE, new Identifier(PootsAdditions.MOD_ID, EngineeringStationRefineRecipe.Type.ID),
+                EngineeringStationRefineRecipe.Type.INSTANCE);
     }
 
 }

@@ -92,6 +92,18 @@ public class InventoryUtil {
         return getItemsFromNbtList(nbtList, stacks);
     }
 
+    public static boolean writeItemIntoNbt(NbtCompound nbt, ItemStack stack, String itemID) {
+        NbtCompound itemNbt = stack.writeNbt(new NbtCompound());
+        nbt.put(itemID, itemNbt);
+        return true;
+    }
+
+    public static ItemStack getItemFromNbt(NbtCompound nbt, String itemID) {
+        NbtCompound itemNbt = nbt.getCompound(itemID);
+        ItemStack stack = ItemStack.fromNbt(itemNbt);
+        return stack;
+    }
+
     /**
      * Tries to merge as many things from the second list to the first. Returns false if the entire list is not merged.
      * **/

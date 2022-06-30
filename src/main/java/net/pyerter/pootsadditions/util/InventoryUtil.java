@@ -98,7 +98,7 @@ public class InventoryUtil {
         return true;
     }
 
-    public static ItemStack getItemFromNbt(NbtCompound nbt, String itemID) {
+    public static ItemStack readItemFromNbt(NbtCompound nbt, String itemID) {
         NbtCompound itemNbt = nbt.getCompound(itemID);
         ItemStack stack = ItemStack.fromNbt(itemNbt);
         return stack;

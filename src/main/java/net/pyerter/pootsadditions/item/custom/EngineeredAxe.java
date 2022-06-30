@@ -1,11 +1,10 @@
 package net.pyerter.pootsadditions.item.custom;
 
-import net.minecraft.block.Block;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.ToolMaterial;
 import net.minecraft.tag.BlockTags;
-import net.minecraft.tag.TagKey;
 import net.minecraft.util.ActionResult;
+import net.pyerter.pootsadditions.item.custom.engineering.AbstractEngineeredTool;
 
 public class EngineeredAxe extends AbstractEngineeredTool {
     public EngineeredAxe(float attackDamage, float attackSpeed, ToolMaterial material, Settings settings) {

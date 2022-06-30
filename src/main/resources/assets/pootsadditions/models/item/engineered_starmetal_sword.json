@@ -1,5 +1,5 @@
 {
-  "parent": "item/generated",
+  "parent": "item/handheld",
   "textures": {
     "layer0": "pootsadditions:item/starmetal_sword",
     "layer1": "pootsadditions:item/engineered_sword_special_layer_1"

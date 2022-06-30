@@ -6,7 +6,7 @@
     }
   ],
   "output": {
-    "item": "pootsadditions:pounded_kelp",
+    "item": "pootsadditions:pounded_kelp_item",
     "count": 2
   },
   "hammer_cost": 1

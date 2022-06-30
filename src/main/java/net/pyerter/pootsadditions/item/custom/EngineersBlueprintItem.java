@@ -1,5 +1,7 @@
 package net.pyerter.pootsadditions.item.custom;
 
+import net.pyerter.pootsadditions.item.custom.engineering.AbstractEngineersItem;
+
 public class EngineersBlueprintItem extends AbstractEngineersItem {
     public EngineersBlueprintItem(Settings settings) {
         super(settings);

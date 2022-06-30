@@ -23,14 +23,12 @@ import net.minecraft.world.World;
 import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.item.ModItems;
 import net.pyerter.pootsadditions.item.ModToolMaterials;
-import net.pyerter.pootsadditions.item.custom.AbstractEngineeredTool;
-import net.pyerter.pootsadditions.item.custom.AbstractEngineersItem;
+import net.pyerter.pootsadditions.item.custom.engineering.AbstractEngineeredTool;
+import net.pyerter.pootsadditions.item.custom.engineering.AbstractEngineersItem;
 import net.pyerter.pootsadditions.item.custom.EngineersTrustyHammer;
-import net.pyerter.pootsadditions.item.custom.MakeshiftCore;
 import net.pyerter.pootsadditions.item.inventory.ImplementedInventory;
 import net.pyerter.pootsadditions.recipe.EngineeringStationRefineRecipe;
 import net.pyerter.pootsadditions.screen.handlers.EngineeringStationScreenHandler;
-import net.pyerter.pootsadditions.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;

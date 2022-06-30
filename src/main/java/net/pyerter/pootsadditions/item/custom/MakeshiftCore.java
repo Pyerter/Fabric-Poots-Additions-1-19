@@ -21,6 +21,8 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.pyerter.pootsadditions.block.entity.CaptureChamberEntity;
+import net.pyerter.pootsadditions.item.Chargeable;
 import net.pyerter.pootsadditions.util.Util;
 import org.apache.logging.log4j.core.appender.rolling.action.Action;
 import org.jetbrains.annotations.Nullable;
@@ -75,6 +77,27 @@ public class MakeshiftCore extends Item {
             return stack.getNbt().getInt("pootsadditions.core_charge");
         } else {
             return setCharge(stack, 0);
+        }
+    }
+
+    public static int tryTransferCharge(ItemStack stack, ItemStack targetStack) {
+        if (!targetStack.isEmpty() && targetStack.getItem() instanceof Chargeable) {
+            Chargeable chargeable = (Chargeable) targetStack.getItem();
+            int availablePower = Util.clamp(getCharge(stack), 0, CaptureChamberEntity.MAX_CHARGE_TRANSFER_RATE);
+            int transferedPower = chargeable.tryCharge(targetStack, availablePower);
+            addCharge(stack, -transferedPower);
+            return transferedPower;
+        }
+        return 0;
+    }
+
+    @Override
+    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
+        super.inventoryTick(stack, world, entity, slot, selected);
+        if (!world.isClient() && entity instanceof PlayerEntity) {
+            PlayerEntity player = (PlayerEntity) entity;
+            ItemStack oppositeStack = player.getMainHandStack().isItemEqual(stack) ? player.getMainHandStack() : player.getOffHandStack();
+            tryTransferCharge(stack, oppositeStack);
         }
     }
 

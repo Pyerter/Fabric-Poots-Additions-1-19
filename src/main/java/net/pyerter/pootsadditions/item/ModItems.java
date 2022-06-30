@@ -48,7 +48,7 @@ public class ModItems {
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE).fireproof()));
 
     public static final Item ENGINEERED_STONE_SWORD = registerItem("engineered_stone_sword",
-            new EngineeredSword(3, 1f, ToolMaterials.STONE,
+            new EngineeredSword(3, -2.4f, ToolMaterials.STONE,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
     public static final Item ENGINEERED_STONE_SHOVEL = registerItem("engineered_stone_shovel",
             new EngineeredShovel(1.5f, -3f, ToolMaterials.STONE,
@@ -64,7 +64,7 @@ public class ModItems {
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 
     public static final Item ENGINEERED_IRON_SWORD = registerItem("engineered_iron_sword",
-            new EngineeredSword(3, 1f, ToolMaterials.IRON,
+            new EngineeredSword(3, -2.4f, ToolMaterials.IRON,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
     public static final Item ENGINEERED_IRON_SHOVEL = registerItem("engineered_iron_shovel",
             new EngineeredShovel(1.5f, -3f, ToolMaterials.IRON,
@@ -80,7 +80,7 @@ public class ModItems {
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 
     public static final Item ENGINEERED_GOLDEN_SWORD = registerItem("engineered_golden_sword",
-            new EngineeredSword(3, 1f, ToolMaterials.GOLD,
+            new EngineeredSword(3, -2.4f, ToolMaterials.GOLD,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
     public static final Item ENGINEERED_GOLDEN_SHOVEL = registerItem("engineered_golden_shovel",
             new EngineeredShovel(1.5f, -3f, ToolMaterials.GOLD,
@@ -96,7 +96,7 @@ public class ModItems {
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 
     public static final Item ENGINEERED_DIAMOND_SWORD = registerItem("engineered_diamond_sword",
-            new EngineeredSword(3, 1f, ToolMaterials.DIAMOND,
+            new EngineeredSword(3, -2.4f, ToolMaterials.DIAMOND,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
     public static final Item ENGINEERED_DIAMOND_SHOVEL = registerItem("engineered_diamond_shovel",
             new EngineeredShovel(1.5f, -3f, ToolMaterials.DIAMOND,
@@ -112,7 +112,7 @@ public class ModItems {
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 
     public static final Item ENGINEERED_NETHERITE_SWORD = registerItem("engineered_netherite_sword",
-            new EngineeredSword(3, 1f, ToolMaterials.NETHERITE,
+            new EngineeredSword(3, -2.4f, ToolMaterials.NETHERITE,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
     public static final Item ENGINEERED_NETHERITE_SHOVEL = registerItem("engineered_netherite_shovel",
             new EngineeredShovel(1.5f, -3f, ToolMaterials.NETHERITE,
@@ -145,6 +145,9 @@ public class ModItems {
 
     public static final Item ENGINEERS_TRUSTY_HAMMER = registerItem("engineers_trusty_hammer",
             new EngineersTrustyHammer(3, -2f, new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
+
+    public static final Item MALICE_SCYTHE = registerItem("malice_scythe",
+            new MaliceScythe(5f, -1f, new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 
     public static final Item ENGINEERS_BLUPRINT = registerItem("engineers_blueprint",
             new EngineersBlueprintItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).maxCount(1)));

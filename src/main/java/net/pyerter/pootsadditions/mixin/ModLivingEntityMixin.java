@@ -1,12 +1,18 @@
 package net.pyerter.pootsadditions.mixin;
 
 import com.google.common.collect.Maps;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.AttributeContainer;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.item.StackDependentAttributeModifierItem;
@@ -17,6 +23,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.Iterator;
+import java.util.List;
 
 @Mixin(LivingEntity.class)
 public abstract class ModLivingEntityMixin implements IModLivingEntityEquipmentRefresher {

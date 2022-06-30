@@ -1,5 +1,5 @@
 {
-  "parent": "item/generated",
+  "parent": "item/handheld",
   "textures": {
     "layer0": "item/diamond_axe",
     "layer1": "pootsadditions:item/engineered_axe_layer_1"

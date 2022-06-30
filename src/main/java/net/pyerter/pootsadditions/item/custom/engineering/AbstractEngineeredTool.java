@@ -1,4 +1,4 @@
-package net.pyerter.pootsadditions.item.custom;
+package net.pyerter.pootsadditions.item.custom.engineering;
 
 import com.google.common.collect.*;
 import com.mojang.datafixers.util.Pair;
@@ -25,13 +25,14 @@ import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.block.ModBlockTags;
+import net.pyerter.pootsadditions.item.SpecialWeaponWithAbility;
 import net.pyerter.pootsadditions.item.StackDependentAttributeModifierItem;
 
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public abstract class AbstractEngineeredTool extends Item implements Vanishable, StackDependentAttributeModifierItem {
+public abstract class AbstractEngineeredTool extends Item implements Vanishable, StackDependentAttributeModifierItem, SpecialWeaponWithAbility {
     public static final String ATTRIBUTES_UPDATED_NBT_ID = "pootsadditions.attributesUpdated";
     public static final String PREVIOUSLY_WORKING_NBT_ID = "pootsadditions.previouslyWorking";
 
@@ -466,7 +467,9 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
 
     /** Damaging Item Methods **/
 
-
+    public boolean tryUseWeaponAbility(Entity target, PlayerEntity attacker) {
+        return false;
+    }
 
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {

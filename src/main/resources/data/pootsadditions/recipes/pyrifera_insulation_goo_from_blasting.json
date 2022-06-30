@@ -4,7 +4,7 @@
   "experience": 0.25,
   "group": "engineering",
   "ingredient": {
-    "item": "pootsadditions:pounded_kelp"
+    "item": "pootsadditions:pounded_kelp_item"
   },
   "result": "pootsadditions:pyrifera_insulation_goo"
 }

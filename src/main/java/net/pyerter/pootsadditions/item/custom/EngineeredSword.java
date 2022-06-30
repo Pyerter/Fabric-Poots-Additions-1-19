@@ -1,11 +1,13 @@
 package net.pyerter.pootsadditions.item.custom;
 
-import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.ToolMaterial;
-import net.minecraft.tag.TagKey;
 import net.minecraft.util.ActionResult;
 import net.pyerter.pootsadditions.block.ModBlockTags;
+import net.pyerter.pootsadditions.item.custom.engineering.AbstractEngineeredTool;
+import net.pyerter.pootsadditions.util.IModPlayerEntityWeaponAbilityTriggerer;
 
 public class EngineeredSword extends AbstractEngineeredTool {
     public EngineeredSword(float attackDamage, float attackSpeed, ToolMaterial material, Settings settings) {
@@ -17,5 +19,10 @@ public class EngineeredSword extends AbstractEngineeredTool {
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
         return super.useOnBlock(context);
+    }
+
+    @Override
+    public boolean tryUseWeaponAbility(Entity target, PlayerEntity attacker) {
+        return ((IModPlayerEntityWeaponAbilityTriggerer)attacker).trySwordSweepAttack(target);
     }
 }

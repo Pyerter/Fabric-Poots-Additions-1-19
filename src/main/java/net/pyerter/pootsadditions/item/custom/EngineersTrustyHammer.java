@@ -5,17 +5,14 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.OreBlock;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ToolMaterial;
 import net.minecraft.item.ToolMaterials;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.TagKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import net.pyerter.pootsadditions.item.custom.engineering.AbstractEngineeredTool;
 import net.pyerter.pootsadditions.util.Util;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class EngineersTrustyHammer extends AbstractEngineeredTool {
 

@@ -38,6 +38,7 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
 
     public static final Map<net.minecraft.util.Pair<ToolMaterial, ToolType>, AbstractEngineeredTool> materialToToolDictionary = new HashMap<>();
     public static final List<net.minecraft.util.Pair<ToolMaterial, ToolType>> toolTypePairs = new ArrayList<>();
+    public static final Map<Item, ToolMaterial> itemToMaterial = new HashMap<>();
 
     public enum ToolType {
         AXE,
@@ -60,6 +61,7 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
     protected Settings settings;
 
     protected ToolMaterial material;
+    protected ToolType toolType;
 
     protected float miningSpeed;
     protected float attackDamage;
@@ -84,6 +86,7 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
 
         this.settings = settings;
         this.material = material;
+        toolType = ToolType.NADA;
         effectiveBlocksList = effectiveBlocks;
         this.miningSpeed = material.getMiningSpeedMultiplier();
         this.attackDamage = attackDamage + material.getAttackDamage();
@@ -109,6 +112,12 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
     }
 
     protected static void registerTool(AbstractEngineeredTool tool, ToolMaterial mat, ToolType toolType) {
+        Arrays.stream(mat.getRepairIngredient().getMatchingStacks()).forEach(matStack -> {
+                    if (!itemToMaterial.containsKey(matStack.getItem())) {
+                        itemToMaterial.put(matStack.getItem(), mat);
+                    }
+                });
+
         Optional<net.minecraft.util.Pair<ToolMaterial, ToolType>> typePair = toolTypePairs.stream().filter(p -> { return p.getLeft().equals(mat) && p.getRight().equals(toolType); }).findFirst();
         if (typePair.isPresent() && !materialToToolDictionary.containsKey(typePair))
             materialToToolDictionary.put(typePair.get(), tool);
@@ -144,6 +153,39 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
             return materialToToolDictionary.containsKey(typePair.get()) ? materialToToolDictionary.get(typePair.get()) : null;
         else
             return null;
+    }
+
+    public static net.minecraft.util.Pair<ToolMaterial, ToolType> tryGetToolInfo(ItemStack stack) {
+        if (stack.getItem() instanceof AbstractEngineeredTool) {
+            AbstractEngineeredTool tool = (AbstractEngineeredTool) stack.getItem();
+            net.minecraft.util.Pair<ToolMaterial, ToolType> typePair = new net.minecraft.util.Pair<>(tool.material, tool.toolType);
+            return typePair;
+        }
+        return null;
+    }
+
+    public static ToolMaterial getToolMaterialFromIngredient(ItemStack stack) {
+        if (itemToMaterial.containsKey(stack.getItem())) {
+            return itemToMaterial.get(stack.getItem());
+        }
+        return null;
+    }
+
+    public static boolean isAcceptedToolIngredient(ItemStack stack) {
+        return itemToMaterial.containsKey(stack.getItem());
+    }
+
+    public static boolean transferToolData(ItemStack original, ItemStack target) {
+        AbstractEngineeredTool originalTool = original.getItem() instanceof AbstractEngineeredTool ? (AbstractEngineeredTool) original.getItem() : null;
+        AbstractEngineeredTool targetTool = target.getItem() instanceof AbstractEngineeredTool ? (AbstractEngineeredTool) target.getItem() : null;
+        if (targetTool == null || originalTool == null)
+            return false;
+
+        return originalTool.copyToolDataTo(original, target);
+    }
+
+    public boolean copyToolDataTo(ItemStack original, ItemStack target) {
+        return true;
     }
 
     public void resetAttributeModifiers() {

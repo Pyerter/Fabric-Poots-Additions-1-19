@@ -13,6 +13,7 @@ public class EngineeredSword extends AbstractEngineeredTool {
     public EngineeredSword(float attackDamage, float attackSpeed, ToolMaterial material, Settings settings) {
         super(attackDamage, attackSpeed, material, ModBlockTags.SWORD_MINEABLE, settings);
 
+        toolType = ToolType.SWORD;
         super.registerTool(this, material, ToolType.SWORD);
     }
 

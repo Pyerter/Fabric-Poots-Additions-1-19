@@ -11,6 +11,7 @@ public class EngineeredPickaxe extends AbstractEngineeredTool {
     public EngineeredPickaxe(float attackDamage, float attackSpeed, ToolMaterial material, Settings settings) {
         super(attackDamage, attackSpeed, material, BlockTags.PICKAXE_MINEABLE, settings);
 
+        toolType = ToolType.PICKAXE;
         super.registerTool(this, material, ToolType.PICKAXE);
     }
 

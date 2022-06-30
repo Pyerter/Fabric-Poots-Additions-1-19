@@ -11,6 +11,7 @@ public class EngineeredShovel extends AbstractEngineeredTool {
     public EngineeredShovel(float attackDamage, float attackSpeed, ToolMaterial material, Settings settings) {
         super(attackDamage, attackSpeed, material, BlockTags.SHOVEL_MINEABLE, settings);
 
+        toolType = ToolType.SHOVEL;
         super.registerTool(this, material, ToolType.SHOVEL);
     }
 

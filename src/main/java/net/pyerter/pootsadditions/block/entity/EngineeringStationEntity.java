@@ -31,6 +31,7 @@ import net.pyerter.pootsadditions.recipe.EngineeringStationRefineRecipe;
 import net.pyerter.pootsadditions.screen.handlers.EngineeringStationScreenHandler;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -217,6 +218,10 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
         if (resultingStack.isPresent())
             return new Pair(resultingStack, new Boolean[]{true, false, true, false});
 
+        resultingStack = canUpgradeEngineerTool(getMaterialSlot(), getEngineeringSlot());
+        if (resultingStack.isPresent())
+            return new Pair(resultingStack, new Boolean[]{false, false, true, true});
+
         Optional<EngineeringStationRefineRecipe> refineRecipe = hasRefineRecipe(this);
         if (refineRecipe.isPresent())
             return new Pair(Optional.of(refineRecipe.get().getOutput()), new Boolean[]{false, false, false, true});
@@ -238,6 +243,28 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
                 return resultTool != null ? Optional.of(new ItemStack(resultTool)) : Optional.empty();
             default: return Optional.empty();
         }
+    }
+
+    public static Optional<ItemStack> canUpgradeEngineerTool(ItemStack materialStack, ItemStack engineerStack) {
+        ToolMaterial mat = AbstractEngineeredTool.getToolMaterialFromIngredient(materialStack);
+        if (mat == null)
+            return Optional.empty();
+
+        Pair<ToolMaterial, AbstractEngineeredTool.ToolType> typePair = AbstractEngineeredTool.tryGetToolInfo(engineerStack);
+        if (typePair == null || typePair.getRight() == AbstractEngineeredTool.ToolType.NADA)
+            return Optional.empty();
+
+        if (!(mat.getMiningLevel() == typePair.getLeft().getMiningLevel() + 1 || mat.getMiningLevel() == typePair.getLeft().getMiningLevel()))
+            return Optional.empty();
+
+        AbstractEngineeredTool newTool = AbstractEngineeredTool.getRegisteredTool(mat, typePair.getRight());
+        ItemStack newStack = new ItemStack(newTool);
+        boolean transferSuccess = AbstractEngineeredTool.transferToolData (engineerStack, newStack);
+        if (!transferSuccess)
+            return Optional.empty();
+
+        Optional<ItemStack> resultStack = Optional.of(newStack);
+        return resultStack;
     }
 
     private static Optional<EngineeringStationRefineRecipe> hasRefineRecipe(EngineeringStationEntity entity) {
@@ -296,7 +323,7 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
 
     /** Slot 3: Materials slot is the top slot **/
     public static boolean acceptsQuickTransferMaterialSlot(ItemStack itemStack) {
-        return acceptedRefiningMaterials.contains(itemStack.getItem());
+        return acceptedRefiningMaterials.contains(itemStack.getItem()) || AbstractEngineeredTool.isAcceptedToolIngredient(itemStack);
     }
     /** Slot 3: Materials slot is the top slot **/
     public ItemStack getMaterialSlot() {

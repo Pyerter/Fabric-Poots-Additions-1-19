@@ -10,6 +10,7 @@ public class EngineeredAxe extends AbstractEngineeredTool {
     public EngineeredAxe(float attackDamage, float attackSpeed, ToolMaterial material, Settings settings) {
         super(attackDamage, attackSpeed, material, BlockTags.AXE_MINEABLE, settings);
 
+        toolType = ToolType.AXE;
         super.registerTool(this, material, ToolType.AXE);
     }
 

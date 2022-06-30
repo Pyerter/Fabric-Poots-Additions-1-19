@@ -251,7 +251,7 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
             return Optional.empty();
 
         Pair<ToolMaterial, AbstractEngineeredTool.ToolType> typePair = AbstractEngineeredTool.tryGetToolInfo(engineerStack);
-        if (typePair == null || typePair.getRight() == AbstractEngineeredTool.ToolType.NADA)
+        if (typePair == null || typePair.getRight() == AbstractEngineeredTool.ToolType.NADA || typePair.getLeft() == mat)
             return Optional.empty();
 
         if (!(mat.getMiningLevel() == typePair.getLeft().getMiningLevel() + 1 || mat.getMiningLevel() == typePair.getLeft().getMiningLevel()))

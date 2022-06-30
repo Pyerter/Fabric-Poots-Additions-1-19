@@ -4,6 +4,8 @@ import com.google.common.collect.*;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.*;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -13,6 +15,7 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -27,6 +30,7 @@ import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.block.ModBlockTags;
 import net.pyerter.pootsadditions.item.SpecialWeaponWithAbility;
 import net.pyerter.pootsadditions.item.StackDependentAttributeModifierItem;
+import net.pyerter.pootsadditions.item.custom.engineering.augments.Augment;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -185,6 +189,14 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
     }
 
     public boolean copyToolDataTo(ItemStack original, ItemStack target) {
+        NbtList enchantments = original.getEnchantments();
+        if (enchantments.size() > 0)
+            target.getOrCreateNbt().put("Enchantments", enchantments);
+
+        NbtList augments = Augment.getAugmentsNbtList(original);
+        if (augments.size() > 0)
+            Augment.writeAugmentsToNbt(target.getOrCreateNbt(), augments);
+
         return true;
     }
 

@@ -1,6 +1,10 @@
 {
   "parent": "item/handheld",
   "textures": {
-    "layer0": "pootsadditions:item/malice_scythe"
-  }
+    "layer0": "pootsadditions:item/malice_scythe_still"
+  },
+  "overrides": [
+    { "predicate": { "charge": 0.000000 }, "model": "pootsadditions:item/malice_scythe" },
+    { "predicate": { "charge": 0.250000 }, "model": "pootsadditions:item/malice_scythe_animated" }
+  ]
 }

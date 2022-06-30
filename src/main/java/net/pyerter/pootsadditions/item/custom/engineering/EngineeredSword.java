@@ -1,4 +1,4 @@
-package net.pyerter.pootsadditions.item.custom;
+package net.pyerter.pootsadditions.item.custom.engineering;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;

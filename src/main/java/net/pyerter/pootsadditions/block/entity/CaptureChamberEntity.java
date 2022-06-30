@@ -18,11 +18,10 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.pyerter.pootsadditions.item.ModItems;
-import net.pyerter.pootsadditions.item.custom.MakeshiftCore;
+import net.pyerter.pootsadditions.item.custom.engineering.AbstractPowerCore;
+import net.pyerter.pootsadditions.item.custom.engineering.MakeshiftCore;
 import net.pyerter.pootsadditions.item.inventory.ImplementedInventory;
-import net.pyerter.pootsadditions.recipe.TridiRecipe;
 import net.pyerter.pootsadditions.screen.handlers.CaptureChamberScreenHandler;
-import net.pyerter.pootsadditions.screen.handlers.TridiScreenHandler;
 import net.pyerter.pootsadditions.util.Util;
 import org.jetbrains.annotations.Nullable;
 
@@ -109,8 +108,12 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
 
     private static int addCoreCharge(CaptureChamberEntity entity, Integer amount, int index) {
         ItemStack core = entity.inventory.get(index);
-        int originalAmount = MakeshiftCore.getCharge(core);
-        int newAmount = MakeshiftCore.addCharge(core, amount);
+        if (core.isEmpty() || !(core.getItem() instanceof AbstractPowerCore))
+            return 0;
+
+        AbstractPowerCore coreItem = (AbstractPowerCore) core.getItem();
+        int originalAmount = coreItem.getCharge(core);
+        int newAmount = coreItem.addCharge(core, amount);
         return newAmount - originalAmount;
     }
 

@@ -1,4 +1,4 @@
-package net.pyerter.pootsadditions.item.custom;
+package net.pyerter.pootsadditions.item.custom.engineering;
 
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.ToolMaterial;

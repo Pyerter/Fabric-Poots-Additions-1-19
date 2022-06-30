@@ -1,4 +1,4 @@
-package net.pyerter.pootsadditions.item.custom;
+package net.pyerter.pootsadditions.item.custom.engineering;
 
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.ToolMaterial;
@@ -6,12 +6,11 @@ import net.minecraft.tag.BlockTags;
 import net.minecraft.util.ActionResult;
 import net.pyerter.pootsadditions.item.custom.engineering.AbstractEngineeredTool;
 
-public class EngineeredShovel extends AbstractEngineeredTool {
+public class EngineeredHoe extends AbstractEngineeredTool {
+    public EngineeredHoe(float attackDamage, float attackSpeed, ToolMaterial material, Settings settings) {
+        super(attackDamage, attackSpeed, material, BlockTags.HOE_MINEABLE, settings);
 
-    public EngineeredShovel(float attackDamage, float attackSpeed, ToolMaterial material, Settings settings) {
-        super(attackDamage, attackSpeed, material, BlockTags.SHOVEL_MINEABLE, settings);
-
-        super.registerTool(this, material, ToolType.SHOVEL);
+        super.registerTool(this, material, ToolType.HOE);
     }
 
     @Override
@@ -19,6 +18,6 @@ public class EngineeredShovel extends AbstractEngineeredTool {
         if (anitcipatedUseOnBlockResult(context) == ActionResult.FAIL)
             return ActionResult.PASS;
 
-        return super.useShovelActionOnBlock(context);
+        return super.useHoeActionOnBlock(context);
     }
 }

@@ -1,4 +1,4 @@
-package net.pyerter.pootsadditions.item.custom;
+package net.pyerter.pootsadditions.item.custom.engineering;
 
 import net.pyerter.pootsadditions.item.custom.engineering.AbstractEngineersItem;
 

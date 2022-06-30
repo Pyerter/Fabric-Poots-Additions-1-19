@@ -2,15 +2,12 @@ package net.pyerter.pootsadditions.block.entity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
@@ -18,19 +15,17 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TextContent;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.pyerter.pootsadditions.block.custom.TridiBlock;
 import net.pyerter.pootsadditions.item.ModItems;
-import net.pyerter.pootsadditions.item.custom.MakeshiftCore;
+import net.pyerter.pootsadditions.item.custom.engineering.AbstractPowerCore;
+import net.pyerter.pootsadditions.item.custom.engineering.MakeshiftCore;
 import net.pyerter.pootsadditions.item.inventory.ImplementedInventory;
 import net.pyerter.pootsadditions.recipe.TridiRecipe;
 import net.pyerter.pootsadditions.screen.handlers.TridiScreenHandler;
 import org.jetbrains.annotations.Nullable;
 
-import java.security.cert.TrustAnchor;
 import java.util.List;
 import java.util.Optional;
 
@@ -127,15 +122,19 @@ public class TridiBlockEntity extends BlockEntity implements NamedScreenHandlerF
     }
 
     private static void consumeFuel(TridiBlockEntity entity, Integer cost) {
-        MakeshiftCore.addCharge(entity.inventory.get(5), -cost);
+        if (entity.inventory.get(5).getItem() instanceof AbstractPowerCore) {
+            AbstractPowerCore core = (AbstractPowerCore) entity.inventory.get(5).getItem();
+            core.addCharge(entity.inventory.get(5), -cost);
+        }
     }
 
     private static boolean hasAvailablePowerInSlot(TridiBlockEntity entity, TridiRecipe recipe) {
         if (entity.inventory.get(5).isEmpty())
             return false;
 
-        if(acceptsQuickTransferFuel(entity.inventory.get(5)) && entity.inventory.get(5).getItem() == ModItems.MAKESHIFT_CORE) {
-            return MakeshiftCore.getCharge(entity.inventory.get(5)) >= recipe.getEnergyCost();
+        if(acceptsQuickTransferFuel(entity.inventory.get(5)) && entity.inventory.get(5).getItem() instanceof AbstractPowerCore) {
+            AbstractPowerCore core = (AbstractPowerCore) entity.inventory.get(5).getItem();
+            return core.getCharge(entity.inventory.get(5)) >= recipe.getEnergyCost();
         }
 
         return false;

@@ -1,7 +1,6 @@
 package net.pyerter.pootsadditions.item;
 
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
-import net.minecraft.block.Material;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.item.*;
 import net.minecraft.util.Formatting;
@@ -11,6 +10,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.pyerter.pootsadditions.entity.ModEntities;
 import net.pyerter.pootsadditions.item.custom.*;
+import net.pyerter.pootsadditions.item.custom.engineering.*;
 
 public class ModItems {
     public static final Item SAPPHIRE_DUST = registerItem("sapphire_dust",
@@ -188,7 +188,9 @@ public class ModItems {
     }
 
     public static void registerPredicateOverrides() {
-        ModelPredicateProviderRegistry.register(ModItems.MAKESHIFT_CORE, new Identifier("charge"), new MakeshiftCore.CoreChargePredicateProvider(
-                (stack) -> MakeshiftCore.getOverridePredicateChargeValue(stack)));
+        ModelPredicateProviderRegistry.register(ModItems.MAKESHIFT_CORE, new Identifier("charge"), new AbstractPowerCore.ChargePredicateProvider(
+                (stack, chargeable) -> chargeable.getOverridePredicateChargeValue(stack)));
+        ModelPredicateProviderRegistry.register(ModItems.MALICE_SCYTHE, new Identifier("charge"), new AbstractPowerCore.ChargePredicateProvider(
+                (stack, chargeable) -> chargeable.getOverridePredicateChargeValue(stack)));
     }
 }

@@ -4,8 +4,6 @@ import com.google.common.collect.*;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.*;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -30,7 +28,6 @@ import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.block.ModBlockTags;
 import net.pyerter.pootsadditions.item.SpecialWeaponWithAbility;
 import net.pyerter.pootsadditions.item.StackDependentAttributeModifierItem;
-import net.pyerter.pootsadditions.item.custom.engineering.augments.Augment;
 
 import java.util.*;
 import java.util.function.Consumer;

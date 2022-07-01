@@ -1,16 +1,19 @@
-package net.pyerter.pootsadditions.item.custom.engineering.augments;
+package net.pyerter.pootsadditions.item.custom.engineering;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.util.ActionResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// :)
 public abstract class Augment extends Item {
     public static final String AUGMENT_NBT_ID = "pootsadditions.augments";
     public static final String AUGMENT_NBT_INDICATOR = "pootsadditions.augment_id";
@@ -34,6 +37,16 @@ public abstract class Augment extends Item {
         return getAugmentNbtID();
     }
     public abstract NbtCompound getNbtCompound();
+
+    /** All of the augment methods that can be overriden to apply effects **/
+    public float onGetAttackDamage(ItemStack stack, AbstractEngineeredTool tool) { return 0; }
+    public float onGetMiningSpeedMultiplier(ItemStack stack, AbstractEngineeredTool tool) { return 0; }
+    public ActionResult onUseOnBlock(ItemStack stack, AbstractEngineeredTool tool) { return ActionResult.PASS; }
+    public boolean onUseWeaponAbility(ItemStack stack, AbstractEngineeredTool tool, Entity target, PlayerEntity attacker) { return false; }
+    public boolean onInventoryTick(ItemStack stack, AbstractEngineeredTool tool) { return false; }
+    public boolean onItemNoLongerSuitable(ItemStack stack, AbstractEngineeredTool tool) { return false; }
+    public boolean onItemNowSuitable(ItemStack stack, AbstractEngineeredTool tool) { return false; }
+    public boolean onStateInEffectiveBlockList(ItemStack stack, AbstractEngineeredTool tool) { return false; }
 
     public static Augment fromNbt(NbtCompound nbt) {
         String augmentID = nbt.getString(AUGMENT_NBT_INDICATOR);

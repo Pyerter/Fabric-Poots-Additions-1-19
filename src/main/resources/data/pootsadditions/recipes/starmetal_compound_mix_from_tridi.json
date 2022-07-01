@@ -1,0 +1,23 @@
+{
+  "type": "pootsadditions:tridi",
+  "ingredients": [
+    {
+      "item": "pootsadditions:sapphire_dust"
+    },
+    {
+      "item": "minecraft:diamond"
+    },
+    {
+      "item": "minecraft:gold_ingot"
+    },
+    {
+      "item": "minecraft:netherite_ingot"
+    }
+  ],
+  "output": {
+    "item": "pootsadditions:starmetal_compound_mix",
+    "count": 2
+  },
+  "cookTime": 100,
+  "energyCost": 50
+}

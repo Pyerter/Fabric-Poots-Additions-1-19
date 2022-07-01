@@ -1,12 +1,16 @@
 package net.pyerter.pootsadditions.item.custom.engineering;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,6 +46,8 @@ public abstract class Augment extends Item {
     public float onGetAttackDamage(ItemStack stack, AbstractEngineeredTool tool) { return 0; }
     public float onGetMiningSpeedMultiplier(ItemStack stack, AbstractEngineeredTool tool) { return 0; }
     public ActionResult onUseOnBlock(ItemStack stack, AbstractEngineeredTool tool) { return ActionResult.PASS; }
+    public boolean onPostHit(ItemStack stack, AbstractEngineeredTool tool, LivingEntity target, LivingEntity attacker) { return false; }
+    public boolean onPostMine(ItemStack stack, AbstractEngineeredTool tool, World world, BlockState state, BlockPos pos, LivingEntity miner) { return false; }
     public boolean onUseWeaponAbility(ItemStack stack, AbstractEngineeredTool tool, Entity target, PlayerEntity attacker) { return false; }
     public boolean onInventoryTick(ItemStack stack, AbstractEngineeredTool tool) { return false; }
     public boolean onItemNoLongerSuitable(ItemStack stack, AbstractEngineeredTool tool) { return false; }
@@ -50,7 +56,7 @@ public abstract class Augment extends Item {
 
     public static Augment fromNbt(NbtCompound nbt) {
         String augmentID = nbt.getString(AUGMENT_NBT_INDICATOR);
-        Augment aug = stringToAugment.containsKey(augmentID) ? stringToAugment.get(augmentID) : null;
+        Augment aug = stringToAugment.get(augmentID);
         return aug;
     }
 
@@ -80,7 +86,9 @@ public abstract class Augment extends Item {
         List<Augment> augments = new ArrayList<>(nbtList.size());
         for (int i = 0; i < nbtList.size(); i++) {
             NbtCompound nbt = nbtList.getCompound(i);
-            augments.add(Augment.fromNbt(nbt));
+            Augment aug = Augment.fromNbt(nbt);
+            if (aug != null)
+                augments.add(aug);
         }
         return augments;
     }

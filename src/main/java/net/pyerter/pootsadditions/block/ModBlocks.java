@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.block.custom.CaptureChamberBlock;
 import net.pyerter.pootsadditions.block.custom.EngineeringStationBlock;
+import net.pyerter.pootsadditions.block.custom.KitchenStoveStation;
 import net.pyerter.pootsadditions.block.custom.TridiBlock;
 import net.pyerter.pootsadditions.block.entity.CaptureChamberEntity;
 import net.pyerter.pootsadditions.item.ModItemGroup;
@@ -39,6 +40,16 @@ public class ModBlocks {
 
     public static final Block ENGINEERING_STATION = registerBlock("engineering_station",
             new EngineeringStationBlock(FabricBlockSettings.of(Material.METAL).nonOpaque()), ModItemGroup.SAPPHIRE);
+
+    public static final Block KITCHEN_STOVE_STATION = registerBlock("kitchen_stove_station",
+            new KitchenStoveStation(FabricBlockSettings.of(Material.METAL).nonOpaque().luminance(state -> {
+                if (state.get(KitchenStoveStation.OVEN_LIT) == true)
+                    return 14;
+                if (state.get(KitchenStoveStation.STOVE_LIT) == true)
+                    return 7;
+                return 0;
+            })),
+            ModItemGroup.SAPPHIRE);
 
     private static Block registerBlock(String name, Block block, ItemGroup tab) {
         registerBlockItem(name, block, tab);

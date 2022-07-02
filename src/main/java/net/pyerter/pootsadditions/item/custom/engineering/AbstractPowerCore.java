@@ -21,16 +21,19 @@ import net.pyerter.pootsadditions.block.entity.CaptureChamberEntity;
 import net.pyerter.pootsadditions.util.Util;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
 public abstract class AbstractPowerCore extends Item implements IChargeable {
 
+    public static final List<Item> REGISTERED_CORES = new ArrayList<>();
     public static final String CHARGE_NBT_ID = "pootsadditions.core_charge";
 
     public AbstractPowerCore(Settings settings) {
         super(settings);
+        REGISTERED_CORES.add(this);
     }
 
     @Override

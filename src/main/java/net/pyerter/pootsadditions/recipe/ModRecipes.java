@@ -15,6 +15,11 @@ public class ModRecipes {
                 EngineeringStationRefineRecipe.Serializer.INSTANCE);
         Registry.register(Registry.RECIPE_TYPE, new Identifier(PootsAdditions.MOD_ID, EngineeringStationRefineRecipe.Type.ID),
                 EngineeringStationRefineRecipe.Type.INSTANCE);
+
+        Registry.register(Registry.RECIPE_SERIALIZER, new Identifier(PootsAdditions.MOD_ID, KitchenStoveRecipe.Serializer.ID),
+                KitchenStoveRecipe.Serializer.INSTANCE);
+        Registry.register(Registry.RECIPE_TYPE, new Identifier(PootsAdditions.MOD_ID, KitchenStoveRecipe.Type.ID),
+                KitchenStoveRecipe.Type.INSTANCE);
     }
 
 }

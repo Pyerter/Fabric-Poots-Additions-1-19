@@ -19,6 +19,7 @@ import net.pyerter.pootsadditions.screen.EngineeringStationScreen;
 import net.pyerter.pootsadditions.screen.PautschItemScreen;
 import net.pyerter.pootsadditions.screen.TridiScreen;
 import net.pyerter.pootsadditions.screen.handlers.EngineeringStationScreenHandler;
+import net.pyerter.pootsadditions.screen.handlers.KitchenStoveStationScreen;
 import net.pyerter.pootsadditions.screen.handlers.ModScreenHandlers;
 
 public class PootsAdditionsClient implements ClientModInitializer {
@@ -27,6 +28,7 @@ public class PootsAdditionsClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.TRIDI, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.CAPTURE_CHAMBER, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.ENGINEERING_STATION, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.KITCHEN_STOVE_STATION, RenderLayer.getCutout());
 
         BlockRenderLayerMap.INSTANCE.putItem(Items.DIAMOND_SWORD, RenderLayer.getCutout());
 
@@ -38,5 +40,6 @@ public class PootsAdditionsClient implements ClientModInitializer {
         ScreenRegistry.register(ModScreenHandlers.CAPTURE_CHAMBER_SCREEN_HANDLER, CaptureChamberScreen::new);
         ScreenRegistry.register(ModScreenHandlers.PAUTSCH_ITEM_SCREEN_HANDLER, PautschItemScreen::new);
         ScreenRegistry.register(ModScreenHandlers.ENGINEERING_STATION_SCREEN_HANDLER, EngineeringStationScreen::new);
+        ScreenRegistry.register(ModScreenHandlers.KITCHEN_STOVE_STATION_SCREEN_HANDLER, KitchenStoveStationScreen::new);
     }
 }

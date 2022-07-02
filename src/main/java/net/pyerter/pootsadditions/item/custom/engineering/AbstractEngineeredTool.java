@@ -237,11 +237,15 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
     }
 
     public boolean postHit(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+        List<Augment> augments = Augment.getAugments(stack, Augment.MASK_POST_HIT);
+        augments.stream().filter(a -> a.onPostHit(stack, this, target, attacker));
         return tryDamageItem(stack, attacker);
     }
 
     public boolean postMine(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity miner) {
         if (!world.isClient && state.getHardness(world, pos) != 0.0F) {
+            List<Augment> augments = Augment.getAugments(stack, Augment.MASK_POST_MINE);
+            augments.stream().filter(a -> a.onPostMine(stack, this, world, state, pos, miner));
             tryDamageItem(stack, miner);
         }
 
@@ -272,10 +276,14 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
 
     public void onItemNoLongerSuitable(ItemStack stack, LivingEntity miner) {
         PootsAdditions.logInfo("No longer suitable!");
+        List<Augment> augments = Augment.getAugments(stack, Augment.MASK_ITEM_NOT_SUITABLE);
+        augments.stream().filter(a -> a.onItemNoLongerSuitable(stack, this));
     }
 
     public void onItemNowSuitable(ItemStack stack) {
         PootsAdditions.logInfo("Item now suitable!");
+        List<Augment> augments = Augment.getAugments(stack, Augment.MASK_ITEM_NOW_SUITABLE);
+        augments.stream().filter(a -> a.onItemNowSuitable(stack, this));
     }
 
     public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(EquipmentSlot slot) {
@@ -372,7 +380,13 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
-        return anitcipatedUseOnBlockResult(context) == ActionResult.SUCCESS ? ActionResult.PASS : ActionResult.PASS;
+        ActionResult result = anitcipatedUseOnBlockResult(context);
+        if (result == ActionResult.SUCCESS) {
+            List<Augment> augments = Augment.getAugments(context.getStack(), Augment.MASK_USE_ON_BLOCK);
+            if (augments.stream().filter(a -> a.onUseOnBlock(context.getStack(), this, context) == ActionResult.SUCCESS).count() > 0)
+                return ActionResult.SUCCESS;
+        }
+        return ActionResult.PASS;
     }
 
     public ActionResult anitcipatedUseOnBlockResult(ItemUsageContext context) {
@@ -519,12 +533,17 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
     /** Damaging Item Methods **/
 
     public boolean tryUseWeaponAbility(Entity target, PlayerEntity attacker) {
+        List<Augment> augments = Augment.getAugments(attacker.getMainHandStack(), Augment.MASK_USE_WEAPON_ABILITY);
+        if (augments.stream().filter(a -> a.onUseWeaponAbility(attacker.getMainHandStack(), this, target, attacker)).count() > 0)
+            return true;
+
         return false;
     }
 
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-        super.inventoryTick(stack, world, entity, slot, selected);
+        List<Augment> augments = Augment.getAugments(stack, Augment.MASK_USE_INVENTORY_TICK);
+        augments.stream().filter(a -> a.onInventoryTick(stack, this, world, entity, slot, selected));
     }
 
     /* Damaging Item Methods */

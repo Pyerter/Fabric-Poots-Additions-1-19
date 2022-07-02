@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:wheat"
+    },
+    {
+      "item": "pootsadditions:rolling_pin_item"
+    }
+  ],
+  "result": {
+    "item": "minecraft:bread"
+  }
+}

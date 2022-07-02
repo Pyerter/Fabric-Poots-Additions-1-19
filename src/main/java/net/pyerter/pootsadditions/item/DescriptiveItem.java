@@ -11,6 +11,7 @@ import net.minecraft.util.Pair;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mutable;
+import org.spongepowered.asm.mixin.injection.Desc;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -19,6 +20,11 @@ import java.util.Optional;
 
 public class DescriptiveItem extends Item {
     public final List<Pair<String, Optional<Formatting[]>>> description;
+
+    public DescriptiveItem(Settings settings) {
+        super(settings);
+        description = List.of();
+    }
 
     public DescriptiveItem(Settings settings, List<Pair<String, Optional<Formatting[]>>> description) {
         super(settings);

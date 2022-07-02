@@ -178,6 +178,9 @@ public class ModItems {
             new SpawnEggItem(ModEntities.BOBCAT, 0x000000, 0xa8925e,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 
+    public static final Item ROLLING_PIN_ITEM = registerItem("rolling_pin_item",
+            new RecipeWithstandingItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
+
 
     private static Item registerItem(String name, Item item) {
         return Registry.register(Registry.ITEM, new Identifier(PootsAdditions.MOD_ID, name), item);

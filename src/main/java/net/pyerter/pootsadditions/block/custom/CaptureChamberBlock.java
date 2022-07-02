@@ -12,20 +12,35 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.*;
+import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.pyerter.pootsadditions.block.ModBlocks;
 import net.pyerter.pootsadditions.block.entity.CaptureChamberEntity;
 import net.pyerter.pootsadditions.block.entity.ModBlockEntities;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.stream.Stream;
+
 public class CaptureChamberBlock extends BlockWithEntity implements BlockEntityProvider {
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
+    protected static final VoxelShape BOUNDING_SHAPE = Stream.of(
+            Block.createCuboidShape(2.0, 0.0, 2.0, 14.0, 15.0, 14.0),
+            Block.createCuboidShape(5.0, 15.0, 5.0, 11.0, 16.0, 11.0))
+            .reduce((v1, v2) -> VoxelShapes.combineAndSimplify(v1, v2, BooleanBiFunction.OR)).get();
 
     public CaptureChamberBlock(Settings settings) {
         super(settings);
+    }
+
+    @Override
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return BOUNDING_SHAPE;
     }
 
     @Nullable

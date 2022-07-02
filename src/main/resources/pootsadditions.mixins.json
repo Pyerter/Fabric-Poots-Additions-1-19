@@ -5,7 +5,8 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "ModLivingEntityMixin",
-    "ModPlayerEntityMixin"
+    "ModPlayerEntityMixin",
+    "ModItemSpecialRecipeMixin"
   ],
   "client": [
     "ExampleMixin"

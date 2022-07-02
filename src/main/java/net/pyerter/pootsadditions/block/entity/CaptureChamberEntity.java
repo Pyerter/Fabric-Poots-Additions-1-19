@@ -1,6 +1,7 @@
 package net.pyerter.pootsadditions.block.entity;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -35,9 +36,11 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
 
     protected final PropertyDelegate propertyDelegate;
     private int storedCharge;
+    private int passiveChargeTicks;
 
     public static final int MAX_STORED_CHARGE = 12100;
     public static final int MAX_CHARGE_TRANSFER_RATE = 50;
+    public static final int TICKS_PER_PASSIVE_CHARGE = 20;
 
     public CaptureChamberEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CAPTURE_CHAMBER, pos, state);
@@ -47,6 +50,7 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
             public int get(int index) {
                 switch (index) {
                     case 0: return CaptureChamberEntity.this.storedCharge;
+                    case 1: return CaptureChamberEntity.this.passiveChargeTicks;
                     default: return 0;
                 }
             }
@@ -55,12 +59,13 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
             public void set(int index, int value) {
                 switch (index) {
                     case 0: CaptureChamberEntity.this.storedCharge = value; break;
+                    case 1: CaptureChamberEntity.this.passiveChargeTicks = value; break;
                 }
             }
 
             @Override
             public int size() {
-                return 1;
+                return 2;
             }
         };
     }
@@ -86,6 +91,7 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
         super.writeNbt(nbt);
         Inventories.writeNbt(nbt, inventory);
         nbt.putInt("capture_chamber.storedCharge", storedCharge);
+        nbt.putInt("capture_chamber.passiveChargeTicks", passiveChargeTicks);
     }
 
     @Override
@@ -93,11 +99,18 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
         Inventories.readNbt(nbt, inventory);
         super.readNbt(nbt);
         storedCharge = nbt.getInt("capture_chamber.storedCharge");
+        passiveChargeTicks = nbt.getInt("capture_chamber.passiveChargeTicks");
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, CaptureChamberEntity entity) {
-        addCharge(entity, 1);
+        if (world.getBlockState(new BlockPos(pos.getX(), pos.getY() + 1, pos.getZ())).getBlock() == Blocks.LIGHTNING_ROD)
+            entity.passiveChargeTicks++;
+        if (entity.passiveChargeTicks % TICKS_PER_PASSIVE_CHARGE == 0) {
+            addCharge(entity, entity.passiveChargeTicks / TICKS_PER_PASSIVE_CHARGE);
+            entity.passiveChargeTicks = 0;
+        }
         tryAddCoreCharges(entity);
+        entity.markDirty();
     }
 
     public static int addCharge(CaptureChamberEntity entity, Integer amount) {

@@ -19,12 +19,8 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 import net.pyerter.pootsadditions.PootsAdditions;
-import net.pyerter.pootsadditions.item.ModItems;
 import net.pyerter.pootsadditions.item.inventory.INbtInventory;
-import net.pyerter.pootsadditions.item.inventory.ImplementedInventory;
-import net.pyerter.pootsadditions.screen.handlers.NbtItemNamedScreenHandlerFactory;
 import net.pyerter.pootsadditions.screen.handlers.PautschItemScreenHandler;
-import net.pyerter.pootsadditions.util.IModServerPlayerEntityPautschScreenOpener;
 import net.pyerter.pootsadditions.util.InventoryUtil;
 import org.jetbrains.annotations.Nullable;
 

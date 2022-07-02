@@ -4,8 +4,13 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
+import net.fabricmc.fabric.impl.client.keybinding.KeyBindingRegistryImpl;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.ScreenshotRecorder;
+import net.minecraft.item.Items;
+import net.minecraft.util.registry.Registry;
 import net.pyerter.pootsadditions.block.ModBlocks;
 import net.pyerter.pootsadditions.entity.ModEntities;
 import net.pyerter.pootsadditions.entity.client.BobcatRenderer;
@@ -22,6 +27,10 @@ public class PootsAdditionsClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.TRIDI, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.CAPTURE_CHAMBER, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.ENGINEERING_STATION, RenderLayer.getCutout());
+
+        BlockRenderLayerMap.INSTANCE.putItem(Items.DIAMOND_SWORD, RenderLayer.getCutout());
+
+        KeyBindingRegistryImpl.registerKeyBinding(new KeyBinding("key.pootsadditions.combat_key", InputUtil.GLFW_KEY_G, "PootsAdditions"));
 
         EntityRendererRegistry.register(ModEntities.BOBCAT, BobcatRenderer::new);
 

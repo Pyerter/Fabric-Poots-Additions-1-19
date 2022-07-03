@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(ItemRenderer.class)
-public class ModItemRendererColorProviderMixin implements IColorsProvider {
+public abstract class ModItemRendererColorProviderMixin implements IColorsProvider {
 
     @Shadow
     ItemColors colors;

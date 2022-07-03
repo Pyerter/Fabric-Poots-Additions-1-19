@@ -17,6 +17,8 @@ public class ModBlockEntities {
 
     public static BlockEntityType<KitchenStoveStationEntity> KITCHEN_STOVE_STATION;
 
+    public static BlockEntityType<FoodPreppingStationEntity> FOOD_PREPPING_STATION;
+
     public static void registerAllBlockEntities() {
         TRIDI = Registry.register(Registry.BLOCK_ENTITY_TYPE,
                 new Identifier(PootsAdditions.MOD_ID, "tridi"),
@@ -33,5 +35,9 @@ public class ModBlockEntities {
         KITCHEN_STOVE_STATION = Registry.register(Registry.BLOCK_ENTITY_TYPE,
                 new Identifier(PootsAdditions.MOD_ID, "kitchen_stove_station"),
                 FabricBlockEntityTypeBuilder.create(KitchenStoveStationEntity::new, ModBlocks.KITCHEN_STOVE_STATION).build(null));
+
+        FOOD_PREPPING_STATION = Registry.register(Registry.BLOCK_ENTITY_TYPE,
+                new Identifier(PootsAdditions.MOD_ID, "food_prepping_station"),
+                FabricBlockEntityTypeBuilder.create(FoodPreppingStationEntity::new, ModBlocks.FOOD_PREPPING_STATION).build(null));
     }
 }

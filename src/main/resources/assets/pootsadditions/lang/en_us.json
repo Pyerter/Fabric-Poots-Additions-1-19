@@ -73,10 +73,19 @@
   "block.pootsadditions.capture_chamber": "Capture Chamber",
   "block.pootsadditions.engineering_station": "Engineering Station",
   "block.pootsadditions.kitchen_stove_station": "Kitchen Stove",
+  "block.pootsadditions.food_prepping_station": "Food Prepping Station",
 
   "item.pootsadditions.bobcat_spawn_egg": "Bobcat Spawn Egg",
 
   "item.pootsadditions.rolling_pin_item": "Rolling Pin",
+  "item.pootsadditions.bread_knife_item": "Bread Knife",
+  "item.pootsadditions.cookie_cutter_item": "Cookie Cutter",
+
+  "item.pootsadditions.sliced_bread_item": "Sliced Bread",
+  "item.pootsadditions.dough_item": "Dough",
+  "item.pootsadditions.flattened_dough_item": "Flattened Dough",
+  "item.pootsadditions.cookie_dough_item": "Cookie Dough",
+  "item.pootsadditions.chocolate_chip_cookie_dough_item": "Chocolate Chip Cookie Dough",
 
   "itemGroup.pootsadditions.sapphire": "Sapphire",
 

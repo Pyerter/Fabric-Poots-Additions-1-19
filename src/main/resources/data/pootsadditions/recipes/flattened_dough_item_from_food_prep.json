@@ -1,0 +1,15 @@
+{
+  "type": "pootsadditions:food_prepping_station",
+  "ingredients": [
+    {
+      "item": "pootsadditions:dough_item"
+    }
+  ],
+  "output": {
+    "item": "pootsadditions:flattened_dough_item",
+    "count": 1
+  },
+  "tool_ingredient": {
+    "item": "pootsadditions:rolling_pin_item"
+  }
+}

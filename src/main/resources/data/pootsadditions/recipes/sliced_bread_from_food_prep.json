@@ -1,0 +1,15 @@
+{
+  "type": "pootsadditions:food_prepping_station",
+  "ingredients": [
+    {
+      "item": "minecraft:bread"
+    }
+  ],
+  "output": {
+    "item": "pootsadditions:sliced_bread_item",
+    "count": 4
+  },
+  "tool_ingredient" : {
+    "item": "pootsadditions:bread_knife_item"
+  }
+}

@@ -10,6 +10,7 @@ import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
@@ -17,6 +18,7 @@ import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.block.entity.TridiBlockEntity;
 import net.pyerter.pootsadditions.item.ModItems;
 import net.pyerter.pootsadditions.item.custom.PautschItem;
+import net.pyerter.pootsadditions.screen.slot.GreedySlot;
 import net.pyerter.pootsadditions.screen.slot.ModFuelSlot;
 import net.pyerter.pootsadditions.screen.slot.ModResultSlot;
 import net.pyerter.pootsadditions.screen.slot.PautschSlot;
@@ -93,6 +95,12 @@ public class PautschItemScreenHandler extends ScreenHandler {
     }
 
     @Override
+    public void onContentChanged(Inventory inventory) {
+        super.onContentChanged(inventory);
+        updatePautschInventory();
+    }
+
+    @Override
     public ItemStack transferSlot(PlayerEntity player, int index) {
         ItemStack itemStack = ItemStack.EMPTY;
         Slot slot = (Slot)this.slots.get(index);
@@ -135,6 +143,7 @@ public class PautschItemScreenHandler extends ScreenHandler {
     private void addPlayerInventory(PlayerInventory playerInventory) {
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
+
                 this.addSlot(new Slot(playerInventory, 9 + col + row * 9, 8 + col * 18, 86 + row * 18));
             }
         }
@@ -142,7 +151,10 @@ public class PautschItemScreenHandler extends ScreenHandler {
 
     private void addPlayerHotbar(PlayerInventory playerInventory) {
         for (int i = 0; i < 9; i++) {
-            this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 144));
+            if (playerInventory.getStack(i).getItem() == pautschItem)
+                this.addSlot(new GreedySlot(playerInventory, i, 8 + i * 18, 144));
+            else
+                this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 144));
         }
     }
 }

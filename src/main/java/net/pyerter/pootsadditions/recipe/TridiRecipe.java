@@ -47,7 +47,7 @@ public class TridiRecipe implements Recipe<SimpleInventory> {
         // loop over the 5 non-fuel slots of the inventory
         int i = 0;
         while (i < 5 && !failedTest) {
-            if (inventory.getStack(i) == ItemStack.EMPTY) {
+            if (inventory.getStack(i).isEmpty()) {
                 i++;
                 continue;
             }

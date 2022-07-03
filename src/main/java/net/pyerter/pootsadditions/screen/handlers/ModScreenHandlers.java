@@ -5,6 +5,7 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.block.entity.EngineeringStationEntity;
+import net.pyerter.pootsadditions.recipe.FoodPreppingStationRecipe;
 
 public class ModScreenHandlers {
     public static ScreenHandlerType<TridiScreenHandler> TRIDI_SCREEN_HANDLER;
@@ -17,11 +18,14 @@ public class ModScreenHandlers {
 
     public static ScreenHandlerType<KitchenStoveStationScreenHandler> KITCHEN_STOVE_STATION_SCREEN_HANDLER;
 
+    public static ScreenHandlerType<FoodPreppingStationScreenHandler> FOOD_PREPPING_STATION_SCREEN_HANDLER;
+
     public static void registerAllScreenHandlers() {
         TRIDI_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(new Identifier(PootsAdditions.MOD_ID, "tridi"), TridiScreenHandler::new);
         CAPTURE_CHAMBER_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(new Identifier(PootsAdditions.MOD_ID, "capture_chamber"), CaptureChamberScreenHandler::new);
         PAUTSCH_ITEM_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(new Identifier(PootsAdditions.MOD_ID, "pautsch_item"), PautschItemScreenHandler::new);
         ENGINEERING_STATION_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(new Identifier(PootsAdditions.MOD_ID, "engineering_station"), EngineeringStationScreenHandler::new);
         KITCHEN_STOVE_STATION_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(new Identifier(PootsAdditions.MOD_ID, "kitchen_stove_station"), KitchenStoveStationScreenHandler::new);
+        FOOD_PREPPING_STATION_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(new Identifier(PootsAdditions.MOD_ID, "food_prepping_station"), FoodPreppingStationScreenHandler::new);
     }
 }

@@ -1,0 +1,15 @@
+{
+  "type": "pootsadditions:food_prepping_station",
+  "ingredients": [
+    {
+      "item": "minecraft:wheat"
+    },
+    {
+      "item": "minecraft:egg"
+    }
+  ],
+  "output": {
+    "item": "pootsadditions:dough_item",
+    "count": 3
+  }
+}

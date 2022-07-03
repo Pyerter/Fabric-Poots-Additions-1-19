@@ -8,18 +8,11 @@ import net.fabricmc.fabric.impl.client.keybinding.KeyBindingRegistryImpl;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.ScreenshotRecorder;
 import net.minecraft.item.Items;
-import net.minecraft.util.registry.Registry;
 import net.pyerter.pootsadditions.block.ModBlocks;
 import net.pyerter.pootsadditions.entity.ModEntities;
 import net.pyerter.pootsadditions.entity.client.BobcatRenderer;
-import net.pyerter.pootsadditions.screen.CaptureChamberScreen;
-import net.pyerter.pootsadditions.screen.EngineeringStationScreen;
-import net.pyerter.pootsadditions.screen.PautschItemScreen;
-import net.pyerter.pootsadditions.screen.TridiScreen;
-import net.pyerter.pootsadditions.screen.handlers.EngineeringStationScreenHandler;
-import net.pyerter.pootsadditions.screen.handlers.KitchenStoveStationScreen;
+import net.pyerter.pootsadditions.screen.*;
 import net.pyerter.pootsadditions.screen.handlers.ModScreenHandlers;
 
 public class PootsAdditionsClient implements ClientModInitializer {
@@ -41,5 +34,6 @@ public class PootsAdditionsClient implements ClientModInitializer {
         ScreenRegistry.register(ModScreenHandlers.PAUTSCH_ITEM_SCREEN_HANDLER, PautschItemScreen::new);
         ScreenRegistry.register(ModScreenHandlers.ENGINEERING_STATION_SCREEN_HANDLER, EngineeringStationScreen::new);
         ScreenRegistry.register(ModScreenHandlers.KITCHEN_STOVE_STATION_SCREEN_HANDLER, KitchenStoveStationScreen::new);
+        ScreenRegistry.register(ModScreenHandlers.FOOD_PREPPING_STATION_SCREEN_HANDLER, FoodPreppingStationScreen::new);
     }
 }

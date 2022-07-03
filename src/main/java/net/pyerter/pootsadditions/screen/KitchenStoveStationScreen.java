@@ -1,4 +1,4 @@
-package net.pyerter.pootsadditions.screen.handlers;
+package net.pyerter.pootsadditions.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -8,6 +8,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.pyerter.pootsadditions.PootsAdditions;
+import net.pyerter.pootsadditions.screen.handlers.KitchenStoveStationScreenHandler;
 
 import java.util.List;
 

@@ -180,6 +180,8 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
 
         ItemStack recipeResult = recipe.get().getOutput();
         int maxStackCount = recipeResult.getMaxCount();
+        int openSpace = (maxStackCount - (!inventory.get(2).isEmpty() ? inventory.get(2).getCount() : 0));
+        maxStackCount = openSpace;
         int repeatTimes = maxStackCount / recipeResult.getCount();
         for (int i = 0; i < 4; i++) {
             if (usedSlots[i])

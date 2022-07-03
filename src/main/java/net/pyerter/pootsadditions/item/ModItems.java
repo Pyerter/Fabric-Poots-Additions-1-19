@@ -179,7 +179,24 @@ public class ModItems {
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 
     public static final Item ROLLING_PIN_ITEM = registerItem("rolling_pin_item",
-            new RecipeWithstandingItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
+            new RecipeWithstandingItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).maxCount(1)));
+    public static final Item COOKIE_CUTTER_ITEM = registerItem("cookie_cutter_item",
+            new RecipeWithstandingItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).maxCount(1)));
+    public static final Item BREAD_KNIFE_ITEM = registerItem("bread_knife_item",
+            new BreadKnifeItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).maxCount(1)));
+
+    public static final Item SLICED_BREAD_ITEM = registerItem("sliced_bread_item",
+            new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).food(
+                    (new FoodComponent.Builder()).hunger(2).snack().build())));
+    public static final Item DOUGH_ITEM = registerItem("dough_item",
+            new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
+    public static final Item FLATTENED_DOUGH_ITEM = registerItem("flattened_dough_item",
+            new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
+    public static final Item COOKIE_DOUGH_ITEM = registerItem("cookie_dough_item",
+            new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
+    public static final Item CHOCOLATE_CHIP_COOKIE_DOUGH_ITEM = registerItem("chocolate_chip_cookie_dough_item",
+            new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).food(
+                    (new FoodComponent.Builder()).hunger(2).snack().build())));
 
 
     private static Item registerItem(String name, Item item) {

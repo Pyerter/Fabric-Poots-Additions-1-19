@@ -34,7 +34,7 @@ import java.util.Optional;
 
 // Kitchen Stove!
 public class KitchenStoveStationEntity extends BlockEntity implements NamedScreenHandlerFactory, ImplementedInventory {
-    private static final String DISPLAY_NAME = "Kitchen Stove Station";
+    private static final String DISPLAY_NAME = "Kitchen Stove";
     private static final List<Item> acceptedQuickTransfersTopLevel = new ArrayList<>();
     private static final List<Item> acceptedQuickTransfersBottomLevel = new ArrayList<>();
     public static boolean tryRegisterQuickTransfer(Item item, int level) {

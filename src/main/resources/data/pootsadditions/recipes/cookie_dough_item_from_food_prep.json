@@ -1,0 +1,15 @@
+{
+  "type": "pootsadditions:food_prepping_station",
+  "ingredients": [
+    {
+      "item": "pootsadditions:flattened_dough_item"
+    }
+  ],
+  "output": {
+    "item": "pootsadditions:cookie_dough_item",
+    "count": 2
+  },
+  "tool_ingredient": {
+    "item": "pootsadditions:cookie_cutter_item"
+  }
+}

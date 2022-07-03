@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "pootsadditions:item/cookie_cutter_item"
+  }
+}

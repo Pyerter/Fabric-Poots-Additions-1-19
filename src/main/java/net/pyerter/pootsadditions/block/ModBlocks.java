@@ -3,10 +3,7 @@ package net.pyerter.pootsadditions.block;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.pyerter.pootsadditions.PootsAdditions;
-import net.pyerter.pootsadditions.block.custom.CaptureChamberBlock;
-import net.pyerter.pootsadditions.block.custom.EngineeringStationBlock;
-import net.pyerter.pootsadditions.block.custom.KitchenStoveStation;
-import net.pyerter.pootsadditions.block.custom.TridiBlock;
+import net.pyerter.pootsadditions.block.custom.*;
 import net.pyerter.pootsadditions.block.entity.CaptureChamberEntity;
 import net.pyerter.pootsadditions.item.ModItemGroup;
 import net.minecraft.block.Block;
@@ -50,6 +47,9 @@ public class ModBlocks {
                 return 0;
             })),
             ModItemGroup.SAPPHIRE);
+
+    public static final Block FOOD_PREPPING_STATION = registerBlock("food_prepping_station",
+            new FoodPreppingStation(FabricBlockSettings.of(Material.WOOD).nonOpaque()), ModItemGroup.SAPPHIRE);
 
     private static Block registerBlock(String name, Block block, ItemGroup tab) {
         registerBlockItem(name, block, tab);

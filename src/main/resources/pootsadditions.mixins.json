@@ -6,7 +6,9 @@
   "mixins": [
     "ModLivingEntityMixin",
     "ModPlayerEntityMixin",
-    "ModItemSpecialRecipeMixin"
+    "ModItemSpecialRecipeMixin",
+    "ModItemRendererColorProviderMixin",
+    "ModEntityRemovalReasonOverriderMixin"
   ],
   "client": [
     "ExampleMixin"

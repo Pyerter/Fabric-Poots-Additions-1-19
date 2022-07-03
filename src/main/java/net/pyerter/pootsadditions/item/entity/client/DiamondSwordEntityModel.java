@@ -22,16 +22,14 @@ import net.minecraft.resource.ResourceReloader;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.pyerter.pootsadditions.item.entity.custom.DiamondSwordEntity;
+import net.pyerter.pootsadditions.util.IColorsProvider;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class DiamondSwordEntityModel extends EntityModel<DiamondSwordEntity> {
 
-    ItemColors colors;
-
     DiamondSwordEntityModel() {
-        colors = ItemColors.create(new BlockColors());
     }
 
     @Override
@@ -45,7 +43,7 @@ public class DiamondSwordEntityModel extends EntityModel<DiamondSwordEntity> {
         renderBakedItemModel(model, Items.DIAMOND_SWORD.getDefaultStack(), light, overlay, matrices, vertices);
     }
 
-    private void renderBakedItemModel(BakedModel model, ItemStack stack, int light, int overlay, MatrixStack matrices, VertexConsumer vertices) {
+    public void renderBakedItemModel(BakedModel model, ItemStack stack, int light, int overlay, MatrixStack matrices, VertexConsumer vertices) {
         Random random = Random.create();
         long l = 42L;
         Direction[] var10 = Direction.values();
@@ -70,7 +68,7 @@ public class DiamondSwordEntityModel extends EntityModel<DiamondSwordEntity> {
             BakedQuad bakedQuad = (BakedQuad)var9.next();
             int i = -1;
             if (bl && bakedQuad.hasColor()) {
-                i = this.colors.getColor(stack, bakedQuad.getColorIndex());
+                i = ((IColorsProvider) MinecraftClient.getInstance().getItemRenderer()).getColors().getColor(stack, bakedQuad.getColorIndex());
             }
 
             float f = (float)(i >> 16 & 255) / 255.0F;

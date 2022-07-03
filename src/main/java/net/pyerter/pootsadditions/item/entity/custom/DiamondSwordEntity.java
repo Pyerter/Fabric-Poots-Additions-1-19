@@ -6,18 +6,20 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.world.World;
+import net.pyerter.pootsadditions.util.IIsRemovedOverrider;
 
-public class DiamondSwordEntity extends ItemEntity {
+public class DiamondSwordEntity extends ItemEntity implements IIsRemovedOverrider {
     public DiamondSwordEntity(EntityType<? extends ItemEntity> entityType, World world) {
         super(entityType, world);
     }
 
     @Override
     public void tick() {
-        if (this.getStack().isEmpty()) {
-            this.discard();
-        } else {
-            super.tick();
-        }
+
+    }
+
+    @Override
+    public boolean isRemovedSpecial() {
+        return false;
     }
 }

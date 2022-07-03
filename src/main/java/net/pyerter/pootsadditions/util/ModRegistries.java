@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRe
 import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.entity.ModEntities;
 import net.pyerter.pootsadditions.entity.custom.BobcatEntity;
+import net.pyerter.pootsadditions.item.entity.ModItemEntities;
 
 public class ModRegistries {
 
@@ -13,6 +14,7 @@ public class ModRegistries {
 
     private static void registerAttributes() {
         PootsAdditions.logInfo("Registering entity attributes");
-        FabricDefaultAttributeRegistry.register(ModEntities.BOBCAT, BobcatEntity.setAttributes());
+        ModEntities.registerEntityAttributes();
+        ModItemEntities.registerEntityAttributes();
     }
 }

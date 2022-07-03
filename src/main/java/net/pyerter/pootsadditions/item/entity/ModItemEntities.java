@@ -8,6 +8,8 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.pyerter.pootsadditions.PootsAdditions;
+import net.pyerter.pootsadditions.entity.ModEntities;
+import net.pyerter.pootsadditions.entity.client.BobcatRenderer;
 import net.pyerter.pootsadditions.item.entity.client.DiamondSwordEntityRenderer;
 import net.pyerter.pootsadditions.item.entity.custom.DiamondSwordEntity;
 
@@ -20,6 +22,10 @@ public class ModItemEntities {
     public static void registerEntityAttributes() {
         EntityRendererRegistry.register(DIAMOND_SWORD_ENTITY, (context) -> { return new DiamondSwordEntityRenderer(context); });
         // FabricDefaultAttributeRegistry.register(DIAMOND_SWORD_ENTITY, DiamondSwordEntity.create);
+    }
+
+    public static void registerEntityRenderers() {
+        EntityRendererRegistry.register(DIAMOND_SWORD_ENTITY, DiamondSwordEntityRenderer::new);
     }
 
 }

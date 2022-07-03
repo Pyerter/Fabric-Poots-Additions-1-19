@@ -1,7 +1,9 @@
 package net.pyerter.pootsadditions.block;
 
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.minecraft.client.render.RenderLayer;
 import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.block.custom.*;
 import net.pyerter.pootsadditions.block.entity.CaptureChamberEntity;
@@ -64,5 +66,13 @@ public class ModBlocks {
     public static void registerModBlocks() {
         PootsAdditions.logDebug("Registering ModBlocks");
 
+    }
+
+    public static void registerModBlockRenderLayers() {
+        BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.TRIDI, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.CAPTURE_CHAMBER, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.ENGINEERING_STATION, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.KITCHEN_STOVE_STATION, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.FOOD_PREPPING_STATION, RenderLayer.getCutout());
     }
 }

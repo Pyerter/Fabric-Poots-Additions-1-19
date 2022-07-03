@@ -12,28 +12,20 @@ import net.minecraft.item.Items;
 import net.pyerter.pootsadditions.block.ModBlocks;
 import net.pyerter.pootsadditions.entity.ModEntities;
 import net.pyerter.pootsadditions.entity.client.BobcatRenderer;
+import net.pyerter.pootsadditions.item.entity.ModItemEntities;
 import net.pyerter.pootsadditions.screen.*;
 import net.pyerter.pootsadditions.screen.handlers.ModScreenHandlers;
 
 public class PootsAdditionsClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.TRIDI, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.CAPTURE_CHAMBER, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.ENGINEERING_STATION, RenderLayer.getCutout());
-        BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.KITCHEN_STOVE_STATION, RenderLayer.getCutout());
-
-        BlockRenderLayerMap.INSTANCE.putItem(Items.DIAMOND_SWORD, RenderLayer.getCutout());
+        ModBlocks.registerModBlockRenderLayers();
 
         KeyBindingRegistryImpl.registerKeyBinding(new KeyBinding("key.pootsadditions.combat_key", InputUtil.GLFW_KEY_G, "PootsAdditions"));
 
-        EntityRendererRegistry.register(ModEntities.BOBCAT, BobcatRenderer::new);
+        ModEntities.registerEntityRenderers();
+        ModItemEntities.registerEntityRenderers();
 
-        ScreenRegistry.register(ModScreenHandlers.TRIDI_SCREEN_HANDLER, TridiScreen::new);
-        ScreenRegistry.register(ModScreenHandlers.CAPTURE_CHAMBER_SCREEN_HANDLER, CaptureChamberScreen::new);
-        ScreenRegistry.register(ModScreenHandlers.PAUTSCH_ITEM_SCREEN_HANDLER, PautschItemScreen::new);
-        ScreenRegistry.register(ModScreenHandlers.ENGINEERING_STATION_SCREEN_HANDLER, EngineeringStationScreen::new);
-        ScreenRegistry.register(ModScreenHandlers.KITCHEN_STOVE_STATION_SCREEN_HANDLER, KitchenStoveStationScreen::new);
-        ScreenRegistry.register(ModScreenHandlers.FOOD_PREPPING_STATION_SCREEN_HANDLER, FoodPreppingStationScreen::new);
+        ModScreens.registerScreens();
     }
 }

@@ -27,7 +27,7 @@ public class PootsAdditionsClient implements ClientModInitializer {
         KeyBindingRegistryImpl.registerKeyBinding(combatKey);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (combatKey.wasPressed()) {
-                AccessoryTabAssistant.tryOpenTabScreen(ModScreenHandlers.ACCESSORIES_INVENTORY_SCREEN_HANDLER);
+                AccessoryTabAssistant.tryOpenTabScreen(ModScreenHandlers.ACCESSORIES_INVENTORY_SCREEN_HANDLER, true);
             }
         });
 

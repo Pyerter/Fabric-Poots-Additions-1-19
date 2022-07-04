@@ -13,7 +13,9 @@
     "ModArmorFeatureRendererHiderMixin",
     "ModInventoryScreenTabsMixin",
     "ModPlayerAccessoriesInventoryMixin",
-    "ModPlayerScreenHandlerAccessoryTabMixin"
+    "ModPlayerScreenHandlerAccessoryTabMixin",
+    "ModServerPlayPacketListenerMixin",
+    "ModPlayerServerEntityScreenHandlerMixin"
   ],
   "client": [
     "ExampleMixin"

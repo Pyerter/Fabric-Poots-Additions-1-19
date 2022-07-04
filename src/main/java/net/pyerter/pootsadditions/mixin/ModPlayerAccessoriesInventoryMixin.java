@@ -5,6 +5,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
@@ -21,6 +22,7 @@ import net.pyerter.pootsadditions.screen.AccessoryTabAssistant;
 import org.apache.commons.compress.harmony.pack200.NewAttributeBands;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -33,6 +35,9 @@ public abstract class ModPlayerAccessoriesInventoryMixin extends LivingEntity im
     protected AccessoriesInventory accessoriesInventory;
     protected List<ScreenHandler> registeredAccessoryTabHandlers;
 
+    @Shadow
+    PlayerInventory inventory;
+
     protected ModPlayerAccessoriesInventoryMixin(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
     }
@@ -41,7 +46,7 @@ public abstract class ModPlayerAccessoriesInventoryMixin extends LivingEntity im
     void onConstructorCall(World world, BlockPos pos, float yaw, GameProfile gameProfile, @Nullable PlayerPublicKey publicKey, CallbackInfo info) {
         accessoriesInventory = new AccessoriesInventory((PlayerEntity)(Object)this);
         registeredAccessoryTabHandlers = new ArrayList<>();
-        AccessoryTabAssistant.generateScreenHandlers(registeredAccessoryTabHandlers, ((PlayerEntity)(Object)this).getInventory(), !world.isClient, ((PlayerEntity)(Object)this));
+        AccessoryTabAssistant.generateScreenHandlers(registeredAccessoryTabHandlers, inventory, !world.isClient, ((PlayerEntity)(Object)this));
     }
 
     @Inject(method="tickMovement", at=@At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerInventory;updateItems()V"))

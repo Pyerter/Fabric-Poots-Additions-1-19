@@ -1,6 +1,7 @@
 package net.pyerter.pootsadditions.screen;
 
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
+import net.minecraft.text.Text;
 import net.minecraft.util.Pair;
 import net.pyerter.pootsadditions.screen.handlers.AccessoryInventoryScreenHandler;
 import net.pyerter.pootsadditions.screen.handlers.ModScreenHandlers;
@@ -19,7 +20,8 @@ public class ModScreens {
     public static void registerAccessoryTabScreens() {
         AccessoryTabAssistant.tryRegisterScreens(ModScreenHandlers.ACCESSORIES_INVENTORY_SCREEN_HANDLER,
                 new Pair<>((player) -> new AccessoryInventoryScreen(player),
-                        (inventory, onServer, owner) -> new AccessoryInventoryScreenHandler(inventory, onServer, owner)));
+                        (inventory, onServer, owner) -> new AccessoryInventoryScreenHandler(inventory, onServer, owner)),
+                Text.of("Accessory Inventory"));
     }
 
 }

@@ -42,6 +42,7 @@ public class PootsAdditions implements ModInitializer {
 		ModScreenHandlers.registerAllScreenHandlers();
 
 		GeckoLib.initialize();
+
 		ModScreens.registerAccessoryTabScreens();
 	}
 

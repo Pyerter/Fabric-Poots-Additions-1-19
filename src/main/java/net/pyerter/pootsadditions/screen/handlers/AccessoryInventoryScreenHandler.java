@@ -12,6 +12,8 @@ import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.pyerter.pootsadditions.PootsAdditions;
@@ -25,12 +27,14 @@ import static net.minecraft.screen.PlayerScreenHandler.*;
 
 public class AccessoryInventoryScreenHandler extends ScreenHandler {
     private final AccessoriesInventory inventory;
+    private final PlayerInventory playerInventory;
     public final boolean onServer;
     private final PlayerEntity owner;
 
     public AccessoryInventoryScreenHandler(PlayerInventory playerInventory, boolean onServer, PlayerEntity owner) {
         super(ModScreenHandlers.ACCESSORIES_INVENTORY_SCREEN_HANDLER, AccessoryTabAssistant.getSyncId(ModScreenHandlers.ACCESSORIES_INVENTORY_SCREEN_HANDLER));
         this.inventory = ((IAccessoriesInventory)owner).getAccessoriesInventory();
+        this.playerInventory = playerInventory;
         this.onServer = onServer;
         this.owner = owner;
         checkSize(this.inventory, AccessoriesInventory.INVENTORY_SIZE);
@@ -56,6 +60,7 @@ public class AccessoryInventoryScreenHandler extends ScreenHandler {
     public AccessoryInventoryScreenHandler(int syncId, PlayerInventory playerInventory, AccessoriesInventory inventory) {
         super(ModScreenHandlers.ACCESSORIES_INVENTORY_SCREEN_HANDLER, syncId);
         this.inventory = inventory;
+        this.playerInventory = playerInventory;
         this.onServer = !playerInventory.player.world.isClient();
         owner = playerInventory.player;
         checkSize(inventory, AccessoriesInventory.INVENTORY_SIZE);
@@ -99,6 +104,7 @@ public class AccessoryInventoryScreenHandler extends ScreenHandler {
     @Override
     public void onContentChanged(Inventory inventory) {
         super.onContentChanged(inventory);
+        playerInventory.markDirty();
     }
 
     @Override
@@ -208,6 +214,13 @@ public class AccessoryInventoryScreenHandler extends ScreenHandler {
         }
         return super.onButtonClick(player, id);
         // have code to open up other tabs
+    }
+
+    @Override
+    public void onSlotClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player) {
+        if (!player.world.isClient)
+            PootsAdditions.logInfo("Got slot click received on server");
+        super.onSlotClick(slotIndex, button, actionType, player);
     }
 
     @Override

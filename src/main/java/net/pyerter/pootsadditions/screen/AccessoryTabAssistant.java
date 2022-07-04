@@ -17,9 +17,11 @@ import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.pyerter.pootsadditions.PootsAdditions;
+import net.pyerter.pootsadditions.network.packet.OpenAccTabScreenC2SPacket;
 import net.pyerter.pootsadditions.screen.factories.InventoryScreenFactory;
 import net.pyerter.pootsadditions.screen.handlers.AccessoryTabsScreenFactory;
 import net.pyerter.pootsadditions.screen.handlers.AccessoryTabsScreenHandlerFactory;
@@ -39,16 +41,18 @@ public class AccessoryTabAssistant {
 
     public static final Identifier ACC_TABS_TEXTURE = new Identifier(PootsAdditions.MOD_ID, "textures/gui/accessory_inventory_tabs_gui.png");
     public static final Map<ScreenHandlerType<? extends ScreenHandler>, Pair<AccessoryTabsScreenFactory, AccessoryTabsScreenHandlerFactory>> registeredScreens = new HashMap<>();
+    public static final Map<ScreenHandlerType<? extends ScreenHandler>, Text> registeredScreenNames = new HashMap<>();
     private static final List<ScreenHandlerType<? extends ScreenHandler>> registeredScreenTypes = initializeList();
     private static List<ScreenHandlerType<? extends ScreenHandler>> initializeList() {
         List<ScreenHandlerType<? extends ScreenHandler>> list = new ArrayList<>();
         return list;
     }
 
-    public static boolean tryRegisterScreens(ScreenHandlerType<? extends ScreenHandler> screenHandlerType, Pair<AccessoryTabsScreenFactory, AccessoryTabsScreenHandlerFactory> screenSupplier) {
+    public static boolean tryRegisterScreens(ScreenHandlerType<? extends ScreenHandler> screenHandlerType, Pair<AccessoryTabsScreenFactory, AccessoryTabsScreenHandlerFactory> screenSupplier, Text screenName) {
         if (!registeredScreenTypes.contains(screenHandlerType) && screenSupplier != null) {
             registeredScreenTypes.add(screenHandlerType);
             registeredScreens.put(screenHandlerType, screenSupplier);
+            registeredScreenNames.put(screenHandlerType, screenName);
             return true;
         } else if (screenSupplier == null)
             PootsAdditions.logInfo("ERROR - screenSupplier given to register screens is null");
@@ -136,16 +140,10 @@ public class AccessoryTabAssistant {
                 if (currentTab != tab && AccessoryTabAssistant.mouseInAccessoryTab(x, y, mouseX, mouseY, tab)) {
                     Pair<Double, Double> mousePos = freezeMouse();
                     if (MinecraftClient.getInstance().player.currentScreenHandler != null)
-                        MinecraftClient.getInstance().player.closeHandledScreen();
+                        MinecraftClient.getInstance().player.closeScreen();
                     PootsAdditions.logInfo("Clicked tab " + tab);
-                    HandledScreen newScreen = registeredScreens.get(registeredScreenTypes.get(i)).getLeft().generateScreen(MinecraftClient.getInstance().player);
-                    if (newScreen == null || newScreen.getScreenHandler() == null) {
-                        PootsAdditions.LOGGER.error("Screen or ScreenHandler for tab " + tab + " is null... I'm not switching to that screen :).");
-                        unfreezeMouse(mousePos);
-                        targetTab = -1;
-                        break;
-                    }
-                    MinecraftClient.getInstance().setScreen(newScreen);
+                    ScreenHandlerType<? extends ScreenHandler> screenType = registeredScreenTypes.get(i);
+                    tryOpenTabScreen(screenType, true);
                     unfreezeMouse(mousePos);
                     targetTab = tab;
                     break;
@@ -160,13 +158,20 @@ public class AccessoryTabAssistant {
     }
 
     public static boolean tryOpenTabScreen(ScreenHandlerType<? extends ScreenHandler> handlerType) {
+        return tryOpenTabScreen(handlerType, false);
+    }
+
+    public static boolean tryOpenTabScreen(ScreenHandlerType<? extends ScreenHandler> handlerType, boolean clientSide) {
         if (registeredScreenTypes.contains(handlerType)) {
             HandledScreen newScreen = registeredScreens.get(handlerType).getLeft().generateScreen(MinecraftClient.getInstance().player);
             if (newScreen == null || newScreen.getScreenHandler() == null) {
                 PootsAdditions.LOGGER.error("Screen or ScreenHandler for handler type " + handlerType.toString() + " is null... I'm not switching to that screen :).");
                 return false;
             }
+            MinecraftClient.getInstance().player.currentScreenHandler = newScreen.getScreenHandler();
             MinecraftClient.getInstance().setScreen(newScreen);
+            if (clientSide)
+                MinecraftClient.getInstance().player.networkHandler.sendPacket(new OpenAccTabScreenC2SPacket(getSyncId(handlerType), handlerType, registeredScreenNames.get(handlerType)));
             return true;
         }
         return false;

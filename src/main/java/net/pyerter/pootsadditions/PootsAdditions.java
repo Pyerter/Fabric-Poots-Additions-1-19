@@ -8,6 +8,7 @@ import net.pyerter.pootsadditions.block.ModBlocks;
 import net.pyerter.pootsadditions.block.entity.ModBlockEntities;
 import net.pyerter.pootsadditions.item.ModItems;
 import net.pyerter.pootsadditions.recipe.ModRecipes;
+import net.pyerter.pootsadditions.screen.ModScreens;
 import net.pyerter.pootsadditions.screen.handlers.ModScreenHandlers;
 import net.pyerter.pootsadditions.util.ModRegistries;
 import net.pyerter.pootsadditions.world.gen.ModWorldGen;
@@ -41,6 +42,8 @@ public class PootsAdditions implements ModInitializer {
 		ModScreenHandlers.registerAllScreenHandlers();
 
 		GeckoLib.initialize();
+
+		ModScreens.registerAccessoryTabScreens();
 	}
 
 	public static void logInfo(String message) {

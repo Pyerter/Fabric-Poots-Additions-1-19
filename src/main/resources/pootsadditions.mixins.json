@@ -10,7 +10,10 @@
     "ModItemRendererColorProviderMixin",
     "ModEntityRemovalReasonOverriderMixin",
     "ModPlayerEntityArmorHiddenTrackerMixin",
-    "ModArmorFeatureRendererHiderMixin"
+    "ModArmorFeatureRendererHiderMixin",
+    "ModInventoryScreenTabsMixin",
+    "ModPlayerAccessoriesInventoryMixin",
+    "ModPlayerScreenHandlerAccessoryTabMixin"
   ],
   "client": [
     "ExampleMixin"

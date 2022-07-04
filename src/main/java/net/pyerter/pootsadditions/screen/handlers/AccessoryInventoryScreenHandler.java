@@ -13,7 +13,10 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.collection.DefaultedList;
+import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.item.inventory.AccessoriesInventory;
+import net.pyerter.pootsadditions.item.inventory.IAccessoriesInventory;
 import net.pyerter.pootsadditions.screen.AccessoryTabAssistant;
 import net.pyerter.pootsadditions.screen.slot.PickySlot;
 import java.util.function.BiPredicate;
@@ -22,18 +25,48 @@ import static net.minecraft.screen.PlayerScreenHandler.*;
 
 public class AccessoryInventoryScreenHandler extends ScreenHandler {
     private final AccessoriesInventory inventory;
+    public final boolean onServer;
+    private final PlayerEntity owner;
+
+    public AccessoryInventoryScreenHandler(PlayerInventory playerInventory, boolean onServer, PlayerEntity owner) {
+        super(ModScreenHandlers.ACCESSORIES_INVENTORY_SCREEN_HANDLER, AccessoryTabAssistant.getSyncId(ModScreenHandlers.ACCESSORIES_INVENTORY_SCREEN_HANDLER));
+        this.inventory = ((IAccessoriesInventory)owner).getAccessoriesInventory();
+        this.onServer = onServer;
+        this.owner = owner;
+        checkSize(this.inventory, AccessoriesInventory.INVENTORY_SIZE);
+        checkSize(playerInventory, 41);
+        //this.inventory.onOpen(owner);
+        //playerInventory.onOpen(owner);
+
+        initializeInventory();
+
+        addPlayerEquipment(playerInventory);
+        addPlayerInventory(playerInventory);
+        addPlayerHotbar(playerInventory);
+        addPlayerOffhand(playerInventory);
+
+        PootsAdditions.logInfo("Generated accessory inventory handler with size " + this.slots.size());
+    }
+
+    @Override
+    public DefaultedList<ItemStack> getStacks() {
+        return super.getStacks();
+    }
 
     public AccessoryInventoryScreenHandler(int syncId, PlayerInventory playerInventory, AccessoriesInventory inventory) {
         super(ModScreenHandlers.ACCESSORIES_INVENTORY_SCREEN_HANDLER, syncId);
         this.inventory = inventory;
+        this.onServer = !playerInventory.player.world.isClient();
+        owner = playerInventory.player;
         checkSize(inventory, AccessoriesInventory.INVENTORY_SIZE);
         inventory.onOpen(playerInventory.player);
 
         initializeInventory();
 
+        addPlayerEquipment(playerInventory);
         addPlayerInventory(playerInventory);
         addPlayerHotbar(playerInventory);
-        addPlayerEquipment(playerInventory);
+        addPlayerOffhand(playerInventory);
 
         // addProperties(propertyDelegate);
     }
@@ -49,7 +82,11 @@ public class AccessoryInventoryScreenHandler extends ScreenHandler {
             int x = startX + offsetX * i;
             for (int j = 0; j < 4; j++) {
                 int y = starY + offsetY * j;
-                this.addSlot(new PickySlot(inventory, i * 4 + j, x, y, (stack, index) -> false));
+                int slotsSize = this.slots.size();
+                this.addSlot(new PickySlot(this.inventory, (i * 4) + j, x, y, (stack, index) -> true));
+                if (slotsSize == this.slots.size()) {
+                    PootsAdditions.LOGGER.error("ERRRROOOOOOORRR IT DIDN'T ADD SLOT AT INDEX " + ((i * 4) + j));
+                }
             }
         }
     }
@@ -124,17 +161,27 @@ public class AccessoryInventoryScreenHandler extends ScreenHandler {
     }
 
     private void addPlayerInventory(PlayerInventory playerInventory) {
-        for (int row = 0; row < 3; row++) {
+        for(int i = 0; i < 3; ++i) {
+            for(int j = 0; j < 9; ++j) {
+                this.addSlot(new Slot(playerInventory, j + (i + 1) * 9, 8 + j * 18, 84 + i * 18));
+            }
+        }
+
+        /*for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
                 this.addSlot(new Slot(playerInventory, 9 + col + row * 9, 8 + col * 18, 84 + row * 18));
             }
-        }
+        }*/
     }
 
     private void addPlayerHotbar(PlayerInventory playerInventory) {
-        for (int i = 0; i < 9; i++) {
+        for(int i = 0; i < 9; ++i) {
             this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 142));
         }
+
+        /*for (int i = 0; i < 9; i++) {
+            this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 142));
+        }*/
     }
 
     private void addPlayerEquipment(PlayerInventory playerInventory) {
@@ -146,6 +193,9 @@ public class AccessoryInventoryScreenHandler extends ScreenHandler {
             slot.backgroundSpriteSupplier = () -> Pair.of(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, EMPTY_ARMOR_SLOT_TEXTURES[equipmentSlot.getEntitySlotId()]);
             this.addSlot(slot);
         }
+    }
+
+    private void addPlayerOffhand(PlayerInventory playerInventory) {
         PickySlot offhandSlot = new PickySlot(playerInventory, PlayerInventory.OFF_HAND_SLOT, 77, 62);
         offhandSlot.backgroundSpriteSupplier = () -> Pair.of(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, PlayerScreenHandler.EMPTY_OFFHAND_ARMOR_SLOT);
         this.addSlot(offhandSlot);

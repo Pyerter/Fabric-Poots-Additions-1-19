@@ -35,8 +35,8 @@ public class ModScreenHandlers {
         ENGINEERING_STATION_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(new Identifier(PootsAdditions.MOD_ID, "engineering_station"), EngineeringStationScreenHandler::new);
         KITCHEN_STOVE_STATION_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(new Identifier(PootsAdditions.MOD_ID, "kitchen_stove_station"), KitchenStoveStationScreenHandler::new);
         FOOD_PREPPING_STATION_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(new Identifier(PootsAdditions.MOD_ID, "food_prepping_station"), FoodPreppingStationScreenHandler::new);
-        ACCESSORIES_INVENTORY_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(new Identifier(PootsAdditions.MOD_ID, "accessories_inventory"),
-                (id, inv) -> new AccessoryInventoryScreenHandler(id, inv, ((IAccessoriesInventory)inv.player).getAccessoriesInventory()));
+        //ACCESSORIES_INVENTORY_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(new Identifier(PootsAdditions.MOD_ID, "accessories_inventory"),
+        //        (id, inv) -> new AccessoryInventoryScreenHandler(id, inv, ((IAccessoriesInventory)inv.player).getAccessoriesInventory()));
         PLAYER_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(new Identifier("inventory"), (id, inv) -> new PlayerScreenHandler(inv, false, inv.player));
     }
 }

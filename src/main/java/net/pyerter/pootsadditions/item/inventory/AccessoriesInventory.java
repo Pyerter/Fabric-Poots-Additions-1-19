@@ -12,7 +12,7 @@ public class AccessoriesInventory implements ImplementedInventory, Nameable {
     public static final String INVENTORY_NBT_ID = "pootsadditions.accessories_inventory";
     public static final Integer INVENTORY_SIZE = 8;
 
-    public final DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
+    public final DefaultedList<ItemStack> items = DefaultedList.ofSize(8, ItemStack.EMPTY);
     public final PlayerEntity player;
     public int selectedSlot = -1;
 
@@ -57,6 +57,8 @@ public class AccessoriesInventory implements ImplementedInventory, Nameable {
     }
 
     public void readNbt(NbtList nbtList) {
+        items.clear();
+
         for(int i = 0; i < nbtList.size(); ++i) {
             NbtCompound nbtCompound = nbtList.getCompound(i);
             int slot = nbtCompound.getByte("Slot") & 255;
@@ -72,5 +74,10 @@ public class AccessoriesInventory implements ImplementedInventory, Nameable {
     @Override
     public Text getName() {
         return Text.of("Accessories Inventory");
+    }
+
+    @Override
+    public boolean canPlayerUse(PlayerEntity player) {
+        return player.equals(this.player);
     }
 }

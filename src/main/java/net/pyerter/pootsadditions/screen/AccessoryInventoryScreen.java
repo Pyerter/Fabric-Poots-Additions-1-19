@@ -4,20 +4,24 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3f;
 import net.pyerter.pootsadditions.PootsAdditions;
+import net.pyerter.pootsadditions.item.inventory.IAccessoryTabsHandlerProvider;
 import net.pyerter.pootsadditions.screen.handlers.AccessoryInventoryScreenHandler;
 import net.pyerter.pootsadditions.screen.handlers.EngineeringStationScreenHandler;
+import net.pyerter.pootsadditions.screen.handlers.ModScreenHandlers;
 import net.pyerter.pootsadditions.screen.handlers.PautschItemScreenHandler;
 
 public class AccessoryInventoryScreen extends HandledScreen<AccessoryInventoryScreenHandler> {
@@ -28,6 +32,14 @@ public class AccessoryInventoryScreen extends HandledScreen<AccessoryInventorySc
     private boolean mouseDown = false;
     private int x, y;
     private float mouseX, mouseY;
+
+    public AccessoryInventoryScreen(ClientPlayerEntity player) {
+        super(((IAccessoryTabsHandlerProvider)player).getAccessoryTabsScreenHandler(AccessoryTabAssistant.getScreenTab(ModScreenHandlers.ACCESSORIES_INVENTORY_SCREEN_HANDLER)),
+                player.getInventory(), Text.of("Accessories Inventory"));
+        passEvents = true;
+
+        PootsAdditions.logInfo("Opened new accessory inventory screen with inventory size " + handler.slots.size());
+    }
 
     public AccessoryInventoryScreen(AccessoryInventoryScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);

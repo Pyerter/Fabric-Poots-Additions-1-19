@@ -2,23 +2,31 @@ package net.pyerter.pootsadditions.screen;
 
 import com.eliotlash.mclib.math.functions.limit.Min;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Mouse;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.screen.factories.InventoryScreenFactory;
+import net.pyerter.pootsadditions.screen.handlers.AccessoryTabsScreenFactory;
+import net.pyerter.pootsadditions.screen.handlers.AccessoryTabsScreenHandlerFactory;
 import net.pyerter.pootsadditions.screen.handlers.ModScreenHandlers;
+import net.pyerter.pootsadditions.util.ICursorController;
 import net.pyerter.pootsadditions.util.Util;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,19 +38,20 @@ import java.util.function.Supplier;
 public class AccessoryTabAssistant {
 
     public static final Identifier ACC_TABS_TEXTURE = new Identifier(PootsAdditions.MOD_ID, "textures/gui/accessory_inventory_tabs_gui.png");
-    public static final Map<ScreenHandlerType<? extends ScreenHandler>, NamedScreenHandlerFactory> registeredScreens = new HashMap<>();
+    public static final Map<ScreenHandlerType<? extends ScreenHandler>, Pair<AccessoryTabsScreenFactory, AccessoryTabsScreenHandlerFactory>> registeredScreens = new HashMap<>();
     private static final List<ScreenHandlerType<? extends ScreenHandler>> registeredScreenTypes = initializeList();
     private static List<ScreenHandlerType<? extends ScreenHandler>> initializeList() {
         List<ScreenHandlerType<? extends ScreenHandler>> list = new ArrayList<>();
         return list;
     }
 
-    public static boolean tryRegisterScreens(ScreenHandlerType<? extends ScreenHandler> screenHandlerType, NamedScreenHandlerFactory screenSupplier) {
-        if (!registeredScreenTypes.contains(screenHandlerType)) {
+    public static boolean tryRegisterScreens(ScreenHandlerType<? extends ScreenHandler> screenHandlerType, Pair<AccessoryTabsScreenFactory, AccessoryTabsScreenHandlerFactory> screenSupplier) {
+        if (!registeredScreenTypes.contains(screenHandlerType) && screenSupplier != null) {
             registeredScreenTypes.add(screenHandlerType);
             registeredScreens.put(screenHandlerType, screenSupplier);
             return true;
-        }
+        } else if (screenSupplier == null)
+            PootsAdditions.logInfo("ERROR - screenSupplier given to register screens is null");
         return false;
     }
 
@@ -54,10 +63,21 @@ public class AccessoryTabAssistant {
         return -1;
     }
 
-    public static int getScreenTab(ScreenHandler screenHandler) {
-        if (screenHandler instanceof PlayerScreenHandler)
-            return 0;
-        return -1;
+    public static int getSyncId(ScreenHandlerType<? extends ScreenHandler> screenHandlerType) {
+        int generatedSyncId = -1;
+
+        int index = registeredScreenTypes.indexOf(screenHandlerType);
+        if (index != -1)
+            generatedSyncId = index + 1;
+
+        return generatedSyncId;
+    }
+
+    public static boolean generateScreenHandlers(List<ScreenHandler> targetList, PlayerInventory inventory, boolean onServer, PlayerEntity owner) {
+        for (ScreenHandlerType<? extends ScreenHandler> screenHandlerType: registeredScreenTypes) {
+            targetList.add(registeredScreens.get(screenHandlerType).getRight().generateScreenHandler(inventory, onServer, owner));
+        }
+        return true;
     }
 
     public static void drawTabBackground(DrawableHelper drawableHelper, MatrixStack matrices, int x, int y) {
@@ -102,7 +122,11 @@ public class AccessoryTabAssistant {
         int targetTab = -1;
 
         if (currentTab != 0 && AccessoryTabAssistant.mouseInAccessoryTab(x, y, mouseX, mouseY, 0)) {
+            Pair<Double, Double> mousePos = freezeMouse();
+            if (MinecraftClient.getInstance().player.currentScreenHandler != null)
+                MinecraftClient.getInstance().player.closeHandledScreen();
             openInventoryScreenManually();
+            unfreezeMouse(mousePos);
             targetTab = 0;
         }
 
@@ -110,22 +134,47 @@ public class AccessoryTabAssistant {
             for (int i = 0; i < registeredScreenTypes.size(); i++) {
                 int tab = i + 1;
                 if (currentTab != tab && AccessoryTabAssistant.mouseInAccessoryTab(x, y, mouseX, mouseY, tab)) {
+                    Pair<Double, Double> mousePos = freezeMouse();
+                    if (MinecraftClient.getInstance().player.currentScreenHandler != null)
+                        MinecraftClient.getInstance().player.closeHandledScreen();
                     PootsAdditions.logInfo("Clicked tab " + tab);
+                    HandledScreen newScreen = registeredScreens.get(registeredScreenTypes.get(i)).getLeft().generateScreen(MinecraftClient.getInstance().player);
+                    if (newScreen == null || newScreen.getScreenHandler() == null) {
+                        PootsAdditions.LOGGER.error("Screen or ScreenHandler for tab " + tab + " is null... I'm not switching to that screen :).");
+                        unfreezeMouse(mousePos);
+                        targetTab = -1;
+                        break;
+                    }
+                    MinecraftClient.getInstance().setScreen(newScreen);
+                    unfreezeMouse(mousePos);
                     targetTab = tab;
                     break;
                 }
             }
         }
 
-        if (targetTab > 0 && MinecraftClient.getInstance().player.currentScreenHandler != null)
-            MinecraftClient.getInstance().player.closeHandledScreen();
+        //if (targetTab > 0 && MinecraftClient.getInstance().player.currentScreenHandler != null)
+        //    MinecraftClient.getInstance().player.closeHandledScreen();
 
         return targetTab;
     }
 
+    public static boolean tryOpenTabScreen(ScreenHandlerType<? extends ScreenHandler> handlerType) {
+        if (registeredScreenTypes.contains(handlerType)) {
+            HandledScreen newScreen = registeredScreens.get(handlerType).getLeft().generateScreen(MinecraftClient.getInstance().player);
+            if (newScreen == null || newScreen.getScreenHandler() == null) {
+                PootsAdditions.LOGGER.error("Screen or ScreenHandler for handler type " + handlerType.toString() + " is null... I'm not switching to that screen :).");
+                return false;
+            }
+            MinecraftClient.getInstance().setScreen(newScreen);
+            return true;
+        }
+        return false;
+    }
+
     public static boolean userOpenHandledScreen(PlayerEntity entity, int tab) {
-        //if (entity.currentScreenHandler != null)
-        //    entity.currentScreenHandler.close(entity);
+        /*if (entity.currentScreenHandler != null)
+            entity.currentScreenHandler.close(entity);
 
         if (tab == 0) {
             return true;
@@ -134,7 +183,7 @@ public class AccessoryTabAssistant {
             PootsAdditions.logInfo("Attemptig to construct screen on tab " + tab);
             entity.openHandledScreen(registeredScreens.get(registeredScreenTypes.get(tab - 1)));
             return true;
-        }
+        }*/
         return false;
     }
 
@@ -153,4 +202,17 @@ public class AccessoryTabAssistant {
         }
     }
 
+    public static Pair<Double, Double> freezeMouse() {
+        Mouse mouse = MinecraftClient.getInstance().mouse;
+        //mouse.lockCursor();
+        return new Pair<>(mouse.getX(), mouse.getY());
+    }
+
+    public static void unfreezeMouse(Pair<Double, Double> targetPos) {
+        Mouse mouse = MinecraftClient.getInstance().mouse;
+        //mouse.unlockCursor();
+        if (targetPos != null && mouse instanceof ICursorController) {
+            //((ICursorController)mouse).setCursorPosition(targetPos.getLeft(), targetPos.getRight());
+        }
+    }
 }

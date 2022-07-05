@@ -71,6 +71,7 @@
 
   "block.pootsadditions.tridi": "Tridiminiumobulator",
   "block.pootsadditions.capture_chamber": "Capture Chamber",
+  "block.pootsadditions.capture_chamber_provider": "Capture Chamber Provider",
   "block.pootsadditions.engineering_station": "Engineering Station",
   "block.pootsadditions.kitchen_stove_station": "Kitchen Stove",
   "block.pootsadditions.food_prepping_station": "Food Prepping Station",

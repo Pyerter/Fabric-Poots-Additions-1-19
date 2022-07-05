@@ -1,5 +1,7 @@
 package net.pyerter.pootsadditions.util;
 
+import net.minecraft.util.math.BlockPos;
+
 import java.util.ArrayList;
 
 public class Util {
@@ -7,6 +9,10 @@ public class Util {
         value = Math.max(value, min);
         value = Math.min(value, max);
         return value;
+    }
+
+    public static boolean blockPosEqual(BlockPos pos1, BlockPos pos2) {
+        return pos1.asLong() == pos2.asLong();
     }
 
     public static boolean isNullOrBlank(String s) {

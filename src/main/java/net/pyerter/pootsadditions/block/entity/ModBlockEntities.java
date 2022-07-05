@@ -12,6 +12,7 @@ public class ModBlockEntities {
     public static BlockEntityType<TridiBlockEntity> TRIDI;
 
     public static BlockEntityType<CaptureChamberEntity> CAPTURE_CHAMBER;
+    public static BlockEntityType<CaptureChamberProviderEntity> CAPTURE_CHAMBER_PROVIDER;
 
     public static BlockEntityType<EngineeringStationEntity> ENGINEERING_STATION;
 
@@ -27,6 +28,10 @@ public class ModBlockEntities {
         CAPTURE_CHAMBER = Registry.register(Registry.BLOCK_ENTITY_TYPE,
                 new Identifier(PootsAdditions.MOD_ID, "capture_chamber"),
                 FabricBlockEntityTypeBuilder.create(CaptureChamberEntity::new, ModBlocks.CAPTURE_CHAMBER).build(null));
+
+        CAPTURE_CHAMBER_PROVIDER = Registry.register(Registry.BLOCK_ENTITY_TYPE,
+                new Identifier(PootsAdditions.MOD_ID, "capture_chamber_provider"),
+                FabricBlockEntityTypeBuilder.create(CaptureChamberProviderEntity::new, ModBlocks.CAPTURE_CHAMBER_PROVIDER).build(null));
 
         ENGINEERING_STATION = Registry.register(Registry.BLOCK_ENTITY_TYPE,
                 new Identifier(PootsAdditions.MOD_ID, "engineering_station"),

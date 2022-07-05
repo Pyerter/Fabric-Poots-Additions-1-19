@@ -18,6 +18,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.pyerter.pootsadditions.block.custom.CaptureChamberProviderBlock;
 import net.pyerter.pootsadditions.item.ModItems;
 import net.pyerter.pootsadditions.item.custom.engineering.AbstractPowerCore;
 import net.pyerter.pootsadditions.item.custom.engineering.MakeshiftCore;
@@ -37,10 +38,14 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
     protected final PropertyDelegate propertyDelegate;
     private int storedCharge;
     private int passiveChargeTicks;
+    private BlockPos provideTo = BlockPos.ORIGIN;
+    private int receivingPriority = -1;
 
     public static final int MAX_STORED_CHARGE = 12100;
     public static final int MAX_CHARGE_TRANSFER_RATE = 50;
     public static final int TICKS_PER_PASSIVE_CHARGE = 20;
+    public static final int TICKS_PER_PASSIVE_TRANSFER = 2;
+    public static final int DEFAULT_PRIORITY = -1;
 
     public CaptureChamberEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CAPTURE_CHAMBER, pos, state);
@@ -92,6 +97,9 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
         Inventories.writeNbt(nbt, inventory);
         nbt.putInt("capture_chamber.storedCharge", storedCharge);
         nbt.putInt("capture_chamber.passiveChargeTicks", passiveChargeTicks);
+        nbt.putLong("capture_chamber.provideTo", provideTo.asLong());
+        nbt.putInt("capture_chamber.receivingPriority", receivingPriority);
+
     }
 
     @Override
@@ -100,6 +108,8 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
         super.readNbt(nbt);
         storedCharge = nbt.getInt("capture_chamber.storedCharge");
         passiveChargeTicks = nbt.getInt("capture_chamber.passiveChargeTicks");
+        provideTo = BlockPos.fromLong(nbt.getLong("capture_chamber.provideTo"));
+        receivingPriority = nbt.getInt("capture_chamber.receivingPriority");
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, CaptureChamberEntity entity) {
@@ -108,15 +118,59 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
         if (entity.passiveChargeTicks % TICKS_PER_PASSIVE_CHARGE == 0) {
             addCharge(entity, entity.passiveChargeTicks / TICKS_PER_PASSIVE_CHARGE);
             entity.passiveChargeTicks = 0;
+            if (entity.receivingPriority != DEFAULT_PRIORITY)
+                assertStillHavePriority(world, pos, entity);
         }
+        if (entity.passiveChargeTicks % TICKS_PER_PASSIVE_TRANSFER == 0)
+            tryProvideTo(world, entity);
+
         tryAddCoreCharges(entity);
         entity.markDirty();
+    }
+
+    public static boolean tryProvideTo(World world, CaptureChamberEntity entity) {
+        if (Util.blockPosEqual(entity.provideTo, BlockPos.ORIGIN))
+            return false;
+
+        if (Util.blockPosEqual(entity.provideTo, entity.getPos())) {
+            entity.provideTo = BlockPos.ORIGIN;
+            return false;
+        }
+
+        BlockEntity targetEntity = world.getBlockEntity(entity.provideTo);
+        if (targetEntity == null || !(targetEntity instanceof CaptureChamberEntity)) {
+            entity.provideTo = BlockPos.ORIGIN;
+            return false;
+        }
+
+        CaptureChamberEntity targetChamber = (CaptureChamberEntity) targetEntity;
+        if (targetChamber.receivingPriority == DEFAULT_PRIORITY || targetChamber.receivingPriority <= entity.receivingPriority) {
+            entity.provideTo = BlockPos.ORIGIN;
+            return false;
+        }
+
+        int canTransfer = Math.min(MAX_CHARGE_TRANSFER_RATE, entity.storedCharge);
+        int transferred = addCharge(targetChamber, canTransfer);
+        if (transferred <= 0) {
+            return false;
+        } else {
+            entity.storedCharge -= transferred;
+            return true;
+        }
+    }
+
+    public static void assertStillHavePriority(World world, BlockPos pos, CaptureChamberEntity entity) {
+        BlockPos upPos = new BlockPos(pos.getX(), pos.getY() + 1, pos.getZ());
+        BlockPos downPos = new BlockPos(pos.getX(), pos.getY() - 1, pos.getZ());
+        if (!(world.getBlockEntity(upPos) instanceof CaptureChamberProviderEntity) && !(world.getBlockEntity(downPos) instanceof CaptureChamberProviderEntity)) {
+            entity.resetPriority();
+        }
     }
 
     public static int addCharge(CaptureChamberEntity entity, Integer amount) {
         int oldCharge = entity.storedCharge;
         entity.storedCharge = Util.clamp(entity.storedCharge + amount, 0, CaptureChamberEntity.MAX_STORED_CHARGE);
-        return  entity.storedCharge - oldCharge;
+        return entity.storedCharge - oldCharge;
     }
 
     private static int addCoreCharge(CaptureChamberEntity entity, Integer amount, int index) {
@@ -139,6 +193,27 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
             i++;
         }
     }
+
+    public int getReceivingPriority() {
+        return receivingPriority;
+    }
+
+    public void setReceivingPriority(int val) {
+        receivingPriority = val;
+        markDirty();
+    }
+
+    public void resetPriority() {
+        receivingPriority = DEFAULT_PRIORITY;
+        markDirty();
+    }
+
+    public void setProvideTarget(BlockPos target) {
+        this.provideTo = target;
+        markDirty();
+    }
+
+    public BlockPos getProvideTarget() { return provideTo; }
 
     private static boolean hasAvailableCoreInSlot(CaptureChamberEntity entity, int index) {
         if (entity.inventory.get(index).isEmpty())

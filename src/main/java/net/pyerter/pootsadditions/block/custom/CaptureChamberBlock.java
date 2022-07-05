@@ -6,7 +6,6 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.Items;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
@@ -20,7 +19,6 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-import net.pyerter.pootsadditions.block.ModBlocks;
 import net.pyerter.pootsadditions.block.entity.CaptureChamberEntity;
 import net.pyerter.pootsadditions.block.entity.ModBlockEntities;
 import org.jetbrains.annotations.Nullable;
@@ -98,8 +96,6 @@ public class CaptureChamberBlock extends BlockWithEntity implements BlockEntityP
                 player.openHandledScreen(screenHandlerFactory);
             }
         }
-
-        world.setThunderGradient(1);
 
         return ActionResult.SUCCESS;
     }

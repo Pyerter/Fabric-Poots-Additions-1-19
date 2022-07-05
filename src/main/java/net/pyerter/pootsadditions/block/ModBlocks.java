@@ -36,6 +36,8 @@ public class ModBlocks {
 
     public static final Block CAPTURE_CHAMBER = registerBlock("capture_chamber",
             new CaptureChamberBlock(FabricBlockSettings.of(Material.METAL).nonOpaque()), ModItemGroup.SAPPHIRE);
+    public static final Block CAPTURE_CHAMBER_PROVIDER = registerBlock("capture_chamber_provider",
+            new CaptureChamberProviderBlock(FabricBlockSettings.of(Material.REDSTONE_LAMP).nonOpaque()), ModItemGroup.SAPPHIRE);
 
     public static final Block ENGINEERING_STATION = registerBlock("engineering_station",
             new EngineeringStationBlock(FabricBlockSettings.of(Material.METAL).nonOpaque()), ModItemGroup.SAPPHIRE);
@@ -71,6 +73,7 @@ public class ModBlocks {
     public static void registerModBlockRenderLayers() {
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.TRIDI, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.CAPTURE_CHAMBER, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.CAPTURE_CHAMBER_PROVIDER, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.ENGINEERING_STATION, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.KITCHEN_STOVE_STATION, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.FOOD_PREPPING_STATION, RenderLayer.getCutout());

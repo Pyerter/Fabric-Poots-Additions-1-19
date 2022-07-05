@@ -21,7 +21,7 @@ public class CaptureChamberScreenHandler extends ScreenHandler {
     private final PropertyDelegate propertyDelegate;
 
     public CaptureChamberScreenHandler(int syncId, PlayerInventory playerInventory) {
-        this(syncId, playerInventory, new SimpleInventory(3), new ArrayPropertyDelegate(1));
+        this(syncId, playerInventory, new SimpleInventory(3), new ArrayPropertyDelegate(2));
     }
 
     public CaptureChamberScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate propertyDelegate) {

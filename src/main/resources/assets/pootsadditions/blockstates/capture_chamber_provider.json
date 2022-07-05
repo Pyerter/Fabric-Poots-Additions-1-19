@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "pootsadditions:block/capture_chamber_provider" }
+  }
+}

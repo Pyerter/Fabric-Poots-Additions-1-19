@@ -65,11 +65,11 @@ public class CaptureChamberProviderBlock extends BlockWithEntity implements Bloc
         if (hand == Hand.MAIN_HAND && entity instanceof CaptureChamberProviderEntity) {
             CaptureChamberProviderEntity chamberProvider = (CaptureChamberProviderEntity) entity;
             if (player.isSneaking()) {
-                if (world.isClient) {
+                if (!world.isClient) {
                     player.sendMessage(Text.of("New priority: " + chamberProvider.incrementPriority()));
                 } else
                     chamberProvider.incrementPriority();
-            } else if (world.isClient) {
+            } else if (!world.isClient) {
                 player.sendMessage(Text.of("Current priority: " + chamberProvider.getPriority() + ", Crouch-click to change."));
             }
             return ActionResult.SUCCESS;

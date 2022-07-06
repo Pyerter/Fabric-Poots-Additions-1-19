@@ -6,6 +6,7 @@ import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
@@ -19,7 +20,9 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.block.entity.CaptureChamberEntity;
+import net.pyerter.pootsadditions.block.entity.CaptureChamberProviderEntity;
 import net.pyerter.pootsadditions.block.entity.ModBlockEntities;
 import org.jetbrains.annotations.Nullable;
 
@@ -72,6 +75,22 @@ public class CaptureChamberBlock extends BlockWithEntity implements BlockEntityP
             }
             super.onStateReplaced(state, world, pos, newState, moved);
         }
+    }
+
+    @Override
+    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        super.onBreak(world, pos, state, player);
+
+        PootsAdditions.logInfo("Block broke!");
+        CaptureChamberProviderEntity.recalculateProviders(world, pos);
+    }
+
+    @Override
+    public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack stack) {
+        super.afterBreak(world, player, pos, state, blockEntity, stack);
+
+        PootsAdditions.logInfo("Block broke!");
+        CaptureChamberProviderEntity.recalculateProviders(world, pos);
     }
 
     @Override

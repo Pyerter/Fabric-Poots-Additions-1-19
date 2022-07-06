@@ -9,6 +9,7 @@ import net.minecraft.world.World;
 import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.util.Util;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -85,24 +86,49 @@ public class CaptureChamberProviderEntity extends BlockEntity {
         if (targetChecker != null && targetChecker instanceof CaptureChamberEntity) {
             CaptureChamberEntity originalEntity = (CaptureChamberEntity) targetChecker;
             originalEntity.setReceivingPriority(entity.getPriority());
-            List<BlockPos> checkedPositions = new ArrayList<>();
-            checkedPositions.add(chamberPos);
-            List<CaptureChamberEntity> providers = new ArrayList<>();
-            providers.add(originalEntity);
-            searchAndLinkBackTo(world, chamberPos, originalEntity, checkedPositions, providers);
+            searchAndLinkBackTo(world, chamberPos, originalEntity, false);
         }
     }
 
-    private static void searchAndLinkBackTo(World world, BlockPos receiverPos, CaptureChamberEntity receiver, List<BlockPos> checkedPositions, List<CaptureChamberEntity> providers) {
+    private static void searchAndLinkBackTo(World world, BlockPos receiverPos, CaptureChamberEntity receiver, boolean forceChange) {
+        List<BlockPos> checkedPositions = new ArrayList<>();
+        List<CaptureChamberEntity> providers = new ArrayList<>();
+        if (receiver != null) {
+            checkedPositions.add(receiverPos);
+            providers.add(receiver);
+        }
+
+        CaptureChamberEntity ultimateReceiver = findPriorityAndProviders(world, receiverPos, receiver, checkedPositions, providers, forceChange);
+
+        for (CaptureChamberEntity current: providers) {
+            if (forceChange)
+                current.setProvideTarget(current == ultimateReceiver || ultimateReceiver == null ? BlockPos.ORIGIN : ultimateReceiver.getPos());
+            else if (ultimateReceiver != null && current != ultimateReceiver && current.getReceivingPriority() < ultimateReceiver.getReceivingPriority())
+                current.setProvideTarget(ultimateReceiver.getPos());
+        }
+    }
+
+    public static CaptureChamberEntity findPriorityAndProviders(World world, BlockPos receiverPos, @Nullable CaptureChamberEntity receiver) {
+        return findPriorityAndProviders(world, receiverPos, receiver, new ArrayList<BlockPos>(), new ArrayList<CaptureChamberEntity>(), false);
+    }
+
+    public static CaptureChamberEntity findPriorityAndProviders(World world, BlockPos receiverPos, @Nullable CaptureChamberEntity receiver, List<BlockPos> checkedPositions, List<CaptureChamberEntity> providers) {
+        return findPriorityAndProviders(world, receiverPos, receiver, checkedPositions, providers, false);
+    }
+
+    public static CaptureChamberEntity findPriorityAndProviders(World world, BlockPos receiverPos, @Nullable CaptureChamberEntity receiver, List<BlockPos> checkedPositions, List<CaptureChamberEntity> providers, boolean forceChange) {
+        CaptureChamberEntity ultimateReceiver = receiver;
+
         LinkedList<BlockPos> queuedPos = new LinkedList<>();
 
         for (Direction dir: HORIZONTAL_DIRECTIONS) {
             BlockPos nextPos = new BlockPos(receiverPos.getX() + dir.getOffsetX(), receiverPos.getY(), receiverPos.getZ() + dir.getOffsetZ());
-            queuedPos.add(nextPos);
-            checkedPositions.add(nextPos);
+            if (!listContainsPos(checkedPositions, nextPos)) {
+                queuedPos.add(nextPos);
+                checkedPositions.add(nextPos);
+            }
         }
 
-        CaptureChamberEntity ultimateReceiver = receiver;
         while (!queuedPos.isEmpty()) {
             BlockPos currentPos = queuedPos.removeFirst();
 
@@ -111,9 +137,10 @@ public class CaptureChamberProviderEntity extends BlockEntity {
                 continue;
 
             CaptureChamberEntity currentChamber = (CaptureChamberEntity) currentEntity;
-            if (!posIsCaptureChamber(world, currentChamber.getProvideTarget()))
+            if (forceChange || !posIsCaptureChamber(world, currentChamber.getProvideTarget()))
                 providers.add(currentChamber);
-            if (currentChamber.getReceivingPriority() > ultimateReceiver.getReceivingPriority())
+            if ((ultimateReceiver == null && currentChamber.getReceivingPriority() > CaptureChamberEntity.DEFAULT_PRIORITY) ||
+                    (ultimateReceiver != null && currentChamber.getReceivingPriority() > ultimateReceiver.getReceivingPriority()))
                 ultimateReceiver = currentChamber;
 
             for (Direction dir: HORIZONTAL_DIRECTIONS) {
@@ -125,9 +152,23 @@ public class CaptureChamberProviderEntity extends BlockEntity {
             }
         }
 
-        for (CaptureChamberEntity current: providers) {
-            if (current != ultimateReceiver && current.getReceivingPriority() < ultimateReceiver.getReceivingPriority())
-                current.setProvideTarget(ultimateReceiver.getPos());
+        return ultimateReceiver;
+    }
+
+    public static void recalculateProviders(World world, BlockPos startingPos) {
+        for (Direction dir: HORIZONTAL_DIRECTIONS) {
+            BlockPos receiverPos = new BlockPos(startingPos.getX() + dir.getOffsetX(), startingPos.getY(), startingPos.getZ() + dir.getOffsetZ());
+
+            List<BlockPos> checkedPositions = new ArrayList<>();
+            List<CaptureChamberEntity> providers = new ArrayList<>();
+            checkedPositions.add(startingPos);
+
+            CaptureChamberEntity ultimateReceiver = findPriorityAndProviders(world, receiverPos, null, checkedPositions, providers, true);
+
+            PootsAdditions.logInfo("Forcing change in provider target for " + providers.size() + " chambers.");
+            for (CaptureChamberEntity current: providers) {
+                current.setProvideTarget(current == ultimateReceiver || ultimateReceiver == null ? BlockPos.ORIGIN : ultimateReceiver.getPos());
+            }
         }
     }
 

@@ -19,6 +19,7 @@ public class CaptureChamberProviderEntity extends BlockEntity {
 
     public static int UPDATE_PERIOD = 50;
     public static int MAX_LINKS = 4;
+    public static int MAX_STRENGTH = 5;
     public static int MAX_PRIORITY = 5;
 
     private int priority = 0;
@@ -59,19 +60,20 @@ public class CaptureChamberProviderEntity extends BlockEntity {
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, CaptureChamberProviderEntity entity) {
-        /*if (!entity.initiallyUpdated) {
-            searchAndLink(world, pos, state, entity);
-            entity.updateTimer = 0;
-            entity.initiallyUpdated = true;
-        }*/
-
         entity.updateTimer += 1;
         if (entity.updateTimer >= UPDATE_PERIOD) {
             entity.updateTimer = 0;
-            searchAndLink(world, pos, state, entity);
+            updateChamberPriority(world, pos, state, entity);
         }
 
         entity.markDirty();
+    }
+
+    public static void updateChamberPriority(World world, BlockPos pos, BlockState state, CaptureChamberProviderEntity entity) {
+        BlockPos originalPosUp = new BlockPos(pos.getX(), pos.getY() + 1, pos.getZ());
+        BlockPos originalPosDown = new BlockPos(pos.getX(), pos.getY() - 1, pos.getZ());
+        CaptureChamberEntity.pulseAddStrength(world, originalPosUp, Direction.DOWN, MAX_STRENGTH, MAX_STRENGTH * entity.priority, true);
+        CaptureChamberEntity.pulseAddStrength(world, originalPosDown, Direction.UP, MAX_STRENGTH, MAX_STRENGTH * entity.priority, true);
     }
 
     public static void searchAndLink(World world, BlockPos pos, BlockState state, CaptureChamberProviderEntity entity) {

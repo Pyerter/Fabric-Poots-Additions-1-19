@@ -17,6 +17,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.pyerter.pootsadditions.block.custom.CaptureChamberProviderBlock;
 import net.pyerter.pootsadditions.item.ModItems;
@@ -40,6 +41,8 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
     private int passiveChargeTicks;
     private BlockPos provideTo = BlockPos.ORIGIN;
     private int receivingPriority = -1;
+    private int directionTransferring = -1;
+    private int transferStrength = 0;
 
     public static final int MAX_STORED_CHARGE = 12100;
     public static final int MAX_CHARGE_TRANSFER_RATE = 50;
@@ -99,6 +102,8 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
         nbt.putInt("capture_chamber.passiveChargeTicks", passiveChargeTicks);
         nbt.putLong("capture_chamber.provideTo", provideTo.asLong());
         nbt.putInt("capture_chamber.receivingPriority", receivingPriority);
+        nbt.putInt("capture_chamber.directionTransferring", directionTransferring);
+        nbt.putInt("capture_chamber.transferStrength", transferStrength);
 
     }
 
@@ -110,6 +115,8 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
         passiveChargeTicks = nbt.getInt("capture_chamber.passiveChargeTicks");
         provideTo = BlockPos.fromLong(nbt.getLong("capture_chamber.provideTo"));
         receivingPriority = nbt.getInt("capture_chamber.receivingPriority");
+        directionTransferring = nbt.getInt("capture_chamber.directionTransferring");
+        transferStrength = nbt.getInt("capture_chamber.transferStrength");
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, CaptureChamberEntity entity) {
@@ -118,14 +125,95 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
         if (entity.passiveChargeTicks % TICKS_PER_PASSIVE_CHARGE == 0) {
             addCharge(entity, entity.passiveChargeTicks / TICKS_PER_PASSIVE_CHARGE);
             entity.passiveChargeTicks = 0;
-            if (entity.receivingPriority != DEFAULT_PRIORITY)
-                assertStillHavePriority(world, pos, entity);
+            if (entity.transferStrength == CaptureChamberProviderEntity.MAX_STRENGTH)
+                assertStillHaveStrengthPriority(world, pos, entity);
         }
         if (entity.passiveChargeTicks % TICKS_PER_PASSIVE_TRANSFER == 0)
-            tryProvideTo(world, entity);
+            //tryProvideTo(world, entity);
+            tryProvideDirection(world, entity);
 
         tryAddCoreCharges(entity);
         entity.markDirty();
+    }
+
+    public static boolean tryProvideDirection(World world, CaptureChamberEntity entity) {
+        if (entity.directionTransferring == -1)
+            return false;
+
+        Direction dir = Util.numbToDirection(entity.directionTransferring);
+        BlockPos targetPos = Util.addBlockPos(entity.getPos(), dir);
+        BlockEntity targetEntity = world.getBlockEntity(targetPos);
+        if (targetEntity == null || !(targetEntity instanceof CaptureChamberEntity)) {
+            pulseRemovedStrength(world, targetPos, null, entity.transferStrength + 1);
+            entity.directionTransferring = -1;
+            return false;
+        }
+
+        CaptureChamberEntity targetChamber = (CaptureChamberEntity) targetEntity;
+        if (targetChamber.receivingPriority == DEFAULT_PRIORITY || targetChamber.transferStrength == 0 || targetChamber.receivingPriority <= entity.receivingPriority) {
+            pulseRemovedStrength(world, targetPos, targetChamber, entity.transferStrength + 1);
+            entity.directionTransferring = -1;
+            return false;
+        }
+
+        int canTransfer = Math.min(MAX_CHARGE_TRANSFER_RATE, entity.storedCharge);
+        int transferred = addCharge(targetChamber, canTransfer);
+        if (transferred <= 0) {
+            return false;
+        } else {
+            entity.storedCharge -= transferred;
+            return true;
+        }
+    }
+
+    public static void pulseRemovedStrength(World world, BlockPos removalPoint, @Nullable CaptureChamberEntity chamber, int previousStrength) {
+        // Base case: stop if strength should be 0
+        if (previousStrength == 0)
+            return;
+
+        // Check chamber properties
+        if (chamber != null) {
+            // Base case: if chamber strength is greater than what should be, don't reset, otherwise do
+            if (chamber.transferStrength <= previousStrength) {
+                chamber.transferStrength = 0;
+                chamber.receivingPriority = 0;
+            } else
+                return;
+        }
+
+        // Base case will be reached in loop if strength is 1
+        if (previousStrength == 1)
+            return;
+
+        for (Direction dir: Util.HORIZONTAL_DIRECTIONS) {
+            BlockPos nextPos = Util.addBlockPos(removalPoint, dir);
+            BlockEntity nextEntity = world.getBlockEntity(nextPos);
+            if (nextEntity instanceof CaptureChamberEntity) {
+                CaptureChamberEntity nextChamber = (CaptureChamberEntity) nextEntity;
+                pulseRemovedStrength(world, Util.addBlockPos(removalPoint, dir), nextChamber, previousStrength - 1);
+            }
+        }
+    }
+
+    public static void pulseAddStrength(World world, BlockPos addPoint, Direction from, int strength, int priority, boolean forcePriority) {
+        BlockEntity targetEntity = world.getBlockEntity(addPoint);
+        if (targetEntity instanceof CaptureChamberEntity) {
+            CaptureChamberEntity targetChamber = (CaptureChamberEntity) targetEntity;
+            if (!forcePriority && targetChamber.receivingPriority > priority)
+                return;
+
+            targetChamber.transferStrength = strength;
+            targetChamber.receivingPriority = priority;
+            if (from.getHorizontal() != -1)
+                targetChamber.directionTransferring = from.getHorizontal();
+
+            if (strength > 1) {
+                for (Direction dir: Util.HORIZONTAL_DIRECTIONS) {
+                    BlockPos nextPos = Util.addBlockPos(addPoint, dir);
+                    pulseAddStrength(world, nextPos, Util.mirrorDirection(dir), strength - 1, priority - 1, false);
+                }
+            }
+        }
     }
 
     public static boolean tryProvideTo(World world, CaptureChamberEntity entity) {
@@ -156,6 +244,14 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
         } else {
             entity.storedCharge -= transferred;
             return true;
+        }
+    }
+
+    public static void assertStillHaveStrengthPriority(World world, BlockPos pos, CaptureChamberEntity entity) {
+        BlockPos upPos = new BlockPos(pos.getX(), pos.getY() + 1, pos.getZ());
+        BlockPos downPos = new BlockPos(pos.getX(), pos.getY() - 1, pos.getZ());
+        if (!(world.getBlockEntity(upPos) instanceof CaptureChamberProviderEntity) && !(world.getBlockEntity(downPos) instanceof CaptureChamberProviderEntity)) {
+            entity.resetPriority();
         }
     }
 
@@ -205,6 +301,7 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
 
     public void resetPriority() {
         receivingPriority = DEFAULT_PRIORITY;
+        transferStrength = 0;
         markDirty();
     }
 
@@ -214,6 +311,9 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
     }
 
     public BlockPos getProvideTarget() { return provideTo; }
+
+    public int getTransferStrength() { return transferStrength; }
+    public void setTransferStrength(int transferStrength) { this.transferStrength = transferStrength; }
 
     private static boolean hasAvailableCoreInSlot(CaptureChamberEntity entity, int index) {
         if (entity.inventory.get(index).isEmpty())

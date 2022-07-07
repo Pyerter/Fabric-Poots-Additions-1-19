@@ -39,7 +39,6 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
     protected final PropertyDelegate propertyDelegate;
     private int storedCharge;
     private int passiveChargeTicks;
-    private BlockPos provideTo = BlockPos.ORIGIN;
     private int receivingPriority = -1;
     private int directionTransferring = -1;
     private int transferStrength = 0;
@@ -100,7 +99,6 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
         Inventories.writeNbt(nbt, inventory);
         nbt.putInt("capture_chamber.storedCharge", storedCharge);
         nbt.putInt("capture_chamber.passiveChargeTicks", passiveChargeTicks);
-        nbt.putLong("capture_chamber.provideTo", provideTo.asLong());
         nbt.putInt("capture_chamber.receivingPriority", receivingPriority);
         nbt.putInt("capture_chamber.directionTransferring", directionTransferring);
         nbt.putInt("capture_chamber.transferStrength", transferStrength);
@@ -113,7 +111,6 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
         super.readNbt(nbt);
         storedCharge = nbt.getInt("capture_chamber.storedCharge");
         passiveChargeTicks = nbt.getInt("capture_chamber.passiveChargeTicks");
-        provideTo = BlockPos.fromLong(nbt.getLong("capture_chamber.provideTo"));
         receivingPriority = nbt.getInt("capture_chamber.receivingPriority");
         directionTransferring = nbt.getInt("capture_chamber.directionTransferring");
         transferStrength = nbt.getInt("capture_chamber.transferStrength");
@@ -216,46 +213,7 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
         }
     }
 
-    public static boolean tryProvideTo(World world, CaptureChamberEntity entity) {
-        if (Util.blockPosEqual(entity.provideTo, BlockPos.ORIGIN))
-            return false;
-
-        if (Util.blockPosEqual(entity.provideTo, entity.getPos())) {
-            entity.provideTo = BlockPos.ORIGIN;
-            return false;
-        }
-
-        BlockEntity targetEntity = world.getBlockEntity(entity.provideTo);
-        if (targetEntity == null || !(targetEntity instanceof CaptureChamberEntity)) {
-            entity.provideTo = BlockPos.ORIGIN;
-            return false;
-        }
-
-        CaptureChamberEntity targetChamber = (CaptureChamberEntity) targetEntity;
-        if (targetChamber.receivingPriority == DEFAULT_PRIORITY || targetChamber.receivingPriority <= entity.receivingPriority) {
-            entity.provideTo = BlockPos.ORIGIN;
-            return false;
-        }
-
-        int canTransfer = Math.min(MAX_CHARGE_TRANSFER_RATE, entity.storedCharge);
-        int transferred = addCharge(targetChamber, canTransfer);
-        if (transferred <= 0) {
-            return false;
-        } else {
-            entity.storedCharge -= transferred;
-            return true;
-        }
-    }
-
     public static void assertStillHaveStrengthPriority(World world, BlockPos pos, CaptureChamberEntity entity) {
-        BlockPos upPos = new BlockPos(pos.getX(), pos.getY() + 1, pos.getZ());
-        BlockPos downPos = new BlockPos(pos.getX(), pos.getY() - 1, pos.getZ());
-        if (!(world.getBlockEntity(upPos) instanceof CaptureChamberProviderEntity) && !(world.getBlockEntity(downPos) instanceof CaptureChamberProviderEntity)) {
-            entity.resetPriority();
-        }
-    }
-
-    public static void assertStillHavePriority(World world, BlockPos pos, CaptureChamberEntity entity) {
         BlockPos upPos = new BlockPos(pos.getX(), pos.getY() + 1, pos.getZ());
         BlockPos downPos = new BlockPos(pos.getX(), pos.getY() - 1, pos.getZ());
         if (!(world.getBlockEntity(upPos) instanceof CaptureChamberProviderEntity) && !(world.getBlockEntity(downPos) instanceof CaptureChamberProviderEntity)) {
@@ -304,13 +262,6 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
         transferStrength = 0;
         markDirty();
     }
-
-    public void setProvideTarget(BlockPos target) {
-        this.provideTo = target;
-        markDirty();
-    }
-
-    public BlockPos getProvideTarget() { return provideTo; }
 
     public int getTransferStrength() { return transferStrength; }
     public void setTransferStrength(int transferStrength) { this.transferStrength = transferStrength; }

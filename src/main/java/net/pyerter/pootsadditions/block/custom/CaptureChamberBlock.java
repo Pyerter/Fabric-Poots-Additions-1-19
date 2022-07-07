@@ -78,22 +78,6 @@ public class CaptureChamberBlock extends BlockWithEntity implements BlockEntityP
     }
 
     @Override
-    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        super.onBreak(world, pos, state, player);
-
-        PootsAdditions.logInfo("Block broke!");
-        CaptureChamberProviderEntity.recalculateProviders(world, pos);
-    }
-
-    @Override
-    public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack stack) {
-        super.afterBreak(world, player, pos, state, blockEntity, stack);
-
-        PootsAdditions.logInfo("Block broke!");
-        CaptureChamberProviderEntity.recalculateProviders(world, pos);
-    }
-
-    @Override
     public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
         if (!world.isClient) {
             if (sourceBlock == Blocks.LIGHTNING_ROD && world.getEmittedRedstonePower(sourcePos, Direction.DOWN) > 0) {

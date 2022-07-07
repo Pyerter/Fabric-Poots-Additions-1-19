@@ -4,6 +4,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Util {
     public static int clamp(int value, int min, int max) {
@@ -42,6 +43,19 @@ public class Util {
             case WEST: return Direction.EAST;
         }
         return Direction.DOWN;
+    }
+
+    public static int manhattanDistanceHorizontal(BlockPos from, BlockPos to) {
+        return Math.abs(to.getX() - from.getX()) + Math.abs(to.getZ() - from.getZ());
+    }
+
+    public static boolean listContainsPos(List<BlockPos> poses, BlockPos pos) {
+        for (BlockPos current: poses) {
+            if (current.getX() == pos.getX() && current.getY() == pos.getY() && current.getZ() == pos.getZ()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static final Direction[] HORIZONTAL_DIRECTIONS = new Direction[]{Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};

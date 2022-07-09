@@ -151,10 +151,15 @@ public class RedstoneMemorizerBlock extends Block {
 
     private int getSidedRedstonePower(World world, BlockPos pos, BlockState state) {
         this.givesPower = false;
-        int power1 = world.getStrongRedstonePower(pos.offset(state.get(FACING)), state.get(FACING).getOpposite());
-        int power2 = world.getStrongRedstonePower(pos.offset(state.get(FACING).getOpposite()), state.get(FACING));
+        int receivedSignal = 0;
+        Iterator horizontalIterator = Direction.Type.HORIZONTAL.iterator();
+        while (horizontalIterator.hasNext()) {
+            Direction dir = (Direction) horizontalIterator.next();
+            if (dir != state.get(FACING) && dir != state.get(FACING).getOpposite()) {
+                receivedSignal = Math.max(world.getStrongRedstonePower(pos.offset(dir), dir.getOpposite()), receivedSignal);
+            }
+        }
         this.givesPower = true;
-        int receivedSignal = Math.max(power1, power2);
 
         int maxPower = 0;
         if (receivedSignal < 15) {

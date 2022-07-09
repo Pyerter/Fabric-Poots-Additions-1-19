@@ -3,7 +3,7 @@
   "textures": {
     "front": "pootsadditions:block/redstone_memorizer_block_front_on",
     "back": "pootsadditions:block/redstone_memorizer_block_front_on",
-    "side": "pootsadditions:block/redstone_memorizer_block_side",
+    "side": "pootsadditions:block/redstone_memorizer_block_side_on",
     "top": "pootsadditions:block/redstone_memorizer_block_top"
   }
 }

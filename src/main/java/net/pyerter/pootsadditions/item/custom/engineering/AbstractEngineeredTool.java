@@ -50,6 +50,25 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
         NADA
     }
 
+    public static final ToolType[] diggerToolTypes = new ToolType[]{ ToolType.AXE, ToolType.HOE, ToolType.PICKAXE, ToolType.SHOVEL };
+    public static boolean toolIsDigger(AbstractEngineeredTool tool) {
+        PootsAdditions.logInfo("Checking if enchant is digger type");
+        for (ToolType type: diggerToolTypes) {
+            if (type == tool.toolType)
+                return true;
+        }
+        return false;
+    }
+
+    public static final ToolType[] weaponToolTypes = new ToolType[]{ ToolType.SWORD };
+    public static boolean toolIsWeapon(AbstractEngineeredTool tool) {
+        for (ToolType type: weaponToolTypes) {
+            if (type == tool.toolType)
+                return true;
+        }
+        return false;
+    }
+
     public static final int DAMAGE_INCREMENT = 1;
     protected List<TagKey<Block>> effectiveBlocksList;
 

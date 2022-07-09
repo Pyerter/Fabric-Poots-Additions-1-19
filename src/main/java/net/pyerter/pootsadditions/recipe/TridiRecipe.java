@@ -136,7 +136,6 @@ public class TridiRecipe implements Recipe<SimpleInventory> {
             Integer cookTime = JsonHelper.getInt(json, "cookTime");
             Integer energyCost = JsonHelper.getInt(json, "energyCost");
 
-            boolean foundNbts = false;
             try {
                 JsonArray nbtInts = JsonHelper.getArray(json, "nbt_output_values");
                 try {
@@ -146,15 +145,12 @@ public class TridiRecipe implements Recipe<SimpleInventory> {
                         int nbtValue = JsonHelper.getInt(jsonObj, "nbt_value");
                         output.getOrCreateNbt().putInt(nbtId, nbtValue);
                     }
-                    foundNbts = true;
                 } catch (JsonSyntaxException e) {
                     PootsAdditions.logDebug("Json syntax exception while reading recipe " + ID + ", error while reading nbt integer values : " + id.toString());
                 }
             } catch (JsonSyntaxException e) {
                 PootsAdditions.logDebug("Json syntax exception while reading recipe " + ID + ", assuming empty nbt list for : " + id.toString());
             }
-            if (foundNbts)
-                PootsAdditions.logInfo("Found NBTS in recipe " + ID);
 
             return new TridiRecipe(id, output, inputs, cookTime, energyCost);
         }

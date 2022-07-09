@@ -15,10 +15,12 @@
     "ModPlayerAccessoriesInventoryMixin",
     "ModPlayerScreenHandlerAccessoryTabMixin",
     "ModServerPlayPacketListenerMixin",
-    "ModPlayerServerEntityScreenHandlerMixin"
+    "ModPlayerServerEntityScreenHandlerMixin",
+    "ModEnchantmentCompatibilityMixin",
+    "ModEnchantmentScreenHandlerModEnchantCompatibilityMixin"
   ],
   "client": [
-    "ExampleMixin"
+    "ModHelloMixin"
   ],
   "injectors": {
     "defaultRequire": 1

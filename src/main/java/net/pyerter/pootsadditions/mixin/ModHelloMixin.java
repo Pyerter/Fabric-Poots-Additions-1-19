@@ -8,9 +8,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(TitleScreen.class)
-public class ExampleMixin {
-	@Inject(at = @At("HEAD"), method = "init()V")
+public class ModHelloMixin {
+
+	@Inject(method = "init", at = @At("HEAD"))
 	private void init(CallbackInfo info) {
-		PootsAdditions.logInfo("This line is printed by an example mod mixin!");
+		PootsAdditions.logInfo("Let's get ready to CRRAAAAFFFFTTT!");
 	}
 }

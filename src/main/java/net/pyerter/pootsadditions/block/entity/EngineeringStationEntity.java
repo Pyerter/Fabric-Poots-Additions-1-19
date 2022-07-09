@@ -251,7 +251,13 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
         switch (craftType) {
             case ENGINEERIFY:
                 AbstractEngineeredTool resultTool = AbstractEngineeredTool.getRegisteredTool(mat, toolType);
-                return resultTool != null ? Optional.of(new ItemStack(resultTool)) : Optional.empty();
+                if (resultTool != null) {
+                    ItemStack resultStack = new ItemStack(resultTool);
+                    AbstractEngineeredTool.copyEnchantmentsFrom(toolStack, resultStack);
+                    return Optional.of(resultStack);
+                }
+                return Optional.empty();
+                // return resultTool != null ? Optional.of(new ItemStack(resultTool)) : Optional.empty();
             default: return Optional.empty();
         }
     }

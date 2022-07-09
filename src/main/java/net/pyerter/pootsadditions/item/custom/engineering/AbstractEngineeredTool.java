@@ -216,6 +216,23 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
         return true;
     }
 
+    public static boolean copyEnchantmentsFrom(ItemStack original, ItemStack target) {
+        ToolItem originalTool = original.getItem() instanceof ToolItem ? (ToolItem) original.getItem() : null;
+        AbstractEngineeredTool targetTool = target.getItem() instanceof AbstractEngineeredTool ? (AbstractEngineeredTool) target.getItem() : null;
+        if (targetTool == null || originalTool == null)
+            return false;
+
+        return targetTool.copyToolEnchantmentsFrom(original, target);
+    }
+
+    public boolean copyToolEnchantmentsFrom(ItemStack original, ItemStack target) {
+        NbtList enchantments = original.getEnchantments();
+        if (enchantments.size() > 0)
+            target.getOrCreateNbt().put("Enchantments", enchantments);
+
+        return true;
+    }
+
     public void resetAttributeModifiers() {
         ImmutableMultimap.Builder<EntityAttribute, EntityAttributeModifier> builder = ImmutableMultimap.builder();
         builder.put(EntityAttributes.GENERIC_ATTACK_DAMAGE, new EntityAttributeModifier(ATTACK_DAMAGE_MODIFIER_ID, "Tool modifier", (double)this.attackDamage, EntityAttributeModifier.Operation.ADDITION));

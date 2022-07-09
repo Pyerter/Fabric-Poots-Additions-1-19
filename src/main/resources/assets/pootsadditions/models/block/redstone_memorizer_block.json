@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "pootsadditions:block/redstone_memorizer_block_front",
+    "back": "pootsadditions:block/redstone_memorizer_block_front",
+    "side": "pootsadditions:block/redstone_memorizer_block_side",
+    "top": "pootsadditions:block/redstone_memorizer_block_top"
+  }
+}

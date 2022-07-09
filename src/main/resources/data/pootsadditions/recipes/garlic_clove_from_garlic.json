@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "pootsadditions:garlic_item"
+    }
+  ],
+  "result": {
+    "item": "pootsadditions:garlic_clove_item",
+    "count": 4
+  }
+}

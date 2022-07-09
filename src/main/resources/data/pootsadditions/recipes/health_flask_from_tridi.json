@@ -1,0 +1,26 @@
+{
+  "type": "pootsadditions:tridi",
+  "ingredients": [
+    {
+      "item": "pootsadditions:garlic_item"
+    },
+    {
+      "item": "pootsadditions:health_flask"
+    },
+    {
+      "item": "pootsadditions:enduring_flesh"
+    }
+  ],
+  "output": {
+    "item": "pootsadditions:health_flask",
+    "count": 1
+  },
+  "cookTime": 100,
+  "energyCost": 50,
+  "nbt_output_values": [
+    {
+      "nbt_id": "pootsadditions.charges",
+      "nbt_value": 3
+    }
+  ]
+}

@@ -54,6 +54,7 @@
 
   "item.pootsadditions.engineers_blueprint": "Engineer's Blueprint",
   "item.pootsadditions.engineers_repair_kit": "Engineer's Repair Kit",
+  "item.pootsadditions.flask_blueprint": "Flask Blueprint",
 
   "item.pootsadditions.copper_wire_item": "Copper Wire",
   "item.pootsadditions.screw_item": "Screws",
@@ -62,6 +63,8 @@
   "item.pootsadditions.pyrifera_insulation_goo": "Pyrifera Insulation Goo",
 
   "item.pootsadditions.makeshift_core": "Makeshift Core",
+
+  "item.pootsadditions.health_flask": "Health Flask",
 
   "item.pootsadditions.pautsch_item": "Pautsch",
 
@@ -87,6 +90,12 @@
   "item.pootsadditions.flattened_dough_item": "Flattened Dough",
   "item.pootsadditions.cookie_dough_item": "Cookie Dough",
   "item.pootsadditions.chocolate_chip_cookie_dough_item": "Chocolate Chip Cookie Dough",
+
+  "item.pootsadditions.garlic_crop_block": "Garlic Crop",
+  "item.pootsadditions.garlic_clove_item": "Garlic Clove",
+  "item.pootsadditions.garlic_item": "Garlic",
+
+  "item.pootsadditions.enduring_flesh": "Enduring Flesh",
 
   "itemGroup.pootsadditions.sapphire": "Sapphire",
 

@@ -1,0 +1,16 @@
+{
+  "type": "pootsadditions:engineering_station_refine",
+  "ingredients": [
+    {
+      "item": "pootsadditions:pyrifera_insulation_goo"
+    }
+  ],
+  "output": {
+    "item": "pootsadditions:health_flask",
+    "count": 1
+  },
+  "hammer_cost": 1,
+  "engineer_ingredient": {
+    "item": "pootsadditions:flask_blueprint"
+  }
+}

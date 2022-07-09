@@ -26,13 +26,25 @@ import net.pyerter.pootsadditions.recipe.TridiRecipe;
 import net.pyerter.pootsadditions.screen.handlers.TridiScreenHandler;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 // Tridiminiumobulator!
 public class TridiBlockEntity extends BlockEntity implements NamedScreenHandlerFactory, ImplementedInventory {
     private static final String DISPLAY_NAME = "Tridiminiumobulator";
-    private static final List<Item> acceptedQuickTransfers = List.of(ModItems.STARMETAL_ALLOY_INGOT, ModItems.SAPPHIRE_STAR);
+    private static final List<Item> acceptedQuickTransfers = initalizeAcceptedQuickTransfers();
+    private static List<Item> initalizeAcceptedQuickTransfers() {
+        List<Item> items = new ArrayList<>();
+        return items;
+    }
+    public static boolean tryRegisterQuickTransfer(Item item) {
+        if (!acceptedQuickTransfers.contains(item)) {
+            acceptedQuickTransfers.add(item);
+            return true;
+        }
+        return false;
+    }
     private static final List<Item> acceptedQuickTransfersFuel = List.of(ModItems.MAKESHIFT_CORE);
     private final DefaultedList<ItemStack> inventory =
             DefaultedList.ofSize(7, ItemStack.EMPTY);
@@ -155,8 +167,12 @@ public class TridiBlockEntity extends BlockEntity implements NamedScreenHandlerF
 
         consumeFuel(entity, recipe.getEnergyCost());
 
-        entity.setStack(6, new ItemStack(recipe.getOutput().getItem(),
-                entity.getStack(6).getCount() + recipe.getOutput().getCount()));
+        if (entity.getStack(6).getCount() == 0)
+            entity.setStack(6, recipe.getOutput());
+        else
+            entity.setStack(6, new ItemStack(recipe.getOutput().getItem(),
+                    entity.getStack(6).getCount() + recipe.getOutput().getCount()));
+
         entity.resetProgress();
     }
 

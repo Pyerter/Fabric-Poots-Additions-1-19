@@ -40,7 +40,12 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
     private static final String DISPLAY_NAME = "Engineering Station";
     private static List<ToolMaterial> materials = null;
     public static List<ToolMaterial> getMaterials() { if(materials == null) materials = updateToolMaterials(); return materials; }
-    private static final List<Item> ENGINEERS_ITEMS = List.of(ModItems.ENGINEERS_BLUPRINT);
+    public static final List<Item> ENGINEERS_ITEMS = initializeEngineerItemsList();
+    private static List<Item> initializeEngineerItemsList() {
+        List<Item> items = new ArrayList<>();
+        items.add(ModItems.ENGINEERS_BLUPRINT);
+        return items;
+    }
     public static final List<Item> acceptedRefiningMaterials = new ArrayList<>();
     public static final int ENGINEERING_STATION_INVENTORY_SIZE = 5;
     private final DefaultedList<ItemStack> inventory =
@@ -225,8 +230,12 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
             return new Pair(resultingStack, new Boolean[]{false, false, true, true});
 
         Optional<EngineeringStationRefineRecipe> refineRecipe = hasRefineRecipe(this);
-        if (refineRecipe.isPresent())
-            return new Pair(Optional.of(refineRecipe.get().getOutput()), new Boolean[]{false, false, false, true});
+        if (refineRecipe.isPresent()) {
+            if (refineRecipe.get().getEngineerIngredient().isEmpty())
+                return new Pair(Optional.of(refineRecipe.get().getOutput()), new Boolean[]{false, false, false, true});
+            else
+                return new Pair(Optional.of(refineRecipe.get().getOutput()), new Boolean[]{false, false, true, true});
+        }
 
         return new Pair<>(Optional.empty(), null);
     }
@@ -276,12 +285,18 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
 
         Optional<EngineeringStationRefineRecipe> match = world.getRecipeManager()
                 .getFirstMatch(EngineeringStationRefineRecipe.Type.INSTANCE, inventory, world);
-
-        if (match.isPresent() && canInsertAmountIntoOutputSlot(inventory)
+        boolean returnMatch = match.isPresent();
+        if (returnMatch) {
+            if (match.get().getEngineerIngredient().isEmpty())
+                returnMatch = canInsertAmountIntoOutputSlot(inventory)
+                        && canInsertItemIntoOutputSlot(inventory, match.get().getOutput());
+        }
+        /*if (match.isPresent() && canInsertAmountIntoOutputSlot(inventory)
                 && canInsertItemIntoOutputSlot(inventory, match.get().getOutput())) {
             return match;
-        }
-        return Optional.empty();
+        }*/
+
+        return returnMatch ? match : Optional.empty();
     }
 
     private static boolean canInsertItemIntoOutputSlot(SimpleInventory inventory, ItemStack output) {

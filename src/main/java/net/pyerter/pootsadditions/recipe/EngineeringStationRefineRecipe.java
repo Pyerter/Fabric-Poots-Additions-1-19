@@ -2,6 +2,7 @@ package net.pyerter.pootsadditions.recipe;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
@@ -12,6 +13,7 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.block.entity.EngineeringStationEntity;
+import net.pyerter.pootsadditions.block.entity.FoodPreppingStationEntity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,15 +24,20 @@ public class EngineeringStationRefineRecipe implements Recipe<SimpleInventory> {
     private final ItemStack output;
     private final DefaultedList<Ingredient> ingredients;
     private final Integer hammerCost;
+    private final Ingredient engineerIngredient;
 
-    public EngineeringStationRefineRecipe(Identifier id, ItemStack output, DefaultedList<Ingredient> recipeItems, Integer hammerCost) {
+    public EngineeringStationRefineRecipe(Identifier id, ItemStack output, DefaultedList<Ingredient> recipeItems, Integer hammerCost, Ingredient engineerIngredient) {
         this.id = id;
         this.output = output;
         this.ingredients = recipeItems;
         this.hammerCost = hammerCost;
+        this.engineerIngredient = engineerIngredient;
+
         if (ingredients.size() == 1) {
             Arrays.stream(ingredients.get(0).getMatchingStacks()).forEach(stack -> EngineeringStationEntity.acceptedRefiningMaterials.add(stack.getItem()));
         }
+        if (!engineerIngredient.isEmpty())
+            Arrays.stream(engineerIngredient.getMatchingStacks()).forEach(stack -> EngineeringStationEntity.ENGINEERS_ITEMS.add(stack.getItem()));
     }
 
     @Override
@@ -52,7 +59,15 @@ public class EngineeringStationRefineRecipe implements Recipe<SimpleInventory> {
         if (inventory.getStack(4).isEmpty() && hammerCost > 0)
             return false;
 
-        return requiredIngredients.get(0).test(inventory.getStack(3));
+        boolean hasNormalIngredient = requiredIngredients.get(0).test(inventory.getStack(3));
+        if (!hasNormalIngredient)
+            return false;
+
+        if (engineerIngredient.isEmpty())
+            return true;
+
+        boolean hasOptionalIngredient = engineerIngredient.test(inventory.getStack(2));
+        return hasOptionalIngredient;
     }
 
     @Override
@@ -87,6 +102,8 @@ public class EngineeringStationRefineRecipe implements Recipe<SimpleInventory> {
         return Type.INSTANCE;
     }
 
+    public Ingredient getEngineerIngredient() { return engineerIngredient; }
+
     public static class Type implements RecipeType<EngineeringStationRefineRecipe> {
         private Type() {}
         public static final Type INSTANCE = new Type();
@@ -110,7 +127,14 @@ public class EngineeringStationRefineRecipe implements Recipe<SimpleInventory> {
 
             Integer hammerCost = JsonHelper.getInt(json, "hammer_cost");
 
-            return new EngineeringStationRefineRecipe(id, output, inputs, hammerCost);
+            Ingredient engineerIngredient = Ingredient.EMPTY;
+            try {
+                engineerIngredient = Ingredient.fromJson(JsonHelper.getObject(json, "engineer_ingredient"));
+            } catch (JsonSyntaxException e) {
+                PootsAdditions.logDebug("Json syntax exception while reading recipe " + ID + ", assuming empty stack for engineer_ingredient: " + id.toString());
+            }
+
+            return new EngineeringStationRefineRecipe(id, output, inputs, hammerCost, engineerIngredient);
         }
 
         @Override
@@ -124,7 +148,13 @@ public class EngineeringStationRefineRecipe implements Recipe<SimpleInventory> {
             }
 
             ItemStack output = buf.readItemStack();
-            return new EngineeringStationRefineRecipe(id, output, inputs, hammerCost);
+
+            boolean hasEngineerIng = buf.readBoolean();
+            Ingredient engineerIngredient = Ingredient.EMPTY;
+            if (hasEngineerIng)
+                engineerIngredient = Ingredient.fromPacket(buf);
+
+            return new EngineeringStationRefineRecipe(id, output, inputs, hammerCost, engineerIngredient);
         }
 
         @Override
@@ -135,6 +165,11 @@ public class EngineeringStationRefineRecipe implements Recipe<SimpleInventory> {
                 ing.write(buf);
             }
             buf.writeItemStack(recipe.getOutput());
+
+            boolean hasEngineerIng = !recipe.engineerIngredient.isEmpty();
+            buf.writeBoolean(hasEngineerIng);
+            if (hasEngineerIng)
+                recipe.engineerIngredient.write(buf);
         }
     }
 

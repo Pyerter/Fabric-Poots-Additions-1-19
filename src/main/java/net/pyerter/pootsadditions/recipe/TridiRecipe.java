@@ -2,7 +2,9 @@ package net.pyerter.pootsadditions.recipe;
 
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
@@ -12,9 +14,13 @@ import net.minecraft.util.JsonHelper;
 import net.minecraft.util.Pair;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
+import net.pyerter.pootsadditions.PootsAdditions;
+import net.pyerter.pootsadditions.block.entity.FoodPreppingStationEntity;
+import net.pyerter.pootsadditions.block.entity.TridiBlockEntity;
 import org.lwjgl.system.Pointer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class TridiRecipe implements Recipe<SimpleInventory> {
@@ -30,6 +36,10 @@ public class TridiRecipe implements Recipe<SimpleInventory> {
         this.ingredients = recipeItems;
         this.cooktime = cookTime;
         this.energyCost = energyCost;
+
+        for (Ingredient ing: ingredients) {
+            Arrays.stream(ing.getMatchingStacks()).forEach(stack -> TridiBlockEntity.tryRegisterQuickTransfer(stack.getItem()));
+        }
     }
 
     @Override
@@ -57,7 +67,7 @@ public class TridiRecipe implements Recipe<SimpleInventory> {
                 if (requiredIngredients.get(ing).test(inventory.getStack(i))) {
                     requiredIngredients.remove(ing);
                     break;
-                } else if (ing == requiredIngredients.size()) {
+                } else if (ing == requiredIngredients.size() - 1) {
                     failedTest = true;
                 }
             }
@@ -125,6 +135,26 @@ public class TridiRecipe implements Recipe<SimpleInventory> {
 
             Integer cookTime = JsonHelper.getInt(json, "cookTime");
             Integer energyCost = JsonHelper.getInt(json, "energyCost");
+
+            boolean foundNbts = false;
+            try {
+                JsonArray nbtInts = JsonHelper.getArray(json, "nbt_output_values");
+                try {
+                    for (int i = 0; i < nbtInts.size(); i++) {
+                        JsonObject jsonObj = nbtInts.get(i).getAsJsonObject();
+                        String nbtId = JsonHelper.getString(jsonObj, "nbt_id");
+                        int nbtValue = JsonHelper.getInt(jsonObj, "nbt_value");
+                        output.getOrCreateNbt().putInt(nbtId, nbtValue);
+                    }
+                    foundNbts = true;
+                } catch (JsonSyntaxException e) {
+                    PootsAdditions.logDebug("Json syntax exception while reading recipe " + ID + ", error while reading nbt integer values : " + id.toString());
+                }
+            } catch (JsonSyntaxException e) {
+                PootsAdditions.logDebug("Json syntax exception while reading recipe " + ID + ", assuming empty nbt list for : " + id.toString());
+            }
+            if (foundNbts)
+                PootsAdditions.logInfo("Found NBTS in recipe " + ID);
 
             return new TridiRecipe(id, output, inputs, cookTime, energyCost);
         }

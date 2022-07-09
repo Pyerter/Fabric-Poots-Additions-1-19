@@ -2,12 +2,15 @@ package net.pyerter.pootsadditions.item;
 
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.*;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Rarity;
 import net.pyerter.pootsadditions.PootsAdditions;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
+import net.pyerter.pootsadditions.block.ModBlocks;
 import net.pyerter.pootsadditions.entity.ModEntities;
 import net.pyerter.pootsadditions.item.custom.*;
 import net.pyerter.pootsadditions.item.custom.engineering.*;
@@ -153,6 +156,8 @@ public class ModItems {
             new EngineersBlueprintItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).maxCount(1)));
     public static final Item ENGINEERS_REPAIR_KIT = registerItem("engineers_repair_kit",
             new EngineersRepairKit(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).maxCount(16)));
+    public static final Item FLASK_BLUEPRINT = registerItem("flask_blueprint",
+            new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).maxCount(1)));
 
     public static final Item SCREW_ITEM = registerItem("screw_item",
             new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
@@ -169,6 +174,9 @@ public class ModItems {
 
     public static final Item MAKESHIFT_CORE = registerItem("makeshift_core",
             new MakeshiftCore(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).fireproof().maxCount(1)));
+
+    public static final Item HEALTH_FLASK = registerItem("health_flask",
+            new HealthFlaskItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).fireproof().maxCount(1)));
 
     public static final Item PAUTSCH_ITEM = registerItem("pautsch_item",
             new PautschItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).fireproof().maxCount(1)));
@@ -198,6 +206,19 @@ public class ModItems {
             new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).food(
                     (new FoodComponent.Builder()).hunger(2).snack().build())));
 
+    public static final Item GARLIC_CLOVE_ITEM = registerItem("garlic_clove_item",
+            new AliasedBlockItem(ModBlocks.GARLIC_CROP_BLOCK, new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
+    public static final Item GARLIC_ITEM = registerItem("garlic_item",
+            new DescriptiveItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE),
+                    DescriptiveItem.DescriptionBuilder.start().add("Stimulate the immune system!")
+                            .add("And maybe keep away vampires...", Formatting.ITALIC, Formatting.GRAY).build()));
+
+    public static final Item ENDURING_FLESH = registerItem("enduring_flesh",
+            new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).food((
+                    new FoodComponent.Builder()).hunger(4).saturationModifier(0.1F).meat()
+                    .statusEffect(new StatusEffectInstance(StatusEffects.HUNGER, 600, 0), 0.8F)
+                    .statusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 600, 0), 0.5f).build())));
+
 
     private static Item registerItem(String name, Item item) {
         return Registry.register(Registry.ITEM, new Identifier(PootsAdditions.MOD_ID, name), item);
@@ -212,5 +233,10 @@ public class ModItems {
                 (stack, chargeable) -> chargeable.getOverridePredicateChargeValue(stack)));
         ModelPredicateProviderRegistry.register(ModItems.MALICE_SCYTHE, new Identifier("charge"), new AbstractPowerCore.ChargePredicateProvider(
                 (stack, chargeable) -> chargeable.getOverridePredicateChargeValue(stack)));
+
+        ModelPredicateProviderRegistry.register(ModItems.HEALTH_FLASK, new Identifier("charge"), new HealthFlaskItem.FlaskChargePredicateProvider(
+                (stack, flaskItem) -> flaskItem.getOverridePredicateChargeValue(stack)));
+        ModelPredicateProviderRegistry.register(ModItems.HEALTH_FLASK, new Identifier("charge"), new HealthFlaskItem.FlaskChargePredicateProvider(
+                (stack, flaskItem) -> flaskItem.getOverridePredicateChargeValue(stack)));
     }
 }

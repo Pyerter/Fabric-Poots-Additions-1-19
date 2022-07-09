@@ -7,6 +7,7 @@ import net.minecraft.data.DataGenerator;
 import net.pyerter.pootsadditions.block.ModBlocks;
 import net.pyerter.pootsadditions.block.entity.ModBlockEntities;
 import net.pyerter.pootsadditions.item.ModItems;
+import net.pyerter.pootsadditions.loottables.ModLootTableModifiers;
 import net.pyerter.pootsadditions.recipe.ModRecipes;
 import net.pyerter.pootsadditions.screen.ModScreens;
 import net.pyerter.pootsadditions.screen.handlers.ModScreenHandlers;
@@ -44,6 +45,8 @@ public class PootsAdditions implements ModInitializer {
 		GeckoLib.initialize();
 
 		ModScreens.registerAccessoryTabScreens();
+
+		ModLootTableModifiers.modifyLootTables();
 	}
 
 	public static void logInfo(String message) {

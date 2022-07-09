@@ -128,7 +128,6 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
     // Right boolean: if result was made
     // Left boolean implies right boolean
     public Pair<Boolean, Boolean> hammerIt(boolean stackCraft) {
-        PootsAdditions.logInfo("Trying to hammer!");
         Pair<Optional<ItemStack>, Boolean[]> craftingResult = getCraftingResult();
         if (!craftingResult.getLeft().isPresent()) {
             resetHammeredProgress();
@@ -140,7 +139,6 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
                 craftingResult.getRight()[3];
 
         hammered++;
-        PootsAdditions.logInfo("Hammering!");
         if (hammered >= HAMMERS_PER_CRAFT) {
             if (shouldStackCraft) {
                 craftResultMax(craftingResult.getLeft().get(), craftingResult.getRight());
@@ -241,7 +239,6 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
     }
 
     public static Optional<ItemStack> canEngineerTool(ItemStack toolStack, ItemStack engineerStack) {
-        PootsAdditions.logInfo("Checking if can engineer tool.");
         ToolMaterial mat = getToolMaterial(toolStack);
         AbstractEngineeredTool.ToolType toolType = AbstractEngineeredTool.getToolType(toolStack);
         if (mat == null || toolType == AbstractEngineeredTool.ToolType.NADA)

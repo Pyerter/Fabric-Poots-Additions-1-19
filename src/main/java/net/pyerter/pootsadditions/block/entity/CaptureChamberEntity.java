@@ -45,6 +45,7 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
 
     public static final int MAX_STORED_CHARGE = 12100;
     public static final int MAX_CHARGE_TRANSFER_RATE = 50;
+    public static final int MAX_CORE_CHARGE_TRANSFER_RATE = MAX_STORED_CHARGE;
     public static final int TICKS_PER_PASSIVE_CHARGE = 20;
     public static final int TICKS_PER_PASSIVE_TRANSFER = 2;
     public static final int DEFAULT_PRIORITY = -1;
@@ -142,14 +143,15 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
         BlockEntity targetEntity = world.getBlockEntity(targetPos);
         if (targetEntity == null || !(targetEntity instanceof CaptureChamberEntity)) {
             pulseRemovedStrength(world, targetPos, null, entity.transferStrength + 1);
-            entity.directionTransferring = -1;
+            entity.resetPriorityAndDirection();
             return false;
         }
 
         CaptureChamberEntity targetChamber = (CaptureChamberEntity) targetEntity;
         if (targetChamber.receivingPriority == DEFAULT_PRIORITY || targetChamber.transferStrength == 0 || targetChamber.receivingPriority <= entity.receivingPriority) {
-            pulseRemovedStrength(world, targetPos, targetChamber, entity.transferStrength + 1);
-            entity.directionTransferring = -1;
+            //pulseRemovedStrength(world, targetPos, targetChamber, entity.transferStrength + 1);
+            // don't do the above ^, assume that capture chambers will reset their priority if they exist
+            entity.resetPriorityAndDirection();
             return false;
         }
 
@@ -216,9 +218,18 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
     public static void assertStillHaveStrengthPriority(World world, BlockPos pos, CaptureChamberEntity entity) {
         BlockPos upPos = new BlockPos(pos.getX(), pos.getY() + 1, pos.getZ());
         BlockPos downPos = new BlockPos(pos.getX(), pos.getY() - 1, pos.getZ());
-        if (!(world.getBlockEntity(upPos) instanceof CaptureChamberProviderEntity) && !(world.getBlockEntity(downPos) instanceof CaptureChamberProviderEntity)) {
-            entity.resetPriority();
+        if (!((world.getBlockEntity(upPos) instanceof CaptureChamberProviderEntity) || (world.getBlockEntity(downPos) instanceof CaptureChamberProviderEntity))) {
+            pulseRemovedStrength(world, pos, entity, entity.transferStrength);
+            entity.resetPriorityAndDirection();
         }
+    }
+
+    public static int getCharge(CaptureChamberEntity entity) {
+        return entity.storedCharge;
+    }
+
+    public static float getPercentChargeFull(CaptureChamberEntity entity) {
+        return ((float)entity.storedCharge) / ((float)MAX_STORED_CHARGE);
     }
 
     public static int addCharge(CaptureChamberEntity entity, Integer amount) {
@@ -242,7 +253,7 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
         int i = 0;
         while (entity.storedCharge > 0 && i < 3) {
             if (hasAvailableCoreInSlot(entity,  i)) {
-                addCharge(entity, -addCoreCharge(entity, Math.min(entity.storedCharge, MAX_CHARGE_TRANSFER_RATE), i));
+                addCharge(entity, -addCoreCharge(entity, Math.min(entity.storedCharge, MAX_CORE_CHARGE_TRANSFER_RATE), i));
             }
             i++;
         }
@@ -261,6 +272,11 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
         receivingPriority = DEFAULT_PRIORITY;
         transferStrength = 0;
         markDirty();
+    }
+
+    public void resetPriorityAndDirection() {
+        resetPriority();
+        directionTransferring = -1;
     }
 
     public int getTransferStrength() { return transferStrength; }

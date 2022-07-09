@@ -105,11 +105,9 @@ public class EngineeringStationScreenHandler extends ScreenHandler {
     }
 
     public Pair<Boolean, Boolean> tryHammer(boolean stackCraft) {
-        PootsAdditions.logInfo("Trying hammer?");
         if (station != null) {
             return station.hammerIt(stackCraft);
         } else {
-            PootsAdditions.logInfo("It's null!");
             return new Pair<>(false, false);
         }
         // return station != null ? station.hammerIt() : new Pair<>(false, false);

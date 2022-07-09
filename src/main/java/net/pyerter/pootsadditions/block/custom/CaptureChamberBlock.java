@@ -8,6 +8,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
@@ -16,6 +17,7 @@ import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
@@ -121,4 +123,19 @@ public class CaptureChamberBlock extends BlockWithEntity implements BlockEntityP
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
         return checkType(type, ModBlockEntities.CAPTURE_CHAMBER, CaptureChamberEntity::tick);
     }
+
+    public boolean hasComparatorOutput(BlockState state) {
+        return true;
+    }
+
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        BlockEntity entity = world.getBlockEntity(pos);
+        if (entity instanceof CaptureChamberEntity) {
+            CaptureChamberEntity chamber = (CaptureChamberEntity) entity;
+            float percentFull = CaptureChamberEntity.getPercentChargeFull(chamber);
+            return MathHelper.floor(percentFull * 14.0F) + (percentFull > 0 ? 1 : 0);
+        }
+        return 0;
+    }
+
 }

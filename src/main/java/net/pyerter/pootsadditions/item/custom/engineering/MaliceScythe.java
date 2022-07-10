@@ -1,23 +1,16 @@
 package net.pyerter.pootsadditions.item.custom.engineering;
 
 import net.minecraft.client.item.TooltipContext;
-import net.minecraft.client.util.ParticleUtil;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.intprovider.UniformIntProvider;
 import net.minecraft.world.World;
-import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.item.ModToolMaterials;
 import net.pyerter.pootsadditions.particle.ModParticles;
 import net.pyerter.pootsadditions.util.IModPlayerEntityWeaponAbilityTriggerer;
@@ -59,17 +52,14 @@ public class MaliceScythe extends AbstractEngineeredTool implements IChargeable 
     }
 
     public void spawnAttackParticles(LivingEntity target) {
-        PootsAdditions.logInfo("Spawning scythe particles!");
         World world = target.world;
         if (world instanceof ServerWorld) {
             double x = target.getX();
             double y = target.getBodyY(0.5f);
             double z = target.getZ();
-            double deltaX = 1; //MathHelper.nextDouble(target.getRandom(), 0, 1);
-            double deltaY = 1; //MathHelper.nextDouble(target.getRandom(), 0, 1);
-            double deltaZ = 1; //MathHelper.nextDouble(target.getRandom(), 0, 1);
+            double deltaVal = 1;
             ServerWorld serverWorld = (ServerWorld) world;
-            serverWorld.spawnParticles(ModParticles.ELECTRO_STATIC_PARTICLE, x, y, z, 20, deltaX, deltaY, deltaZ, 0.5);
+            serverWorld.spawnParticles(ModParticles.ELECTRO_STATIC_PARTICLE, x, y, z, 20, deltaVal, deltaVal, deltaVal, 0.5);
         }
     }
 

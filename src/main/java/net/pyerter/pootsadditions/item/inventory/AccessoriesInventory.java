@@ -9,6 +9,9 @@ import net.minecraft.util.Nameable;
 import net.minecraft.util.collection.DefaultedList;
 import net.pyerter.pootsadditions.item.custom.accessory.AccessoryItem;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AccessoriesInventory implements ImplementedInventory, Nameable {
     public static final String INVENTORY_NBT_ID = "pootsadditions.accessories_inventory";
     public static final Integer INVENTORY_SIZE = 8;
@@ -31,7 +34,7 @@ public class AccessoriesInventory implements ImplementedInventory, Nameable {
             ItemStack targetStack = items.get(i);
             if (!(targetStack.isEmpty())) {
                 if (targetStack.getItem() instanceof AccessoryItem)
-                    ((AccessoryItem)targetStack.getItem()).accessoryTick(this.player.world, this.player, targetStack, i, this.selectedSlot == i);
+                    ((AccessoryItem)targetStack.getItem()).accessoryTick(this.player.world, this.player, this, targetStack, i, this.selectedSlot == i);
                 else
                     targetStack.inventoryTick(this.player.world, this.player, i, this.selectedSlot == i);
             }
@@ -90,6 +93,8 @@ public class AccessoriesInventory implements ImplementedInventory, Nameable {
         return getStack(5);
     }
 
+    public ItemStack getBeltAccessorySlot() { return getStack(7); }
+
     public boolean acceptsItemInSlot(ItemStack stack, int slotIndex) {
         if (!stack.isEmpty() && (slotIndex <= 3 && slotIndex >= 0))
             return true;
@@ -97,8 +102,33 @@ public class AccessoriesInventory implements ImplementedInventory, Nameable {
             AccessoryItem item = (AccessoryItem) stack.getItem();
             switch (item.getEquipStyle()) {
                 case BACK: case BACK_SHEATHED: return slotIndex == 5;
+                case BELT_LEFT: case BELT_BACK: case BELT_RIGHT: return slotIndex == 7;
             }
         }
         return false;
+    }
+
+    public List<ItemStack> getAllEquipmentStacks(PlayerEntity entity) {
+        List<ItemStack> stacks = new ArrayList<>();
+
+        ItemStack mainHand = entity.getMainHandStack();
+        ItemStack offHand = entity.getOffHandStack();
+        if (!mainHand.isEmpty())
+            stacks.add(mainHand);
+        if (!offHand.isEmpty())
+            stacks.add(offHand);
+
+        for (ItemStack item: items) {
+            if (!item.isEmpty())
+                stacks.add(item);
+        }
+
+        for (int i = 0; i < entity.getInventory().armor.size(); i++) {
+            ItemStack armorStack = entity.getInventory().getArmorStack(i);
+            if (!armorStack.isEmpty())
+                stacks.add(armorStack);
+        }
+
+        return stacks;
     }
 }

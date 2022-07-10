@@ -19,6 +19,9 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 import net.pyerter.pootsadditions.PootsAdditions;
+import net.pyerter.pootsadditions.item.custom.accessory.AccessoryItem;
+import net.pyerter.pootsadditions.item.entity.client.ItemModelRenderer;
+import net.pyerter.pootsadditions.item.inventory.AccessoriesInventory;
 import net.pyerter.pootsadditions.item.inventory.INbtInventory;
 import net.pyerter.pootsadditions.screen.handlers.PautschItemScreenHandler;
 import net.pyerter.pootsadditions.util.InventoryUtil;
@@ -26,12 +29,22 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class PautschItem extends Item implements INbtInventory, NamedScreenHandlerFactory {
+public class PautschItem extends Item implements INbtInventory, NamedScreenHandlerFactory, AccessoryItem {
     public static final String ITEM_INVENTORY_NBT_ID = "pootsadditions.pautsch_inventory";
     public static final Integer PAUTSCH_INVENTORY_SIZE = 27;
 
     public PautschItem(Settings settings) {
         super(settings);
+    }
+
+    @Override
+    public ItemModelRenderer.PlayerEquipStyle getEquipStyle() {
+        return ItemModelRenderer.PlayerEquipStyle.BELT_LEFT;
+    }
+
+    @Override
+    public boolean accessoryTick(World world, PlayerEntity entity, AccessoriesInventory inventory, ItemStack stack, int slot, boolean selected) {
+        return false;
     }
 
     public DefaultedList<ItemStack> getFullInventory(ItemStack stack) {

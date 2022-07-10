@@ -95,20 +95,20 @@ public class ItemModelRenderer extends ItemEntityRenderer {
         ItemStack referenceStack = stack;
         BakedModel referenceModel = bakedModel;
         transformByStyle(entity, matrixStack, equipStyle, tickDelta,
-                () -> BakedItemModelRenderer.renderBakedItemModel(referenceModel, referenceStack, light, OverlayTexture.DEFAULT_UV, matrixStack, vertexConsumer)
-        );
+                () -> BakedItemModelRenderer.renderBakedItemModel(referenceModel, referenceStack, light, OverlayTexture.DEFAULT_UV, matrixStack, vertexConsumer),
+        false);
 
         matrixStack.pop();
     }
 
-    public static boolean renderItemViaVanilla(MatrixStack matrices, PlayerEntity entity, ItemStack stack, int light, float tickDelta, VertexConsumerProvider vertexConsumerProvider) {
+    public static boolean renderItemViaVanilla(MatrixStack matrices, PlayerEntity entity, ItemStack stack, int light, float tickDelta, VertexConsumerProvider vertexConsumerProvider, boolean hasChestplate) {
         if (!(stack.getItem() instanceof AccessoryItem))
             return false;
 
         BakedModel model = MinecraftClient.getInstance().getItemRenderer().getModels().getModel(stack);
         BakedModel referenceModel = model.getOverrides().apply(model, stack, MinecraftClient.getInstance().world, entity, 0);
         Runnable renderCall = () -> MinecraftClient.getInstance().getItemRenderer().renderItem(stack, ModelTransformation.Mode.FIXED, false, matrices, vertexConsumerProvider, light, 0, referenceModel);
-        ItemModelRenderer.transformByStyle(entity, matrices, ((AccessoryItem) stack.getItem()).getEquipStyle(), tickDelta, renderCall);
+        ItemModelRenderer.transformByStyle(entity, matrices, ((AccessoryItem) stack.getItem()).getEquipStyle(), tickDelta, renderCall, hasChestplate);
         return true;
     }
 
@@ -120,10 +120,11 @@ public class ItemModelRenderer extends ItemEntityRenderer {
         }
     }
 
-    public static void transformByStyle(PlayerEntity entity, MatrixStack matrices, PlayerEquipStyle style, float tickDelta, Runnable renderCall) {
+    public static void transformByStyle(PlayerEntity entity, MatrixStack matrices, PlayerEquipStyle style, float tickDelta, Runnable renderCall, boolean hasChestplate) {
         switch (style) {
-            case BACK: transformBack(entity, matrices, tickDelta, false, renderCall); break;
-            default: case BACK_SHEATHED: transformBack(entity, matrices, tickDelta, true, renderCall); break;
+            case BACK: transformBack(entity, matrices, tickDelta, false, renderCall, hasChestplate); break;
+            default: case BACK_SHEATHED: transformBack(entity, matrices, tickDelta, true, renderCall, hasChestplate); break;
+            case BELT_LEFT: transformBeltLeft(entity, matrices, tickDelta, renderCall, hasChestplate);
             case NADA: break;
         }
     }
@@ -152,21 +153,42 @@ public class ItemModelRenderer extends ItemEntityRenderer {
         matrices.translate(-0.5, -1.0, -0.3);
     }
 
-    public static void transformBack(PlayerEntity entity, MatrixStack matrices, float tickDelta, boolean sheathed, Runnable renderCall) {
+    public static void transformBack(PlayerEntity entity, MatrixStack matrices, float tickDelta, boolean sheathed, Runnable renderCall, boolean hasChestplate) {
         matrices.push();
 
-        Quaternion rotationYaw = null;
-        float yaw = entity.bodyYaw;
-        rotationYaw = new Quaternion(Vec3f.POSITIVE_X, 180, true);
+        Quaternion rotationYaw = new Quaternion(Vec3f.POSITIVE_X, 180, true);
 
         if (!sheathed) {
             matrices.scale(0.75f, 0.75f, 0.75f);
-            matrices.translate(0, 0, -0.35);
+            matrices.translate(0, 0, -0.25);
+            if (hasChestplate)
+                matrices.translate(0, 0, -0.1);
         } else {
             matrices.scale(0.75f, 0.75f, 0.75f);
-            matrices.translate(0, 0.5, 0.35);
+            matrices.translate(0, 0.5, 0.25);
+            if (hasChestplate)
+                matrices.translate(0, 0, 0.1);
             matrices.multiply(rotationYaw);
         }
+
+        renderCall.run();
+
+        matrices.pop();
+    }
+
+    public static void transformBeltLeft(PlayerEntity entity, MatrixStack matrices, float tickDelta, Runnable renderCall, boolean hasChestplate) {
+        matrices.push();
+
+        Quaternion rotateZ = new Quaternion(Vec3f.POSITIVE_Z, 180, true);
+        Quaternion rotateY = new Quaternion(Vec3f.POSITIVE_Y, 90, true);
+
+
+        matrices.multiply(rotateZ);
+        matrices.multiply(rotateY);
+        matrices.scale(0.5f, 0.5f, 0.5f);
+        matrices.translate(0, -1.2, -0.55);
+        if (hasChestplate)
+            matrices.translate(0, 0, -0.1);
 
         renderCall.run();
 

@@ -20,6 +20,7 @@ import net.minecraft.world.World;
 import net.pyerter.pootsadditions.block.entity.CaptureChamberEntity;
 import net.pyerter.pootsadditions.item.custom.accessory.AccessoryItem;
 import net.pyerter.pootsadditions.item.entity.client.ItemModelRenderer;
+import net.pyerter.pootsadditions.item.inventory.AccessoriesInventory;
 import net.pyerter.pootsadditions.util.Util;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,20 +45,17 @@ public abstract class AbstractPowerCore extends Item implements IChargeable, Acc
     }
 
     @Override
-    public boolean accessoryTick(World world, PlayerEntity entity, ItemStack stack, int slot, boolean selected) {
-        if (!world.isClient() && entity instanceof PlayerEntity) {
-            PlayerEntity player = (PlayerEntity) entity;
-            ItemStack mainStack = player.getMainHandStack();
-            ItemStack offStack = player.getOffHandStack();
+    public boolean accessoryTick(World world, PlayerEntity entity, AccessoriesInventory inventory, ItemStack stack, int slot, boolean selected) {
+        if (!world.isClient()) {
+            List<ItemStack> stacks = inventory.getAllEquipmentStacks(entity);
             boolean transferred = false;
-            if (mainStack.getItem() instanceof IChargeable) {
-                tryTransferCharge(stack, mainStack);
-                transferred = true;
+            for (ItemStack targetStack: stacks) {
+                if (targetStack != stack && targetStack.getItem() instanceof IChargeable) {
+                    tryTransferCharge(stack, targetStack);
+                    transferred = true;
+                }
             }
-            if (mainStack.getItem() instanceof IChargeable) {
-                tryTransferCharge(stack, offStack);
-                transferred = true;
-            }
+
             return transferred;
         }
         return false;

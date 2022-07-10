@@ -12,6 +12,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
 import net.pyerter.pootsadditions.item.custom.accessory.AccessoryItem;
 import net.pyerter.pootsadditions.item.entity.client.ItemModelRenderer;
@@ -33,12 +34,19 @@ public abstract class ModArmorFeatureRendererHiderMixin <T extends LivingEntity,
 
     @Inject(method="renderArmor", at=@At("HEAD"), cancellable = true)
     void onRenderArmorCall(MatrixStack matrices, VertexConsumerProvider vertexConsumers, T entity, EquipmentSlot armorSlot, int light, A model, CallbackInfo info) {
+        if (isArmorHidden(entity, armorSlot)) {
+            info.cancel();
+        }
+    }
+
+    public boolean isArmorHidden(T entity, EquipmentSlot armorSlot) {
         if (entity instanceof IArmorHider) {
             IArmorHider armorHider = (IArmorHider) entity;
             if (!IArmorHider.getArmorVisibleByEquipSlot(armorHider, armorSlot)) {
-                info.cancel();
+                return true;
             }
         }
+        return false;
     }
 
     @Inject(method="render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/entity/LivingEntity;FFFFFF)V", at=@At(value="RETURN"))
@@ -47,11 +55,23 @@ public abstract class ModArmorFeatureRendererHiderMixin <T extends LivingEntity,
         // this.renderArmor(matrixStack, vertexConsumerProvider, livingEntity, EquipmentSlot.HEAD, i, this.getArmor(EquipmentSlot.HEAD));
         if (livingEntity instanceof PlayerEntity) {
             PlayerEntity entity = (PlayerEntity) livingEntity;
-            AccessoriesInventory accessoriesInventory = ((IAccessoriesInventory) entity).getAccessoriesInventory();
-            ItemStack backStack = accessoriesInventory.getBackAccessorySlot();
             float tickDelta = g;
+
+            boolean hasChestplate = false;
+            ItemStack itemStack = entity.getEquippedStack(EquipmentSlot.CHEST);
+            if (itemStack.getItem() instanceof ArmorItem && !isArmorHidden(livingEntity, EquipmentSlot.CHEST)) {
+                hasChestplate = true;
+            }
+            AccessoriesInventory accessoriesInventory = ((IAccessoriesInventory) entity).getAccessoriesInventory();
+
+            ItemStack backStack = accessoriesInventory.getBackAccessorySlot();
             if (!backStack.isEmpty() && backStack.getItem() instanceof AccessoryItem) {
-                ItemModelRenderer.renderItemViaVanilla(matrixStack, entity, backStack, i, tickDelta, vertexConsumerProvider);
+                ItemModelRenderer.renderItemViaVanilla(matrixStack, entity, backStack, i, tickDelta, vertexConsumerProvider, hasChestplate);
+            }
+
+            ItemStack beltStack = accessoriesInventory.getBeltAccessorySlot();
+            if (!beltStack.isEmpty() && beltStack.getItem() instanceof AccessoryItem) {
+                ItemModelRenderer.renderItemViaVanilla(matrixStack, entity, beltStack, i, tickDelta, vertexConsumerProvider, hasChestplate);
             }
         }
     }

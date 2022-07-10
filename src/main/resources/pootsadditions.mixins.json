@@ -17,7 +17,9 @@
     "ModServerPlayPacketListenerMixin",
     "ModPlayerServerEntityScreenHandlerMixin",
     "ModEnchantmentCompatibilityMixin",
-    "ModEnchantmentScreenHandlerModEnchantCompatibilityMixin"
+    "ModEnchantmentScreenHandlerModEnchantCompatibilityMixin",
+    "ModServerPlayerEntityAccessoriesInventoryMixin",
+    "ModClientPlayNetworkHandlerMixin"
   ],
   "client": [
     "ModHelloMixin"

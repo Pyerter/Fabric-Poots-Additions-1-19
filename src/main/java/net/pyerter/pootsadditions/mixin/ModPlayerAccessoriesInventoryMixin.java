@@ -11,6 +11,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.network.encryption.PlayerPublicKey;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerSyncHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
@@ -19,6 +21,7 @@ import net.pyerter.pootsadditions.item.inventory.AccessoriesInventory;
 import net.pyerter.pootsadditions.item.inventory.IAccessoriesInventory;
 import net.pyerter.pootsadditions.item.inventory.IAccessoryTabsHandlerProvider;
 import net.pyerter.pootsadditions.screen.AccessoryTabAssistant;
+import net.pyerter.pootsadditions.util.ScreenHanderSyncHandlerOwner;
 import org.apache.commons.compress.harmony.pack200.NewAttributeBands;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -96,5 +99,10 @@ public abstract class ModPlayerAccessoriesInventoryMixin extends LivingEntity im
 
         PootsAdditions.LOGGER.error("Error - tried fetching non-generated player screen tab from PlayerEntity");
         return null;
+    }
+
+    @Override
+    public List<ScreenHandler> getAllRegisteredAccessoryScreenHandlers() {
+        return registeredAccessoryTabHandlers;
     }
 }

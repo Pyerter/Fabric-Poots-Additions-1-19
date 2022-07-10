@@ -88,7 +88,7 @@ public class AccessoryInventoryScreenHandler extends ScreenHandler {
             for (int j = 0; j < 4; j++) {
                 int y = starY + offsetY * j;
                 int slotsSize = this.slots.size();
-                this.addSlot(new PickySlot(this.inventory, (i * 4) + j, x, y, (stack, index) -> true));
+                this.addSlot(new PickySlot(this.inventory, (i * 4) + j, x, y, (stack, index) -> inventory.acceptsItemInSlot(stack, index), (i * 4) + j));
                 if (slotsSize == this.slots.size()) {
                     PootsAdditions.LOGGER.error("ERRRROOOOOOORRR IT DIDN'T ADD SLOT AT INDEX " + ((i * 4) + j));
                 }

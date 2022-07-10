@@ -18,6 +18,8 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.pyerter.pootsadditions.block.entity.CaptureChamberEntity;
+import net.pyerter.pootsadditions.item.custom.accessory.AccessoryItem;
+import net.pyerter.pootsadditions.item.entity.client.ItemModelRenderer;
 import net.pyerter.pootsadditions.util.Util;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,7 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
-public abstract class AbstractPowerCore extends Item implements IChargeable {
+public abstract class AbstractPowerCore extends Item implements IChargeable, AccessoryItem {
 
     public static final List<Item> REGISTERED_CORES = new ArrayList<>();
     public static final String CHARGE_NBT_ID = "pootsadditions.core_charge";
@@ -34,6 +36,31 @@ public abstract class AbstractPowerCore extends Item implements IChargeable {
     public AbstractPowerCore(Settings settings) {
         super(settings);
         REGISTERED_CORES.add(this);
+    }
+
+    @Override
+    public ItemModelRenderer.PlayerEquipStyle getEquipStyle() {
+        return ItemModelRenderer.PlayerEquipStyle.BACK_SHEATHED;
+    }
+
+    @Override
+    public boolean accessoryTick(World world, PlayerEntity entity, ItemStack stack, int slot, boolean selected) {
+        if (!world.isClient() && entity instanceof PlayerEntity) {
+            PlayerEntity player = (PlayerEntity) entity;
+            ItemStack mainStack = player.getMainHandStack();
+            ItemStack offStack = player.getOffHandStack();
+            boolean transferred = false;
+            if (mainStack.getItem() instanceof IChargeable) {
+                tryTransferCharge(stack, mainStack);
+                transferred = true;
+            }
+            if (mainStack.getItem() instanceof IChargeable) {
+                tryTransferCharge(stack, offStack);
+                transferred = true;
+            }
+            return transferred;
+        }
+        return false;
     }
 
     @Override

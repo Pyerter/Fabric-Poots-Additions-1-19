@@ -7,6 +7,7 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.text.Text;
 import net.minecraft.util.Nameable;
 import net.minecraft.util.collection.DefaultedList;
+import net.pyerter.pootsadditions.item.custom.accessory.AccessoryItem;
 
 public class AccessoriesInventory implements ImplementedInventory, Nameable {
     public static final String INVENTORY_NBT_ID = "pootsadditions.accessories_inventory";
@@ -27,8 +28,12 @@ public class AccessoriesInventory implements ImplementedInventory, Nameable {
 
     public void updateItems() {
         for (int i = 0; i < items.size(); i++) {
-            if (!(items.get(i).isEmpty())) {
-                items.get(i).inventoryTick(this.player.world, this.player, i, this.selectedSlot == i);
+            ItemStack targetStack = items.get(i);
+            if (!(targetStack.isEmpty())) {
+                if (targetStack.getItem() instanceof AccessoryItem)
+                    ((AccessoryItem)targetStack.getItem()).accessoryTick(this.player.world, this.player, targetStack, i, this.selectedSlot == i);
+                else
+                    targetStack.inventoryTick(this.player.world, this.player, i, this.selectedSlot == i);
             }
         }
     }
@@ -79,5 +84,21 @@ public class AccessoriesInventory implements ImplementedInventory, Nameable {
     @Override
     public boolean canPlayerUse(PlayerEntity player) {
         return player.equals(this.player);
+    }
+
+    public ItemStack getBackAccessorySlot() {
+        return getStack(5);
+    }
+
+    public boolean acceptsItemInSlot(ItemStack stack, int slotIndex) {
+        if (!stack.isEmpty() && (slotIndex <= 3 && slotIndex >= 0))
+            return true;
+        if (!stack.isEmpty() && stack.getItem() instanceof AccessoryItem) {
+            AccessoryItem item = (AccessoryItem) stack.getItem();
+            switch (item.getEquipStyle()) {
+                case BACK: case BACK_SHEATHED: return slotIndex == 5;
+            }
+        }
+        return false;
     }
 }

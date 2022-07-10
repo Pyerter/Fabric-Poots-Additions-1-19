@@ -1,10 +1,12 @@
 package net.pyerter.pootsadditions.item.entity.client;
 
+import com.eliotlash.mclib.math.functions.limit.Min;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.entity.*;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
+import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -13,6 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3f;
+import net.pyerter.pootsadditions.item.custom.accessory.AccessoryItem;
 
 public class ItemModelRenderer extends ItemEntityRenderer {
     public enum PlayerEquipStyle {
@@ -69,10 +72,58 @@ public class ItemModelRenderer extends ItemEntityRenderer {
         matrixStack.pop();
     }
 
+    public static void renderItem(PlayerEntity entity, ItemStack stack, Item item, PlayerEquipStyle equipStyle, float f, float tickDelta, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light) {
+        BakedModel bakedModel = MinecraftClient.getInstance().getItemRenderer().getModels().getModel(item);
+        bakedModel = bakedModel.getOverrides().apply(bakedModel, stack, MinecraftClient.getInstance().world, entity, 0);
+        if (stack == null)
+            stack = item.getDefaultStack();
+
+        boolean glint = stack.hasGlint();
+        boolean modelItem = true;
+        RenderLayer renderLayer = RenderLayers.getItemLayer(stack, modelItem);
+        VertexConsumer vertexConsumer;
+        if (!glint) {
+            vertexConsumer = vertexConsumerProvider.getBuffer(renderLayer);
+        } else {
+            MatrixStack.Entry entry = matrixStack.peek();
+            entry.getPositionMatrix().multiply(0.75f);
+            vertexConsumer = ItemRenderer.getCompassGlintConsumer(vertexConsumerProvider, renderLayer, entry);
+        }
+
+        matrixStack.push();
+
+        ItemStack referenceStack = stack;
+        BakedModel referenceModel = bakedModel;
+        transformByStyle(entity, matrixStack, equipStyle, tickDelta,
+                () -> BakedItemModelRenderer.renderBakedItemModel(referenceModel, referenceStack, light, OverlayTexture.DEFAULT_UV, matrixStack, vertexConsumer)
+        );
+
+        matrixStack.pop();
+    }
+
+    public static boolean renderItemViaVanilla(MatrixStack matrices, PlayerEntity entity, ItemStack stack, int light, float tickDelta, VertexConsumerProvider vertexConsumerProvider) {
+        if (!(stack.getItem() instanceof AccessoryItem))
+            return false;
+
+        BakedModel model = MinecraftClient.getInstance().getItemRenderer().getModels().getModel(stack);
+        BakedModel referenceModel = model.getOverrides().apply(model, stack, MinecraftClient.getInstance().world, entity, 0);
+        Runnable renderCall = () -> MinecraftClient.getInstance().getItemRenderer().renderItem(stack, ModelTransformation.Mode.FIXED, false, matrices, vertexConsumerProvider, light, 0, referenceModel);
+        ItemModelRenderer.transformByStyle(entity, matrices, ((AccessoryItem) stack.getItem()).getEquipStyle(), tickDelta, renderCall);
+        return true;
+    }
+
     public static void transformByStyle(ItemEntity entity, MatrixStack matrices, PlayerEquipStyle style, float tickDelta) {
         switch (style) {
-            default: case BACK: transformBack(entity, matrices, tickDelta, false); break;
-            case BACK_SHEATHED: transformBack(entity, matrices, tickDelta, true); break;
+            case BACK: transformBack(entity, matrices, tickDelta, false); break;
+            default: case BACK_SHEATHED: transformBack(entity, matrices, tickDelta, true); break;
+            case NADA: break;
+        }
+    }
+
+    public static void transformByStyle(PlayerEntity entity, MatrixStack matrices, PlayerEquipStyle style, float tickDelta, Runnable renderCall) {
+        switch (style) {
+            case BACK: transformBack(entity, matrices, tickDelta, false, renderCall); break;
+            default: case BACK_SHEATHED: transformBack(entity, matrices, tickDelta, true, renderCall); break;
             case NADA: break;
         }
     }
@@ -80,16 +131,7 @@ public class ItemModelRenderer extends ItemEntityRenderer {
     public static void transformBack(ItemEntity entity, MatrixStack matrices, float tickDelta, boolean sheathed) {
         Quaternion rotationYaw = null;
         if (entity.hasVehicle()) {
-            //EntityRenderer renderer = MinecraftClient.getInstance().getEntityRenderDispatcher().getRenderer(entity.getVehicle());
             if (entity.getVehicle() instanceof PlayerEntity) {
-                // whelp at least now I know how to access the playerRenderer and thus player entity model
-                // ;-;
-                // && renderer instanceof PlayerEntityRenderer) {
-                //PlayerEntityRenderer playerRenderer = (PlayerEntityRenderer) renderer;
-                //float h = MathHelper.lerpAngleDegrees(tickDelta, playerEntity.prevBodyYaw, playerEntity.bodyYaw);
-                //float j = MathHelper.lerpAngleDegrees(tickDelta, playerEntity.prevHeadYaw, playerEntity.headYaw);
-                //float k = j - h;
-
                 PlayerEntity playerEntity = (PlayerEntity) entity.getVehicle();
                 float yaw = playerEntity.bodyYaw;
                 rotationYaw = new Quaternion(Vec3f.POSITIVE_Y, -yaw, true);
@@ -108,5 +150,26 @@ public class ItemModelRenderer extends ItemEntityRenderer {
         matrices.multiply(rotationYaw);
         matrices.scale(0.75f, 0.75f, 0.75f);
         matrices.translate(-0.5, -1.0, -0.3);
+    }
+
+    public static void transformBack(PlayerEntity entity, MatrixStack matrices, float tickDelta, boolean sheathed, Runnable renderCall) {
+        matrices.push();
+
+        Quaternion rotationYaw = null;
+        float yaw = entity.bodyYaw;
+        rotationYaw = new Quaternion(Vec3f.POSITIVE_X, 180, true);
+
+        if (!sheathed) {
+            matrices.scale(0.75f, 0.75f, 0.75f);
+            matrices.translate(0, 0, -0.35);
+        } else {
+            matrices.scale(0.75f, 0.75f, 0.75f);
+            matrices.translate(0, 0.5, 0.35);
+            matrices.multiply(rotationYaw);
+        }
+
+        renderCall.run();
+
+        matrices.pop();
     }
 }

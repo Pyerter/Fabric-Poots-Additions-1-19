@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-
+    "pootsadditions:food_prepping_station",
+    "pootsadditions:engineering_station"
   ]
 }

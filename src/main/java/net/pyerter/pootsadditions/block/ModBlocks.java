@@ -36,15 +36,15 @@ public class ModBlocks {
             new GarlicCropBlock(FabricBlockSettings.copy(Blocks.WHEAT)));
 
     public static final Block TRIDI = registerBlock("tridi",
-            new TridiBlock(FabricBlockSettings.of(Material.METAL).nonOpaque()), ModItemGroup.SAPPHIRE);
+            new TridiBlock(FabricBlockSettings.of(Material.METAL).nonOpaque().strength(3f).requiresTool()), ModItemGroup.SAPPHIRE);
 
     public static final Block CAPTURE_CHAMBER = registerBlock("capture_chamber",
-            new CaptureChamberBlock(FabricBlockSettings.of(Material.METAL).nonOpaque()), ModItemGroup.SAPPHIRE);
+            new CaptureChamberBlock(FabricBlockSettings.of(Material.METAL).nonOpaque().strength(2f).requiresTool()), ModItemGroup.SAPPHIRE);
     public static final Block CAPTURE_CHAMBER_PROVIDER = registerBlock("capture_chamber_provider",
-            new CaptureChamberProviderBlock(FabricBlockSettings.of(Material.REDSTONE_LAMP).nonOpaque()), ModItemGroup.SAPPHIRE);
+            new CaptureChamberProviderBlock(FabricBlockSettings.of(Material.REDSTONE_LAMP).nonOpaque().strength(2f).requiresTool()), ModItemGroup.SAPPHIRE);
 
     public static final Block ENGINEERING_STATION = registerBlock("engineering_station",
-            new EngineeringStationBlock(FabricBlockSettings.of(Material.METAL).nonOpaque()), ModItemGroup.SAPPHIRE);
+            new EngineeringStationBlock(FabricBlockSettings.of(Material.METAL).nonOpaque().strength(2f).requiresTool()), ModItemGroup.SAPPHIRE);
 
     public static final Block KITCHEN_STOVE_STATION = registerBlock("kitchen_stove_station",
             new KitchenStoveStation(FabricBlockSettings.of(Material.METAL).nonOpaque().luminance(state -> {
@@ -53,14 +53,14 @@ public class ModBlocks {
                 if (state.get(KitchenStoveStation.STOVE_LIT) == true)
                     return 7;
                 return 0;
-            })),
+            }).strength(2f).requiresTool()),
             ModItemGroup.SAPPHIRE);
 
     public static final Block FOOD_PREPPING_STATION = registerBlock("food_prepping_station",
-            new FoodPreppingStation(FabricBlockSettings.of(Material.WOOD).nonOpaque()), ModItemGroup.SAPPHIRE);
+            new FoodPreppingStation(FabricBlockSettings.of(Material.WOOD).nonOpaque().strength(2f).requiresTool()), ModItemGroup.SAPPHIRE);
 
     public static final Block REDSTONE_MEMORIZER_BLOCK = registerBlock("redstone_memorizer_block",
-            new RedstoneMemorizerBlock(FabricBlockSettings.of(Material.REDSTONE_LAMP).luminance(RedstoneMemorizerBlock::calculateLuminance).solidBlock((a, b, c) -> false)), ModItemGroup.SAPPHIRE);
+            new RedstoneMemorizerBlock(FabricBlockSettings.of(Material.REDSTONE_LAMP).luminance(RedstoneMemorizerBlock::calculateLuminance).solidBlock((a, b, c) -> false).strength(1f)), ModItemGroup.SAPPHIRE);
 
     private static Block registerOnlyBlock(String name, Block block) {
         return Registry.register(Registry.BLOCK, new Identifier(PootsAdditions.MOD_ID, name), block);

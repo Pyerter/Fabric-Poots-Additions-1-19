@@ -1,6 +1,6 @@
 {
   "item.pootsadditions.sapphire_dust": "Sapphire Dust",
-  "item.pootsadditions.starmetal_alloy_ingot": "Sapphire Alloy",
+  "item.pootsadditions.starmetal_alloy_ingot": "Starmetal Alloy",
   "item.pootsadditions.starmetal_compound_mix": "Starmetal Compound",
   "item.pootsadditions.sapphire_star": "Sapphire Star",
   "item.pootsadditions.sapphire_star_base": "Sapphire Star Base",
@@ -78,6 +78,8 @@
   "block.pootsadditions.engineering_station": "Engineering Station",
   "block.pootsadditions.kitchen_stove_station": "Kitchen Stove",
   "block.pootsadditions.food_prepping_station": "Food Prepping Station",
+
+  "block.pootsadditions.redstone_memorizer_block": "Redstone Memorizer",
 
   "item.pootsadditions.bobcat_spawn_egg": "Bobcat Spawn Egg",
 

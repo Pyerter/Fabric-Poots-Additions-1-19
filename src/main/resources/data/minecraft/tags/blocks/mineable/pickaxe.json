@@ -3,6 +3,10 @@
   "values": [
     "pootsadditions:sapphire_dust_ore",
     "pootsadditions:deepslate_sapphire_dust_ore",
-    "pootsadditions:spiral_cube_block"
+    "pootsadditions:spiral_cube_block",
+    "pootsadditions:capture_chamber",
+    "pootsadditions:capture_chamber_provider",
+    "pootsadditions:kitchen_stove_station",
+    "pootsadditions:tridi"
   ]
 }

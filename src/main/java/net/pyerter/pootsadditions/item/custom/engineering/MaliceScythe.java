@@ -1,23 +1,37 @@
 package net.pyerter.pootsadditions.item.custom.engineering;
 
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.client.util.ParticleUtil;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.intprovider.UniformIntProvider;
 import net.minecraft.world.World;
+import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.item.ModToolMaterials;
-import net.pyerter.pootsadditions.item.custom.engineering.AbstractEngineeredTool;
+import net.pyerter.pootsadditions.particle.ModParticles;
 import net.pyerter.pootsadditions.util.IModPlayerEntityWeaponAbilityTriggerer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public class MaliceScythe extends AbstractEngineeredTool implements IChargeable {
+    public static final int ZAP_CHARGE_REQ = 2;
+
     public MaliceScythe(float attackDamage, float attackSpeed, Settings settings) {
         super(attackDamage, attackSpeed, ModToolMaterials.STARMETAL, BlockTags.HOE_MINEABLE, settings);
+
+        toolType = ToolType.SWORD;
     }
 
     @Override
@@ -27,12 +41,41 @@ public class MaliceScythe extends AbstractEngineeredTool implements IChargeable 
 
     @Override
     public boolean tryUseWeaponAbility(Entity target, PlayerEntity attacker) {
-        return target instanceof LivingEntity ? ((IModPlayerEntityWeaponAbilityTriggerer)attacker).trySwordSweepAttack(target, 2) : false;
+        if (target instanceof LivingEntity) {
+            LivingEntity targetEntity = (LivingEntity) target;
+            if (((IModPlayerEntityWeaponAbilityTriggerer)attacker).trySwordSweepAttack(target, 2)) {
+                ItemStack attackStack = attacker.getMainHandStack();
+                if (attackStack.getItem() instanceof MaliceScythe && getCharge(attackStack) >= ZAP_CHARGE_REQ) {
+                    float zapDamage = 2.0F + EnchantmentHelper.getSweepingMultiplier(attacker);
+                    spawnAttackParticles(targetEntity);
+                    targetEntity.damage(DamageSource.player(attacker), zapDamage);
+                    addCharge(attackStack, -ZAP_CHARGE_REQ);
+                }
+                return true;
+            }
+        }
+        return false;
+        //return target instanceof LivingEntity ? ((IModPlayerEntityWeaponAbilityTriggerer)attacker).trySwordSweepAttack(target, 2) : false;
+    }
+
+    public void spawnAttackParticles(LivingEntity target) {
+        PootsAdditions.logInfo("Spawning scythe particles!");
+        World world = target.world;
+        if (world instanceof ServerWorld) {
+            double x = target.getX();
+            double y = target.getBodyY(0.5f);
+            double z = target.getZ();
+            double deltaX = 1; //MathHelper.nextDouble(target.getRandom(), 0, 1);
+            double deltaY = 1; //MathHelper.nextDouble(target.getRandom(), 0, 1);
+            double deltaZ = 1; //MathHelper.nextDouble(target.getRandom(), 0, 1);
+            ServerWorld serverWorld = (ServerWorld) world;
+            serverWorld.spawnParticles(ModParticles.ELECTRO_STATIC_PARTICLE, x, y, z, 20, deltaX, deltaY, deltaZ, 0.5);
+        }
     }
 
     @Override
     public boolean hasGlint(ItemStack stack) {
-        return getCharge(stack) > 0;
+        return getCharge(stack) > getMaxCharge() / 2;
     }
 
     @Override

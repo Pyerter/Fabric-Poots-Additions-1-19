@@ -6,8 +6,11 @@ import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
 import net.minecraft.data.DataGenerator;
 import net.pyerter.pootsadditions.block.ModBlocks;
 import net.pyerter.pootsadditions.block.entity.ModBlockEntities;
+import net.pyerter.pootsadditions.entity.ModEntities;
 import net.pyerter.pootsadditions.item.ModItems;
+import net.pyerter.pootsadditions.item.entity.ModItemEntities;
 import net.pyerter.pootsadditions.loottables.ModLootTableModifiers;
+import net.pyerter.pootsadditions.particle.ModParticles;
 import net.pyerter.pootsadditions.recipe.ModRecipes;
 import net.pyerter.pootsadditions.screen.ModScreens;
 import net.pyerter.pootsadditions.screen.handlers.ModScreenHandlers;
@@ -27,26 +30,32 @@ public class PootsAdditions implements ModInitializer {
 	@Override
 	public void onInitialize() {
 
+		// Register blocks, items, and entities
 		ModItems.registerModItems();
-		ModBlocks.registerModBlocks();
-
 		ModItems.registerPredicateOverrides();
 
-		ModRegistries.registerModElements();
-
-		ModWorldGen.initializeWorldGen();
-
+		ModBlocks.registerModBlocks();
 		ModBlockEntities.registerAllBlockEntities();
 
+		ModEntities.registerEntityAttributes();
+		ModItemEntities.registerEntityAttributes();
+
+		// Register particles
+		ModParticles.registerParticles();
+
+		// Register data
 		ModRecipes.registerRecipes();
-
-		ModScreenHandlers.registerAllScreenHandlers();
-
-		GeckoLib.initialize();
-
-		ModScreens.registerAccessoryTabScreens();
-
 		ModLootTableModifiers.modifyLootTables();
+
+		// Register custom screen handlers (yes, this goes for the server too)
+		ModScreenHandlers.registerAllScreenHandlers();
+		ModScreens.registerAccessoryTabScreens(); // this one is important for packet handling
+
+		// Initialize world gen
+		ModWorldGen.initializeWorldGen();
+
+		// Initialize dependency of geckolib
+		GeckoLib.initialize();
 	}
 
 	public static void logInfo(String message) {

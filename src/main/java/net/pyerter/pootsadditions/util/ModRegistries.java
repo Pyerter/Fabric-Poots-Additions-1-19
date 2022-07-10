@@ -14,7 +14,5 @@ public class ModRegistries {
 
     private static void registerAttributes() {
         PootsAdditions.logInfo("Registering entity attributes");
-        ModEntities.registerEntityAttributes();
-        ModItemEntities.registerEntityAttributes();
     }
 }

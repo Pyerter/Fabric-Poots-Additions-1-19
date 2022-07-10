@@ -9,13 +9,11 @@ import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.pyerter.pootsadditions.PootsAdditions;
-import net.pyerter.pootsadditions.item.inventory.IAccessoriesInventory;
 import net.pyerter.pootsadditions.item.inventory.IAccessoryTabsHandlerProvider;
 import net.pyerter.pootsadditions.network.packet.CloseAccTabScreenC2SPacket;
 import net.pyerter.pootsadditions.network.packet.OpenAccTabScreenC2SPacket;
 import net.pyerter.pootsadditions.network.packet.ToggleHideArmorSlotC2SPacket;
-import net.pyerter.pootsadditions.network.packet.ToggleHideArmorSlotNotifyPlayersS2CPacket;
-import net.pyerter.pootsadditions.screen.AccessoryTabAssistant;
+import net.pyerter.pootsadditions.network.packet.ToggleHideArmorSlotS2CPacket;
 import net.pyerter.pootsadditions.util.IAccTabScreenHandlerOpener;
 import net.pyerter.pootsadditions.util.IArmorHider;
 import net.pyerter.pootsadditions.util.ICustomServerPacketHandler;
@@ -67,7 +65,7 @@ public class ModServerPlayPacketListenerMixin implements IAccTabScreenHandlerOpe
     @Override
     public void onToggleHideArmorSlot(ToggleHideArmorSlotC2SPacket packet) {
         IArmorHider.setArmorVisibleByEquipSlot((IArmorHider)player, packet.isSlotVisible(), packet.getEquipmentSlot());
-        ToggleHideArmorSlotNotifyPlayersS2CPacket responsePacket = new ToggleHideArmorSlotNotifyPlayersS2CPacket(packet.getEquipmentSlot(), packet.isSlotVisible());
+        ToggleHideArmorSlotS2CPacket responsePacket = new ToggleHideArmorSlotS2CPacket(packet.getEquipmentSlot(), packet.isSlotVisible());
         ((ServerWorld)this.player.world).getChunkManager().sendToOtherNearbyPlayers(player, responsePacket);
     }
 }

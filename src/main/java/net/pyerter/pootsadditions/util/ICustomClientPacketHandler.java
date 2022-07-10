@@ -1,10 +1,9 @@
 package net.pyerter.pootsadditions.util;
 
-import net.pyerter.pootsadditions.network.packet.ToggleHideArmorSlotC2SPacket;
-import net.pyerter.pootsadditions.network.packet.ToggleHideArmorSlotNotifyPlayersS2CPacket;
+import net.pyerter.pootsadditions.network.packet.ToggleHideArmorSlotS2CPacket;
 
 public interface ICustomClientPacketHandler {
 
-    public void onToggleHideArmorSlot(ToggleHideArmorSlotNotifyPlayersS2CPacket packet);
+    public void onToggleHideArmorSlot(ToggleHideArmorSlotS2CPacket packet);
 
 }

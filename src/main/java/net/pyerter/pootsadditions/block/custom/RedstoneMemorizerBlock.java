@@ -1,10 +1,7 @@
 package net.pyerter.pootsadditions.block.custom;
 
 import com.google.common.collect.Sets;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
@@ -24,6 +21,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldView;
 import net.pyerter.pootsadditions.block.entity.EngineeringStationEntity;
 import net.pyerter.pootsadditions.block.entity.ModBlockEntities;
 import net.pyerter.pootsadditions.util.Util;
@@ -73,7 +71,6 @@ public class RedstoneMemorizerBlock extends Block {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-
         return ActionResult.PASS;
     }
 
@@ -87,6 +84,7 @@ public class RedstoneMemorizerBlock extends Block {
         return getRedstonePower(state, direction);
     }
 
+    // NOTE: dir is the direction that the receiving block is coming from
     public int getRedstonePower(BlockState state, Direction dir) {
         if (!this.givesPower)
             return 0;
@@ -102,10 +100,10 @@ public class RedstoneMemorizerBlock extends Block {
         if ((Integer)state.get(REDSTONE_POWER) != receivedRedstonePower) {
             if (world.getBlockState(pos) == state) {
                 int memorizedPower = state.get(MEMORIZED_POWER);
-                if (memorizedPower == 0)
-                    world.setBlockState(pos, (BlockState)state.with(REDSTONE_POWER, receivedRedstonePower).with(MEMORIZED_POWER, receivedRedstonePower).with(LIT, receivedRedstonePower > 0), 2);
-                else if (memorizedPower == receivedRedstonePower) {
+                if (memorizedPower == receivedRedstonePower) {
                     world.setBlockState(pos, (BlockState)state.with(REDSTONE_POWER, receivedRedstonePower).with(MEMORIZED_POWER, 0).with(LIT, false), 2);
+                } else if (receivedRedstonePower > 0) {
+                    world.setBlockState(pos, (BlockState)state.with(REDSTONE_POWER, receivedRedstonePower).with(MEMORIZED_POWER, receivedRedstonePower).with(LIT, receivedRedstonePower > 0), 2);
                 } else {
                     world.setBlockState(pos, (BlockState)state.with(REDSTONE_POWER, receivedRedstonePower), 2);
                 }
@@ -131,48 +129,74 @@ public class RedstoneMemorizerBlock extends Block {
 
     }
 
-    /*
-    private int getReceivedRedstonePower(World world, BlockPos pos) {
-        this.givesPower = false;
-        int receivedSignal = world.getReceivedRedstonePower(pos);
-        this.givesPower = true;
+    private int getSidedRedstonePower(World world, BlockPos pos, BlockState state) {
+        int receivedSignal = getWorldReceivedSignal(world, pos, state);
         int maxPower = 0;
         if (receivedSignal < 15) {
-            for (Direction dir: Direction.values()) {
-                BlockPos blockPos = pos.offset(dir);
-                BlockState blockState = world.getBlockState(blockPos);
-                maxPower = Math.max(maxPower, this.increasePower(blockState, dir));
-            }
+            maxPower = getRedstoneMemorizersSignals(world, pos, state);
         }
 
         return Math.max(receivedSignal, maxPower - 1);
     }
-    */
 
-    private int getSidedRedstonePower(World world, BlockPos pos, BlockState state) {
+    private int getWorldReceivedSignal(World world, BlockPos pos, BlockState state) {
         this.givesPower = false;
         int receivedSignal = 0;
         Iterator horizontalIterator = Direction.Type.HORIZONTAL.iterator();
         while (horizontalIterator.hasNext()) {
             Direction dir = (Direction) horizontalIterator.next();
             if (dir != state.get(FACING) && dir != state.get(FACING).getOpposite()) {
-                receivedSignal = Math.max(world.getStrongRedstonePower(pos.offset(dir), dir.getOpposite()), receivedSignal);
+                int probableSignal = getPower(world, pos, dir);
+                receivedSignal = Math.max(probableSignal, receivedSignal);
+                // sadge
+                // when you pass in a direction to get a redstone signal, you don't flip the direction you use to offset to get
+                // to that position
             }
         }
         this.givesPower = true;
+        return receivedSignal;
+    }
 
+    protected int getPower(World world, BlockPos pos, Direction dir) {
+        BlockPos blockPos = pos.offset(dir);
+        int i = world.getEmittedRedstonePower(blockPos, dir);
+        if (i >= 15) {
+            return i;
+        } else {
+            BlockState blockState = world.getBlockState(blockPos);
+            return Math.max(i, blockState.isOf(Blocks.REDSTONE_WIRE) ? (Integer)blockState.get(RedstoneWireBlock.POWER) : 0);
+        }
+    }
+
+    protected int getInputLevel(WorldView world, BlockPos pos, Direction dir) {
+        BlockState blockState = world.getBlockState(pos);
+        if (this.isValidInput(blockState)) {
+            if (blockState.isOf(Blocks.REDSTONE_BLOCK)) {
+                return 15;
+            } else {
+                return blockState.isOf(Blocks.REDSTONE_WIRE) ? (Integer)blockState.get(RedstoneWireBlock.POWER) : world.getStrongRedstonePower(pos, dir);
+            }
+        } else {
+            return 0;
+        }
+    }
+
+    protected boolean isValidInput(BlockState state) {
+        return state.emitsRedstonePower();
+    }
+
+    private int getRedstoneMemorizersSignals(World world, BlockPos pos, BlockState state) {
         int maxPower = 0;
-        if (receivedSignal < 15) {
-            for (Direction dir: Direction.values()) {
-                if (dir == state.get(FACING) || dir == state.get(FACING).getOpposite()) {
-                    BlockPos blockPos = pos.offset(dir);
-                    BlockState blockState = world.getBlockState(blockPos);
-                    maxPower = Math.max(maxPower, this.increasePower(blockState, dir));
-                }
+        Iterator horizontalIterator = Direction.Type.HORIZONTAL.iterator();
+        while (horizontalIterator.hasNext()) {
+            Direction dir = (Direction) horizontalIterator.next();
+            if (dir != state.get(FACING) && dir != state.get(FACING).getOpposite()) {
+                BlockPos blockPos = pos.offset(dir);
+                BlockState blockState = world.getBlockState(blockPos);
+                maxPower = Math.max(maxPower, this.increasePower(blockState, dir));
             }
         }
-
-        return Math.max(receivedSignal, maxPower - 1);
+        return maxPower;
     }
 
     private int increasePower(BlockState state, Direction dir) {
@@ -181,7 +205,8 @@ public class RedstoneMemorizerBlock extends Block {
 
     public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
         if (!world.isClient) {
-            this.update(world, pos, state);
+            // this.update(world, pos, state);
+            world.createAndScheduleBlockTick(pos, this, 2);
         }
     }
 
@@ -205,7 +230,6 @@ public class RedstoneMemorizerBlock extends Block {
                 this.updateNeighbors(world, blockPos.down());
             }
         }
-
     }
 
     private void updateNeighbors(World world, BlockPos pos) {
@@ -224,7 +248,9 @@ public class RedstoneMemorizerBlock extends Block {
 
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
         if (!oldState.isOf(state.getBlock()) && !world.isClient) {
-            this.update(world, pos, state);
+            //this.update(world, pos, state);
+            world.createAndScheduleBlockTick(pos, this, 2);
+
             Iterator var6 = Direction.Type.VERTICAL.iterator();
 
             while(var6.hasNext()) {
@@ -252,17 +278,16 @@ public class RedstoneMemorizerBlock extends Block {
                     world.updateNeighborsAlways(pos.offset(direction), this);
                 }
 
-                this.update(world, pos, state);
+                //this.update(world, pos, state);
+                world.createAndScheduleBlockTick(pos, this, 2);
+
                 this.updateOffsetNeighbors(world, pos);
             }
         }
     }
 
     public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        if ((Boolean)state.get(LIT) && !world.isReceivingRedstonePower(pos)) {
-            world.setBlockState(pos, (BlockState)state.cycle(LIT), 2);
-        }
-
+        update(world, pos, state);
     }
 
     public static int calculateLuminance(BlockState state) {

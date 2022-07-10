@@ -60,7 +60,7 @@ public class ModBlocks {
             new FoodPreppingStation(FabricBlockSettings.of(Material.WOOD).nonOpaque()), ModItemGroup.SAPPHIRE);
 
     public static final Block REDSTONE_MEMORIZER_BLOCK = registerBlock("redstone_memorizer_block",
-            new RedstoneMemorizerBlock(FabricBlockSettings.of(Material.REDSTONE_LAMP).luminance(RedstoneMemorizerBlock::calculateLuminance)), ModItemGroup.SAPPHIRE);
+            new RedstoneMemorizerBlock(FabricBlockSettings.of(Material.REDSTONE_LAMP).luminance(RedstoneMemorizerBlock::calculateLuminance).solidBlock((a, b, c) -> false)), ModItemGroup.SAPPHIRE);
 
     private static Block registerOnlyBlock(String name, Block block) {
         return Registry.register(Registry.BLOCK, new Identifier(PootsAdditions.MOD_ID, name), block);

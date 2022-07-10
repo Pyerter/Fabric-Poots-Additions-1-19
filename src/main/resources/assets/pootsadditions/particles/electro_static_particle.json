@@ -1,5 +1,7 @@
 {
   "textures": [
-    "pootsadditions:electro_static_particle"
+    "pootsadditions:electro_static_particle",
+    "pootsadditions:electro_static_particle2",
+    "pootsadditions:electro_static_particle3"
   ]
 }

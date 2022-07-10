@@ -49,7 +49,6 @@ public class MaliceScythe extends AbstractEngineeredTool implements IChargeable 
             }
         }
         return false;
-        //return target instanceof LivingEntity ? ((IModPlayerEntityWeaponAbilityTriggerer)attacker).trySwordSweepAttack(target, 2) : false;
     }
 
     public void spawnAttackParticles(LivingEntity target) {

@@ -1,12 +1,13 @@
 package net.pyerter.pootsadditions.network.packet;
 
+import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.pyerter.pootsadditions.util.ICustomClientPacketHandler;
 
-public class ToggleHideArmorSlotS2CPacket implements Packet<ClientPlayPacketListener> {
+public class ToggleHideArmorSlotS2CPacket implements Packet<ClientPlayNetworkHandler> {
     private final int entitySlotId;
     private final boolean slotVisible;
 
@@ -27,7 +28,7 @@ public class ToggleHideArmorSlotS2CPacket implements Packet<ClientPlayPacketList
     }
 
     @Override
-    public void apply(ClientPlayPacketListener listener) {
+    public void apply(ClientPlayNetworkHandler listener) {
         ((ICustomClientPacketHandler)listener).onToggleHideArmorSlot(this);
     }
 

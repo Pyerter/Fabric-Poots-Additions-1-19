@@ -7,6 +7,11 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 
 public interface IArmorHider {
+    public static final String NBT_HEAD_VISIBLITY = "pootsadditions.head_visible";
+    public static final String NBT_CHEST_VISIBLITY = "pootsadditions.chest_visible";
+    public static final String NBT_LEGS_VISIBLITY = "pootsadditions.legs_visible";
+    public static final String NBT_FEET_VISIBLITY = "pootsadditions.feet_visible";
+
     public static final TrackedData<Boolean> ARMOR_VISIBLE_CHEST = DataTracker.registerData(PlayerEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     public static final TrackedData<Boolean> ARMOR_VISIBLE_LEGS = DataTracker.registerData(PlayerEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     public static final TrackedData<Boolean> ARMOR_VISIBLE_FEET = DataTracker.registerData(PlayerEntity.class, TrackedDataHandlerRegistry.BOOLEAN);

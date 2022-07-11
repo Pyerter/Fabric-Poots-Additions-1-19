@@ -19,8 +19,11 @@ import net.minecraft.util.collection.DefaultedList;
 import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.item.inventory.AccessoriesInventory;
 import net.pyerter.pootsadditions.item.inventory.IAccessoriesInventory;
+import net.pyerter.pootsadditions.network.packet.ToggleHideArmorSlotS2CPacket;
 import net.pyerter.pootsadditions.screen.AccessoryTabAssistant;
 import net.pyerter.pootsadditions.screen.slot.PickySlot;
+import net.pyerter.pootsadditions.util.IArmorHider;
+
 import java.util.function.BiPredicate;
 
 import static net.minecraft.screen.PlayerScreenHandler.*;
@@ -209,10 +212,47 @@ public class AccessoryInventoryScreenHandler extends ScreenHandler {
 
     @Override
     public boolean onButtonClick(PlayerEntity player, int id) {
-        if (AccessoryTabAssistant.userOpenHandledScreen(player, id)) {
-            return true;
+        int minButtonId = AccessoryTabAssistant.getFreeButtonId();
+        int selectedArmor = id - minButtonId;
+
+        if (!player.world.isClient && player instanceof ServerPlayerEntity) {
+            IArmorHider armorHider = ((IArmorHider) player);
+            EquipmentSlot slot = EquipmentSlot.HEAD;
+            boolean visibility = false;
+            boolean selected = false;
+            switch (selectedArmor) {
+                case 0:
+                    slot = EquipmentSlot.HEAD;
+                    armorHider.setArmorHeadVisible(!armorHider.isArmorHeadVisible());
+                    visibility = armorHider.isArmorHeadVisible();
+                    selected = true;
+                    break;
+                case 1:
+                    slot = EquipmentSlot.CHEST;
+                    armorHider.setArmorChestVisible(!armorHider.isArmorChestVisible());
+                    visibility = armorHider.isArmorChestVisible();
+                    selected = true;
+                    break;
+                case 2:
+                    slot = EquipmentSlot.LEGS;
+                    armorHider.setArmorLegsVisible(!armorHider.isArmorLegsVisible());
+                    visibility = armorHider.isArmorLegsVisible();
+                    selected = true;
+                    break;
+                case 3:
+                    slot = EquipmentSlot.FEET;
+                    armorHider.setArmorFeetVisible(!armorHider.isArmorFeetVisible());
+                    visibility = armorHider.isArmorFeetVisible();
+                    selected = true;
+                    break;
+            }
+            if (selected) {
+                ((ServerPlayerEntity)player).networkHandler.sendPacket(new ToggleHideArmorSlotS2CPacket(slot, visibility));
+                return true;
+            }
         }
-        return super.onButtonClick(player, id);
+
+        return false;
         // have code to open up other tabs
     }
 

@@ -2,6 +2,7 @@ package net.pyerter.pootsadditions.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -13,6 +14,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Quaternion;
@@ -23,6 +26,7 @@ import net.pyerter.pootsadditions.screen.handlers.AccessoryInventoryScreenHandle
 import net.pyerter.pootsadditions.screen.handlers.EngineeringStationScreenHandler;
 import net.pyerter.pootsadditions.screen.handlers.ModScreenHandlers;
 import net.pyerter.pootsadditions.screen.handlers.PautschItemScreenHandler;
+import net.pyerter.pootsadditions.util.Util;
 
 public class AccessoryInventoryScreen extends HandledScreen<AccessoryInventoryScreenHandler> {
 
@@ -54,7 +58,7 @@ public class AccessoryInventoryScreen extends HandledScreen<AccessoryInventorySc
         this.height = height;
 
         titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2;
-        titleY = -10;
+        titleY = -25;
     }
 
     @Override
@@ -65,6 +69,8 @@ public class AccessoryInventoryScreen extends HandledScreen<AccessoryInventorySc
         x = (width - backgroundWidth) / 2;
         y = (height - backgroundHeight) / 2;
         drawTexture(matrices, x, y, 0, 0, backgroundWidth, backgroundHeight);
+
+        drawVisibleGlassesIfHovered(this, matrices, x, y);
 
         RenderSystem.setShaderTexture(0, AccessoryTabAssistant.ACC_TABS_TEXTURE);
 
@@ -83,6 +89,11 @@ public class AccessoryInventoryScreen extends HandledScreen<AccessoryInventorySc
         }
 
         drawEntity(x + 51, y + 75, 30, (float)(x + 51) - this.mouseX, (float)(y + 75 - 50) - this.mouseY, this.client.player);
+    }
+
+    @Override
+    protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
+        this.textRenderer.draw(matrices, this.title, (float)this.titleX, (float)this.titleY, 4210752);
     }
 
     public static void drawEntity(int x, int y, int size, float mouseX, float mouseY, LivingEntity entity) {
@@ -135,13 +146,41 @@ public class AccessoryInventoryScreen extends HandledScreen<AccessoryInventorySc
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         mouseDown = true;
 
+        int minButtonId = AccessoryTabAssistant.getFreeButtonId();
+
         int buttonClicked = AccessoryTabAssistant.tryClickAction(handler.getType(), x, y, mouseX, mouseY, button);
         if (buttonClicked >= 0) {
             this.client.interactionManager.clickButton(this.handler.syncId, buttonClicked);
             return true;
         }
 
+        int glassClicked = getGlassHovered(mouseX, mouseY, x, y);
+        if (glassClicked >= 0) {
+            this.client.interactionManager.clickButton(this.handler.syncId, minButtonId + glassClicked);
+            MinecraftClient.getInstance().player.playSound(SoundEvents.UI_BUTTON_CLICK, MinecraftClient.getInstance().options.getSoundVolume(SoundCategory.MASTER), 1f);
+            return true;
+        }
+
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    public void drawVisibleGlassesIfHovered(DrawableHelper helper, MatrixStack matrices, int x, int y) {
+        int hovered = getGlassHovered(mouseX, mouseY, x, y);
+        if (hovered >= 0)
+            drawGlassInSlot(helper, matrices, x, y, hovered);
+    }
+
+    public int getGlassHovered(double mouseX, double mouseY, int x, int y) {
+        for (int i = 0; i < 4; i++) {
+            if (Util.pointInRectangleByCorners(mouseX, mouseY, x + 101, y + 10 + (18 * i), x + 101 + 11, y + 10 + 11 + (18 * i))) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public void drawGlassInSlot(DrawableHelper helper, MatrixStack matrices, int x, int y, int glassNumb) {
+        helper.drawTexture(matrices, x + 101, y + 10 + (18 * glassNumb), 176, 0, 12, 12);
     }
 
     @Override

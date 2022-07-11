@@ -58,7 +58,7 @@ public class AccessoryInventoryScreen extends HandledScreen<AccessoryInventorySc
         this.height = height;
 
         titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2;
-        titleY = -25;
+        titleY = -27;
     }
 
     @Override
@@ -93,7 +93,7 @@ public class AccessoryInventoryScreen extends HandledScreen<AccessoryInventorySc
 
     @Override
     protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
-        this.textRenderer.draw(matrices, this.title, (float)this.titleX, (float)this.titleY, 4210752);
+        // this.textRenderer.draw(matrices, this.title, (float)this.titleX, (float)this.titleY, 4210752);
     }
 
     public static void drawEntity(int x, int y, int size, float mouseX, float mouseY, LivingEntity entity) {

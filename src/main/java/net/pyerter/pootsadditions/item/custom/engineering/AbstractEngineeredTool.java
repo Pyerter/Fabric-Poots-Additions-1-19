@@ -395,7 +395,9 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
 
     public boolean isSuitableFor(BlockState state) {
         int i = this.getMaterial().getMiningLevel();
-        if (i < 4 && state.isIn(ModBlockTags.NEEDS_STARMETAL_TOOL)) {
+        if (i < 5 && state.isIn(ModBlockTags.NEEDS_STARMETAL_TOOL)) {
+            return false;
+        } else if (i < 4 && state.isIn(ModBlockTags.NEEDS_NETHERITE_TOOL)) {
             return false;
         } else if (i < 3 && state.isIn(BlockTags.NEEDS_DIAMOND_TOOL)) {
             return false;

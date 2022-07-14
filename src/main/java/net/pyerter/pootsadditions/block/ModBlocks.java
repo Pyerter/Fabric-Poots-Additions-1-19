@@ -5,9 +5,9 @@ import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.tag.TagKey;
 import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.block.custom.*;
-import net.pyerter.pootsadditions.block.entity.CaptureChamberEntity;
 import net.pyerter.pootsadditions.item.ModItemGroup;
 import net.minecraft.block.Block;
 import net.minecraft.block.Material;
@@ -18,11 +18,13 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.intprovider.UniformIntProvider;
 import net.minecraft.util.registry.Registry;
+import net.pyerter.pootsadditions.tag.ModBlockTagProvider;
+import net.pyerter.pootsadditions.tag.ModBlockTags;
 
 public class ModBlocks {
-    public static final Block SPIRAL_CUBE_BLOCK = registerBlock("spiral_cube_block",
+    public static final Block SPIRAL_CUBE_BLOCK = registerBlockWithTag("spiral_cube_block",
             new Block(FabricBlockSettings.of(Material.METAL).luminance(6).strength(4f).requiresTool()),
-            ModItemGroup.SAPPHIRE);
+            ModItemGroup.SAPPHIRE, ModBlockTags.NEEDS_STARMETAL_TOOL);
 
     public static final Block SAPPHIRE_DUST_ORE = registerBlock("sapphire_dust_ore",
             new OreBlock(FabricBlockSettings.of(Material.STONE).strength(3f).requiresTool(), UniformIntProvider.create(4, 8)),
@@ -64,6 +66,12 @@ public class ModBlocks {
 
     private static Block registerOnlyBlock(String name, Block block) {
         return Registry.register(Registry.BLOCK, new Identifier(PootsAdditions.MOD_ID, name), block);
+    }
+
+    private static Block registerBlockWithTag(String name, Block block, ItemGroup tab, TagKey<Block> tagKey) {
+        Block registeredBlock = registerBlock(name, block, tab);
+        ModBlockTagProvider.tryRegisterBlockToTag(tagKey, registeredBlock);
+        return registeredBlock;
     }
 
     private static Block registerBlock(String name, Block block, ItemGroup tab) {

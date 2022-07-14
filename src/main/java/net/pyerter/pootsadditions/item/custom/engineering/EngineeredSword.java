@@ -5,8 +5,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.ToolMaterial;
 import net.minecraft.util.ActionResult;
-import net.pyerter.pootsadditions.block.ModBlockTags;
-import net.pyerter.pootsadditions.item.custom.engineering.AbstractEngineeredTool;
+import net.pyerter.pootsadditions.tag.ModBlockTags;
 import net.pyerter.pootsadditions.util.IModPlayerEntityWeaponAbilityTriggerer;
 
 public class EngineeredSword extends AbstractEngineeredTool {

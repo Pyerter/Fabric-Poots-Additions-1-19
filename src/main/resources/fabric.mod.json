@@ -24,8 +24,8 @@
     "client": [
       "net.pyerter.pootsadditions.PootsAdditionsClient"
     ],
-    "fabric-datagen": [
-      "net.pyerter.pootsadditions.PootsAdditionsDataGeneration"
+    "datagen": [
+      "net.pyerter.pootsadditions.PootsAdditionsDataGenerator"
     ]
   },
   "mixins": [

@@ -10,7 +10,7 @@ import net.minecraft.util.Lazy;
 import java.util.function.Supplier;
 
 public enum ModToolMaterials implements ToolMaterial {
-    STARMETAL(4, 3000, 10.0f, 5.0f, 22, () -> {
+    STARMETAL(5, 3000, 10.0f, 5.0f, 22, () -> {
         return Ingredient.ofItems(new ItemConvertible[]{ModItems.STARMETAL_ALLOY_INGOT});
     });
 

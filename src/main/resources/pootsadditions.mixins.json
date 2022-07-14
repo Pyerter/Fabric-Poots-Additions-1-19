@@ -19,7 +19,8 @@
     "ModEnchantmentCompatibilityMixin",
     "ModEnchantmentScreenHandlerModEnchantCompatibilityMixin",
     "ModServerPlayerEntityAccessoriesInventoryMixin",
-    "ModClientPlayNetworkHandlerMixin"
+    "ModClientPlayNetworkHandlerMixin",
+    "ModMiningToolMixin"
   ],
   "client": [
     "ModHelloMixin"

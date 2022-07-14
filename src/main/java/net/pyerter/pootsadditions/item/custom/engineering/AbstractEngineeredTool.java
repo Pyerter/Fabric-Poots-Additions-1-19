@@ -25,7 +25,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import net.pyerter.pootsadditions.PootsAdditions;
-import net.pyerter.pootsadditions.block.ModBlockTags;
+import net.pyerter.pootsadditions.tag.ModBlockTags;
 import net.pyerter.pootsadditions.item.SpecialWeaponWithAbility;
 import net.pyerter.pootsadditions.item.StackDependentAttributeModifierItem;
 
@@ -395,7 +395,7 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
 
     public boolean isSuitableFor(BlockState state) {
         int i = this.getMaterial().getMiningLevel();
-        if (i < 4 && state.isIn(ModBlockTags.NEEDS_SAPPHIRE_TOOL)) {
+        if (i < 4 && state.isIn(ModBlockTags.NEEDS_STARMETAL_TOOL)) {
             return false;
         } else if (i < 3 && state.isIn(BlockTags.NEEDS_DIAMOND_TOOL)) {
             return false;

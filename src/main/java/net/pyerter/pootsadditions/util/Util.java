@@ -2,6 +2,7 @@ package net.pyerter.pootsadditions.util;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,5 +80,9 @@ public class Util {
             list.add(arg);
         }
         return list;
+    }
+
+    public static int redstoneStrengthFromPercent(double percent) {
+        return MathHelper.floor(percent * 14.0F) + (percent > 0 ? 1 : 0);
     }
 }

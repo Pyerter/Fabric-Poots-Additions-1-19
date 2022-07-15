@@ -2,6 +2,7 @@ package net.pyerter.pootsadditions.block.entity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
@@ -17,6 +18,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.pyerter.pootsadditions.item.ModItems;
 import net.pyerter.pootsadditions.item.custom.engineering.AbstractPowerCore;
@@ -54,6 +56,8 @@ public class TridiBlockEntity extends BlockEntity implements NamedScreenHandlerF
     private int maxProgress = 72;
     private int fuelTime = 0;
     private int maxFuelTime = 0;
+    private int transferCooldown = 0;
+    private static final int MAX_TRANSFER_COOLDOWN = 2;
 
     public TridiBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.TRIDI, pos, state);
@@ -93,6 +97,18 @@ public class TridiBlockEntity extends BlockEntity implements NamedScreenHandlerF
     }
 
     @Override
+    public void setStack(int slot, ItemStack stack) {
+        getItems().set(slot, stack);
+        if (stack.getCount() > getMaxCountPerStack()) {
+            stack.setCount(getMaxCountPerStack());
+        }
+        if (slot == 5) {
+            world.updateComparators(pos, getCachedState().getBlock());
+            transferCooldown = MAX_TRANSFER_COOLDOWN;
+        }
+    }
+
+    @Override
     public Text getDisplayName() {
         return MutableText.of(new LiteralTextContent(DISPLAY_NAME));
     }
@@ -110,6 +126,7 @@ public class TridiBlockEntity extends BlockEntity implements NamedScreenHandlerF
         nbt.putInt("tridi.progress", progress);
         nbt.putInt("tridi.fuelTime", fuelTime);
         nbt.putInt("tridi.maxFuelTime", maxFuelTime);
+        nbt.putInt("tridi.transferCooldown", transferCooldown);
     }
 
     @Override
@@ -119,9 +136,12 @@ public class TridiBlockEntity extends BlockEntity implements NamedScreenHandlerF
         progress = nbt.getInt("tridi.progress");
         fuelTime = nbt.getInt("tridi.fuelTime");
         maxFuelTime = nbt.getInt("tridi.maxFuelTime");
+        transferCooldown = nbt.getInt("tridi.transferCooldown");
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, TridiBlockEntity entity) {
+        entity.transferCooldown = --entity.transferCooldown < 0 ? 0 : entity.transferCooldown;
+
         Optional<TridiRecipe> recipe = hasRecipe(entity);
         if (recipe.isPresent()) {
             entity.progress++;
@@ -174,6 +194,8 @@ public class TridiBlockEntity extends BlockEntity implements NamedScreenHandlerF
                     entity.getStack(6).getCount() + recipe.getOutput().getCount()));
 
         entity.resetProgress();
+
+        entity.world.updateComparators(entity.pos, entity.getCachedState().getBlock());
     }
 
     private static Optional<TridiRecipe> hasRecipe(TridiBlockEntity entity) {
@@ -234,5 +256,36 @@ public class TridiBlockEntity extends BlockEntity implements NamedScreenHandlerF
 
     public static boolean acceptsQuickTransferFuel(ItemStack itemStack) {
         return acceptedQuickTransfersFuel.contains(itemStack.getItem());
+    }
+
+    // only allow extraction from bottom and top sides
+    // only allow extraction from the fuel and output slots
+    @Override
+    public boolean canExtract(int slot, ItemStack stack, Direction side) {
+        if (!(side == Direction.DOWN || side == Direction.UP))
+            return false;
+
+        return (slot == 5 || slot == 6) && transferCooldown <= 0;
+
+        /*
+        if (slot == 5 && !stack.isEmpty()) {
+            return true;
+            if (stack.getItem() instanceof AbstractPowerCore) {
+                AbstractPowerCore core = (AbstractPowerCore) stack.getItem();
+                return core.getCharge(stack) < 100;
+            }
+            return false;
+        }
+
+        if (slot == 6 && !stack.isEmpty()) {
+            return true;
+        }
+
+        return false;*/
+    }
+
+    @Override
+    public int[] getAvailableSlots(Direction side) {
+        return side == Direction.DOWN || side == Direction.UP ? new int[]{6, 5} : new int[0];
     }
 }

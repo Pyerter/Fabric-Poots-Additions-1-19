@@ -26,6 +26,7 @@ import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.block.entity.CaptureChamberEntity;
 import net.pyerter.pootsadditions.block.entity.CaptureChamberProviderEntity;
 import net.pyerter.pootsadditions.block.entity.ModBlockEntities;
+import net.pyerter.pootsadditions.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
@@ -133,7 +134,7 @@ public class CaptureChamberBlock extends BlockWithEntity implements BlockEntityP
         if (entity instanceof CaptureChamberEntity) {
             CaptureChamberEntity chamber = (CaptureChamberEntity) entity;
             float percentFull = CaptureChamberEntity.getPercentChargeFull(chamber);
-            return MathHelper.floor(percentFull * 14.0F) + (percentFull > 0 ? 1 : 0);
+            return Util.redstoneStrengthFromPercent(percentFull);
         }
         return 0;
     }

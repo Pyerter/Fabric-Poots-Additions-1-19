@@ -5,7 +5,9 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
@@ -18,6 +20,8 @@ import net.minecraft.world.World;
 import net.pyerter.pootsadditions.block.ModBlocks;
 import net.pyerter.pootsadditions.block.entity.ModBlockEntities;
 import net.pyerter.pootsadditions.block.entity.TridiBlockEntity;
+import net.pyerter.pootsadditions.item.custom.engineering.AbstractPowerCore;
+import net.pyerter.pootsadditions.util.Util;
 import org.jetbrains.annotations.Nullable;
 
 public class TridiBlock extends BlockWithEntity implements BlockEntityProvider {
@@ -90,5 +94,24 @@ public class TridiBlock extends BlockWithEntity implements BlockEntityProvider {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
         return checkType(type, ModBlockEntities.TRIDI, TridiBlockEntity::tick);
+    }
+
+    @Override
+    public boolean hasComparatorOutput(BlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+        BlockEntity entity = world.getBlockEntity(pos);
+        if (entity instanceof TridiBlockEntity) {
+            TridiBlockEntity tridi = (TridiBlockEntity) entity;
+            ItemStack stack = tridi.getStack(5);
+            if (stack.getItem() instanceof AbstractPowerCore) {
+                AbstractPowerCore core = (AbstractPowerCore) stack.getItem();
+                return tridi.getStack(6).isEmpty() ? Util.redstoneStrengthFromPercent(core.getFilledPercent(stack)) : 0;
+            }
+        }
+        return 0;
     }
 }

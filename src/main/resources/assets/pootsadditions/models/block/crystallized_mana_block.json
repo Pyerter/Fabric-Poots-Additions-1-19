@@ -1,0 +1,7 @@
+{
+  "parent": "block/cube_all",
+  "render": "translucent",
+  "textures": {
+    "all": "pootsadditions:block/crystallized_mana_block"
+  }
+}

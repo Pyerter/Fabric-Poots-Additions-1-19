@@ -3,15 +3,12 @@ package net.pyerter.pootsadditions.block;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.*;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.tag.TagKey;
 import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.block.custom.*;
 import net.pyerter.pootsadditions.item.ModItemGroup;
-import net.minecraft.block.Block;
-import net.minecraft.block.Material;
-import net.minecraft.block.OreBlock;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -33,6 +30,9 @@ public class ModBlocks {
     public static final Block DEEPSLATE_SAPPHIRE_DUST_ORE = registerBlock("deepslate_sapphire_dust_ore",
             new OreBlock(FabricBlockSettings.of(Material.STONE).strength(3f).requiresTool(), UniformIntProvider.create(4, 8)),
             ModItemGroup.SAPPHIRE);
+
+    public static final Block CRYSTALLIZED_MANA_BLOCK = registerBlockWithTag("crystallized_mana_block",
+            new CrystallizedManaBlock(FabricBlockSettings.of(ModMaterials.CRYSTALLIZED_MANA).strength(10f).requiresTool().nonOpaque()), ModItemGroup.SAPPHIRE, ModBlockTags.NEEDS_NETHERITE_TOOL);
 
     public static final Block GARLIC_CROP_BLOCK = registerOnlyBlock("garlic_crop_block",
             new GarlicCropBlock(FabricBlockSettings.copy(Blocks.WHEAT)));
@@ -98,5 +98,7 @@ public class ModBlocks {
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.FOOD_PREPPING_STATION, RenderLayer.getCutout());
 
         BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.GARLIC_CROP_BLOCK, RenderLayer.getCutout());
+
+        BlockRenderLayerMap.INSTANCE.putBlock(ModBlocks.CRYSTALLIZED_MANA_BLOCK, RenderLayer.getTranslucent());
     }
 }

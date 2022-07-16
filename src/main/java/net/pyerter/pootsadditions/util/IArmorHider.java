@@ -1,6 +1,7 @@
 package net.pyerter.pootsadditions.util;
 
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -61,5 +62,15 @@ public interface IArmorHider {
             case HEAD: return armorHider.isArmorHeadVisible();
         }
         return true;
+    }
+
+    public static boolean isArmorHidden(LivingEntity entity, EquipmentSlot armorSlot) {
+        if (entity instanceof IArmorHider) {
+            IArmorHider armorHider = (IArmorHider) entity;
+            if (!IArmorHider.getArmorVisibleByEquipSlot(armorHider, armorSlot)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

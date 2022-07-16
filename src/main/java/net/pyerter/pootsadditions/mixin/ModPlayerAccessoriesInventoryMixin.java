@@ -3,6 +3,7 @@ package net.pyerter.pootsadditions.mixin;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -21,6 +22,7 @@ import net.pyerter.pootsadditions.item.inventory.AccessoriesInventory;
 import net.pyerter.pootsadditions.item.inventory.IAccessoriesInventory;
 import net.pyerter.pootsadditions.item.inventory.IAccessoryTabsHandlerProvider;
 import net.pyerter.pootsadditions.screen.AccessoryTabAssistant;
+import net.pyerter.pootsadditions.util.IArmorHider;
 import net.pyerter.pootsadditions.util.ScreenHanderSyncHandlerOwner;
 import org.apache.commons.compress.harmony.pack200.NewAttributeBands;
 import org.jetbrains.annotations.Nullable;
@@ -29,6 +31,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +40,12 @@ import java.util.List;
 public abstract class ModPlayerAccessoriesInventoryMixin extends LivingEntity implements IAccessoriesInventory, IAccessoryTabsHandlerProvider {
     protected AccessoriesInventory accessoriesInventory;
     protected List<ScreenHandler> registeredAccessoryTabHandlers;
+    private boolean renderingArmor = false;
 
     @Shadow
     PlayerInventory inventory;
+
+    @Shadow public abstract void readCustomDataFromNbt(NbtCompound nbt);
 
     protected ModPlayerAccessoriesInventoryMixin(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
@@ -104,5 +110,23 @@ public abstract class ModPlayerAccessoriesInventoryMixin extends LivingEntity im
     @Override
     public List<ScreenHandler> getAllRegisteredAccessoryScreenHandlers() {
         return registeredAccessoryTabHandlers;
+    }
+
+    // by using the boolean renderingArmor, returns the accessory slot of the armor only when rendering
+    @Inject(method="getEquippedStack", at=@At("HEAD"), cancellable = true)
+    public void onCallToGetEquippedStack(EquipmentSlot slot, CallbackInfoReturnable info) {
+        if (renderingArmor && slot.getType() == EquipmentSlot.Type.ARMOR && IArmorHider.isArmorHidden(this, slot)) {
+            info.setReturnValue(((IAccessoriesInventory)this).getAccessoriesInventory().getArmorSlot(slot));
+        }
+    }
+
+    @Override
+    public void onStartRenderingArmor() {
+        renderingArmor = true;
+    }
+
+    @Override
+    public void onEndRenderingArmor() {
+        renderingArmor = false;
     }
 }

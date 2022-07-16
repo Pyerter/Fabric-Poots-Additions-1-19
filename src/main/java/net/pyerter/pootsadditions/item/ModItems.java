@@ -2,6 +2,7 @@ package net.pyerter.pootsadditions.item;
 
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.*;
@@ -13,6 +14,7 @@ import net.minecraft.util.registry.Registry;
 import net.pyerter.pootsadditions.block.ModBlocks;
 import net.pyerter.pootsadditions.entity.ModEntities;
 import net.pyerter.pootsadditions.item.custom.*;
+import net.pyerter.pootsadditions.item.custom.armor.LeatherJacketArmorItem;
 import net.pyerter.pootsadditions.item.custom.engineering.*;
 
 public class ModItems {
@@ -145,6 +147,9 @@ public class ModItems {
     public static final Item ENGINEERED_STARMETAL_HOE = registerItem("engineered_starmetal_hoe",
             new EngineeredHoe(-4, 0f, ModToolMaterials.STARMETAL,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
+
+    public static final Item LEATHER_JACKET_ARMOR_ITEM = registerItem("leather_jacket_armor",
+            new LeatherJacketArmorItem(ModArmorMaterials.TAILORED, EquipmentSlot.CHEST, new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 
     public static final Item ENGINEERS_TRUSTY_HAMMER = registerItem("engineers_trusty_hammer",
             new EngineersTrustyHammer(3, -2f, new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));

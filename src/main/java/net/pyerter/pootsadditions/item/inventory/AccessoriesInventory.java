@@ -1,6 +1,8 @@
 package net.pyerter.pootsadditions.item.inventory;
 
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
@@ -130,5 +132,15 @@ public class AccessoriesInventory implements ImplementedInventory, Nameable {
         }
 
         return stacks;
+    }
+
+    public ItemStack getArmorSlot(EquipmentSlot slot) {
+        switch (slot) {
+            case HEAD: return items.get(0);
+            case CHEST: return items.get(1);
+            case LEGS: return items.get(2);
+            case FEET: return items.get(3);
+        }
+        return ItemStack.EMPTY;
     }
 }

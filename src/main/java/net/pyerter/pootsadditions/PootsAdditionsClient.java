@@ -14,6 +14,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.Items;
 import net.pyerter.pootsadditions.block.ModBlocks;
+import net.pyerter.pootsadditions.entity.ModArmors;
 import net.pyerter.pootsadditions.entity.ModEntities;
 import net.pyerter.pootsadditions.entity.client.BobcatRenderer;
 import net.pyerter.pootsadditions.item.entity.ModItemEntities;
@@ -30,6 +31,7 @@ public class PootsAdditionsClient implements ClientModInitializer {
         ModBlocks.registerModBlockRenderLayers();
         ModEntities.registerEntityRenderers();
         ModItemEntities.registerEntityRenderers();
+        ModArmors.registerArmorRenderers();
 
         // Register other visual generators
         ModParticles.registerParticleFactories();

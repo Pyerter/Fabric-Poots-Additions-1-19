@@ -47,9 +47,9 @@ public class AccessoryInventoryScreenHandler extends ScreenHandler {
 
         initializeInventory();
 
-        addPlayerEquipment(playerInventory);
-        addPlayerInventory(playerInventory);
         addPlayerHotbar(playerInventory);
+        addPlayerInventory(playerInventory);
+        addPlayerEquipment(playerInventory);
         addPlayerOffhand(playerInventory);
 
         PootsAdditions.logInfo("Generated accessory inventory handler with size " + this.slots.size());
@@ -121,27 +121,36 @@ public class AccessoryInventoryScreenHandler extends ScreenHandler {
 
             // if index corresponds to player inventory
             int invSize = AccessoriesInventory.INVENTORY_SIZE;
-            int playerHotbarIndex = invSize + 27;
-            int playerEquipmentIndex = playerHotbarIndex + 9;
+            int playerInvIndex = invSize + 9;
+            int playerEquipmentIndex = playerInvIndex + 27;
             int maxInvSize = playerEquipmentIndex + 5;
 
-            if (index >= playerHotbarIndex && index < playerHotbarIndex) {
-                if (!(this.insertItem(itemStack2, invSize, playerHotbarIndex, false) || this.insertItem(itemStack2, playerEquipmentIndex, playerEquipmentIndex + 4, false))) {
+            if (index >= 0 && index < 4) {
+                if (!(this.insertItem(itemStack2, playerEquipmentIndex, playerEquipmentIndex + 4, false) ||
+                        this.insertItem(itemStack2, invSize, playerEquipmentIndex, false))) {
                     return ItemStack.EMPTY;
                 }
+                // :)
+            } else if (index >= playerEquipmentIndex && index < playerEquipmentIndex + 4) {
+                if (!(this.insertItem(itemStack2, 0, 4, false) || this.insertItem(itemStack2, invSize, playerEquipmentIndex, false))) {
+                    return ItemStack.EMPTY;
+                }
+                // :)
             } else if (index >= invSize && index < playerEquipmentIndex && equipmentSlot.getType() == EquipmentSlot.Type.ARMOR &&
-                    this.insertItem(itemStack2, playerEquipmentIndex, maxInvSize, false)) {
+                    (this.insertItem(itemStack2, playerEquipmentIndex, playerEquipmentIndex + 4, false) || this.insertItem(itemStack2, 0, 4, false))) {
                 // :)
             } else if (equipmentSlot == EquipmentSlot.OFFHAND && !(this.slots.get(playerEquipmentIndex + 4)).hasStack()) {
                 if (!this.insertItem(itemStack2, playerEquipmentIndex + 4, maxInvSize, false)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (index >= invSize && index < playerHotbarIndex) {
-                if (!this.insertItem(itemStack2, playerHotbarIndex, playerHotbarIndex + 9, false)) {
+            } else if (index >= invSize && index < playerInvIndex) {
+                if (!(this.insertItem(itemStack2, playerEquipmentIndex, playerEquipmentIndex + 4, false) ||
+                        this.insertItem(itemStack2, playerInvIndex, playerInvIndex + 9, false))) {
                     return ItemStack.EMPTY;
                 }
-            } else if (index >= playerHotbarIndex && index < playerHotbarIndex + 9) {
-                if (!this.insertItem(itemStack2, invSize, playerHotbarIndex, false)) {
+            } else if (index >= playerInvIndex && index < playerEquipmentIndex) {
+                if (!(this.insertItem(itemStack2, playerEquipmentIndex, playerEquipmentIndex + 4, false) ||
+                        this.insertItem(itemStack2, invSize, playerInvIndex, false))) {
                     return ItemStack.EMPTY;
                 }
             } else if (!this.insertItem(itemStack2, 0, playerEquipmentIndex, false)) {

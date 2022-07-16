@@ -2,6 +2,7 @@ package net.pyerter.pootsadditions.item.inventory;
 
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -98,8 +99,19 @@ public class AccessoriesInventory implements ImplementedInventory, Nameable {
     public ItemStack getBeltAccessorySlot() { return getStack(7); }
 
     public boolean acceptsItemInSlot(ItemStack stack, int slotIndex) {
-        if (!stack.isEmpty() && (slotIndex <= 3 && slotIndex >= 0))
-            return true;
+        if (!stack.isEmpty() && (slotIndex <= 3 && slotIndex >= 0)) {
+            if (stack.getItem() instanceof ArmorItem) {
+                ArmorItem armorItem = (ArmorItem) stack.getItem();
+                EquipmentSlot slotType = armorItem.getSlotType();
+                switch (slotIndex) {
+                    case 0: return slotType == EquipmentSlot.HEAD;
+                    case 1: return slotType == EquipmentSlot.CHEST;
+                    case 2: return slotType == EquipmentSlot.LEGS;
+                    case 3: return slotType == EquipmentSlot.FEET;
+                }
+            }
+            return false;
+        }
         if (!stack.isEmpty() && stack.getItem() instanceof AccessoryItem) {
             AccessoryItem item = (AccessoryItem) stack.getItem();
             switch (item.getEquipStyle()) {

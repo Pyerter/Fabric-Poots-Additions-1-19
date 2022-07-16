@@ -26,6 +26,12 @@
     ],
     "datagen": [
       "net.pyerter.pootsadditions.PootsAdditionsDataGenerator"
+    ],
+    "rei_client": [
+      "net.pyerter.pootsadditions.integration.rei.REIPootsAdditionsClientPlugin"
+    ],
+    "rei_server": [
+      "net.pyerter.pootsadditions.integration.rei.REIPootsAdditionsServerPlugin"
     ]
   },
   "mixins": [

@@ -19,6 +19,16 @@ repositories {
 
 	// GeckoLib!
 	maven { url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
+
+	// JEI
+	/*maven {
+		// location of the maven that hosts JEI files
+		name = "Progwml6 maven"
+		url = "https://dvs1.progwml6.com/files/maven/"
+	}*/
+
+	// REI
+	maven { url "https://maven.shedaniel.me" }
 }
 
 dependencies {
@@ -32,6 +42,19 @@ dependencies {
 
 	// GeckoLib Mod used for animating custom entities
 	modImplementation 'software.bernie.geckolib:geckolib-fabric-1.19:3.1.2'
+
+	// compile against the JEI API but do not include it at runtime
+	//modCompileOnlyApi "mezz.jei:jei-${mc_version}-common-api:${jei_version}"
+	//modCompileOnlyApi "mezz.jei:jei-${mc_version}-fabric-api:${jei_version}"
+	// at runtime, use the full JEI jar for Fabric
+	//modRuntimeOnly "mezz.jei:jei-${mc_version}-fabric:${jei_version}"
+
+	modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${rei_version}"
+	modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${rei_version}"
+	modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:${rei_version}"
+	modCompileOnly "me.shedaniel:RoughlyEnoughItems-api:${rei_version}"
+	modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${rei_version}"
+	modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin:${rei_version}"
 }
 
 processResources {

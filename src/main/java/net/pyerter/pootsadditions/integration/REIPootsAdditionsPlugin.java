@@ -3,6 +3,7 @@ package net.pyerter.pootsadditions.integration;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.plugins.REIPlugin;
 import net.pyerter.pootsadditions.PootsAdditions;
+import net.pyerter.pootsadditions.integration.rei.REIPootsAdditionsPluginProvider;
 import net.pyerter.pootsadditions.integration.rei.display.EngineeringStationRefineRecipeDisplay;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,6 +18,6 @@ public class REIPootsAdditionsPlugin implements REIPlugin {
 
     @Override
     public Class getPluginProviderClass() {
-        return null;
+        return REIPootsAdditionsPluginProvider.class;
     }
 }

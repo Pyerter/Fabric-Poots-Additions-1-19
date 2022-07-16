@@ -62,10 +62,14 @@ public abstract class ModArmorFeatureRendererHiderMixin <T extends LivingEntity,
     }
 
     public boolean isItemStackSlimArmor(ItemStack stack) {
-        if (!stack.isEmpty() && stack.getItem() instanceof AccessoryArmorItem) {
+        if (stack.isEmpty())
+            return true;
+
+        if (stack.getItem() instanceof AccessoryArmorItem) {
             AccessoryArmorItem accessoryArmorItem = (AccessoryArmorItem) stack.getItem();
             return accessoryArmorItem.isSlim();
         }
+
         return false;
     }
 

@@ -20,6 +20,8 @@ public class ModEnchantmentCompatibilityMixin {
     @Shadow
     EnchantmentTarget type;
 
+    // creates compatibility between custom tools and normal tools enchantments
+    // allows engineered tools to be enchanted just like normal tools can
     @Inject(method="isAcceptableItem", at=@At(value="HEAD"), cancellable = true)
     public void onIsAcceptableItemCallback(ItemStack stack, CallbackInfoReturnable info) {
         Optional<ModEnchantmentTarget> modEnchantType = ModEnchantmentTarget.vanillaToModTarget(type);

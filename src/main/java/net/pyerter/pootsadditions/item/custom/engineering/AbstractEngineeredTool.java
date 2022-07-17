@@ -41,6 +41,13 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
     public static final List<net.minecraft.util.Pair<ToolMaterial, ToolType>> toolTypePairs = new ArrayList<>();
     public static final Map<Item, ToolMaterial> itemToMaterial = new HashMap<>();
 
+    public static UUID getAttackDamageID() {
+        return ATTACK_DAMAGE_MODIFIER_ID;
+    }
+    public static UUID getAttackSpeedID() {
+        return ATTACK_SPEED_MODIFIER_ID;
+    }
+
     public enum ToolType {
         AXE,
         HOE,
@@ -112,10 +119,7 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
         this.attackDamage = attackDamage + material.getAttackDamage();
         this.attackSpeed = attackSpeed;
 
-        ImmutableMultimap.Builder<EntityAttribute, EntityAttributeModifier> builder = ImmutableMultimap.builder();
-        builder.put(EntityAttributes.GENERIC_ATTACK_DAMAGE, new EntityAttributeModifier(ATTACK_DAMAGE_MODIFIER_ID, "Tool modifier", (double)this.attackDamage, EntityAttributeModifier.Operation.ADDITION));
-        builder.put(EntityAttributes.GENERIC_ATTACK_SPEED, new EntityAttributeModifier(ATTACK_SPEED_MODIFIER_ID, "Tool modifier", (double)attackSpeed, EntityAttributeModifier.Operation.ADDITION));
-        this.attributeModifiers = builder.build();
+        resetAttributeModifiers();
 
         ImmutableMultimap.Builder<EntityAttribute, EntityAttributeModifier> unsuitableBuilder = ImmutableMultimap.builder();
         unsuitableBuilder.put(EntityAttributes.GENERIC_ATTACK_DAMAGE, new EntityAttributeModifier(ATTACK_DAMAGE_MODIFIER_ID, "Tool modifier", (double)-attackDamage, EntityAttributeModifier.Operation.ADDITION));
@@ -236,7 +240,7 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
     public void resetAttributeModifiers() {
         ImmutableMultimap.Builder<EntityAttribute, EntityAttributeModifier> builder = ImmutableMultimap.builder();
         builder.put(EntityAttributes.GENERIC_ATTACK_DAMAGE, new EntityAttributeModifier(ATTACK_DAMAGE_MODIFIER_ID, "Tool modifier", (double)this.attackDamage, EntityAttributeModifier.Operation.ADDITION));
-        builder.put(EntityAttributes.GENERIC_ATTACK_SPEED, new EntityAttributeModifier(ATTACK_SPEED_MODIFIER_ID, "Tool modifier", (double)attackSpeed, EntityAttributeModifier.Operation.ADDITION));
+        builder.put(EntityAttributes.GENERIC_ATTACK_SPEED, new EntityAttributeModifier(ATTACK_SPEED_MODIFIER_ID, "Tool modifier", (double)this.attackSpeed, EntityAttributeModifier.Operation.ADDITION));
         this.attributeModifiers = builder.build();
     }
 
@@ -330,9 +334,19 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
         // Reset the value of attributes updated, since the most recent update was applied
         setAttributesUpdated(stack, false);
         if (willNotBreak(stack))
-            return slot == EquipmentSlot.MAINHAND ? this.attributeModifiers : super.getAttributeModifiers(slot);
+            return slot == EquipmentSlot.MAINHAND ? tryGetAugmentedAttributes(stack) : super.getAttributeModifiers(slot);
         else
             return slot == EquipmentSlot.MAINHAND ? this.unsuitableAttributeModifiers : super.getAttributeModifiers(slot);
+    }
+
+    public Multimap<EntityAttribute, EntityAttributeModifier> tryGetAugmentedAttributes(ItemStack stack) {
+        List<Augment> attributeAugments = AugmentHelper.getAugments(stack, Augment.MASK_ATTRIBUTE_PRESENT);
+        if (attributeAugments.size() == 0)
+            return this.attributeModifiers;
+
+        Multimap<EntityAttribute, EntityAttributeModifier> augmentedAttributes = AugmentHelper.constructAugmentedAttributes(attributeAugments, this.attackDamage, this.attackSpeed, this.miningSpeed);
+
+        return augmentedAttributes;
     }
 
     @Override

@@ -28,14 +28,17 @@ public abstract class Augment extends Item {
     public static final int MASK_NADA =                 0;
     public static final int MASK_GET_ATTACK_DAMAGE =    1;
     public static final int MASK_GET_MINING_SPEED =     1 << 1;
-    public static final int MASK_USE_ON_BLOCK =         1 << 2;
-    public static final int MASK_POST_HIT =             1 << 3;
-    public static final int MASK_POST_MINE =            1 << 4;
-    public static final int MASK_USE_WEAPON_ABILITY =   1 << 5;
-    public static final int MASK_USE_INVENTORY_TICK =   1 << 6;
-    public static final int MASK_ITEM_NOT_SUITABLE =    1 << 7;
-    public static final int MASK_ITEM_NOW_SUITABLE =    1 << 8;
-    public static final int MASK_EFFECTIVE_BLOCKS =     1 << 9;
+    public static final int MASK_GET_ATTACK_SPEED =     1 << 2;
+    public static final int MASK_USE_ON_BLOCK =         1 << 3;
+    public static final int MASK_POST_HIT =             1 << 4;
+    public static final int MASK_POST_MINE =            1 << 5;
+    public static final int MASK_USE_WEAPON_ABILITY =   1 << 6;
+    public static final int MASK_USE_INVENTORY_TICK =   1 << 7;
+    public static final int MASK_ITEM_NOT_SUITABLE =    1 << 8;
+    public static final int MASK_ITEM_NOW_SUITABLE =    1 << 9;
+    public static final int MASK_EFFECTIVE_BLOCKS =     1 << 10;
+
+    public static final int MASK_ATTRIBUTE_PRESENT = MASK_GET_ATTACK_DAMAGE + MASK_GET_MINING_SPEED + MASK_GET_ATTACK_SPEED;
 
     public static boolean registerAugment(Augment aug) {
         if (!stringToAugment.containsKey(aug.getAugmentID())) {
@@ -64,7 +67,10 @@ public abstract class Augment extends Item {
 
     /** All of the augment methods that can be overriden to apply effects **/
     public float onGetAttackDamage(ItemStack stack, AbstractEngineeredTool tool) { return 0; }
-    public float onGetMiningSpeedMultiplier(ItemStack stack, AbstractEngineeredTool tool) { return 0; }
+    public float getAugmentAttackDamage() { return 0; }
+    public float onGetMiningSpeedMultiplier(ItemStack stack, AbstractEngineeredTool tool) { return 1; }
+    public float getAugmentMiningSpeedMultiplier() { return 1; }
+    public float getAugmentAttackSpeed() { return 0; }
     public ActionResult onUseOnBlock(ItemStack stack, AbstractEngineeredTool tool, ItemUsageContext context) { return ActionResult.PASS; }
     public boolean onPostHit(ItemStack stack, AbstractEngineeredTool tool, LivingEntity target, LivingEntity attacker) { return false; }
     public boolean onPostMine(ItemStack stack, AbstractEngineeredTool tool, World world, BlockState state, BlockPos pos, LivingEntity miner) { return false; }
@@ -130,6 +136,5 @@ public abstract class Augment extends Item {
         }
         return augments;
     }
-
 
 }

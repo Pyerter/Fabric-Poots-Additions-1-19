@@ -4,6 +4,7 @@ import com.google.common.collect.*;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.*;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -19,6 +20,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.TagKey;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -28,6 +30,7 @@ import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.tag.ModBlockTags;
 import net.pyerter.pootsadditions.item.SpecialWeaponWithAbility;
 import net.pyerter.pootsadditions.item.StackDependentAttributeModifierItem;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -242,6 +245,14 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
         builder.put(EntityAttributes.GENERIC_ATTACK_DAMAGE, new EntityAttributeModifier(ATTACK_DAMAGE_MODIFIER_ID, "Tool modifier", (double)this.attackDamage, EntityAttributeModifier.Operation.ADDITION));
         builder.put(EntityAttributes.GENERIC_ATTACK_SPEED, new EntityAttributeModifier(ATTACK_SPEED_MODIFIER_ID, "Tool modifier", (double)this.attackSpeed, EntityAttributeModifier.Operation.ADDITION));
         this.attributeModifiers = builder.build();
+    }
+
+    @Override
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        List<Augment> augments = AugmentHelper.getAugments(stack);
+        for (Augment aug: augments) {
+            tooltip.add(Text.of(aug.getTranslation()));
+        }
     }
 
     /** ToolItem methods **/

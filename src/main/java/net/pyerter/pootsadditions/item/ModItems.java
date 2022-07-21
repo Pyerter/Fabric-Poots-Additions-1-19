@@ -224,6 +224,10 @@ public class ModItems {
                     .statusEffect(new StatusEffectInstance(StatusEffects.HUNGER, 600, 0), 0.8F)
                     .statusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 600, 0), 0.5f).build())));
 
+    public static final Item AUGMENT_HONED_EDGE_1 = registerItem("augment_honed_edge_1",
+            (new SimpleAugment.Builder(new FabricItemSettings().group(ModItemGroup.SAPPHIRE), "honed_edge_1"))
+                    .setLevel(1).setLevelMultiplier(0.5f).addAttackDamage(3).build());
+
 
     private static Item registerItem(String name, Item item) {
         return Registry.register(Registry.ITEM, new Identifier(PootsAdditions.MOD_ID, name), item);

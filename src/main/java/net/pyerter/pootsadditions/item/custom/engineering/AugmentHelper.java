@@ -16,8 +16,6 @@ public class AugmentHelper {
 
     public static List<Augment> getAugments(ItemStack stack) {
         NbtList nbtList = Augment.getAugmentsNbtList(stack);
-        if (nbtList == null)
-            return null;
 
         List<Augment> augments = new ArrayList<>(nbtList.size());
         for (int i = 0; i < nbtList.size(); i++) {
@@ -31,8 +29,6 @@ public class AugmentHelper {
 
     public static List<Augment> getAugments(ItemStack stack, int mask) {
         NbtList nbtList = Augment.getAugmentsNbtList(stack);
-        if (nbtList == null)
-            return null;
 
         List<Augment> augments = new ArrayList<>(nbtList.size());
         for (int i = 0; i < nbtList.size(); i++) {
@@ -82,6 +78,18 @@ public class AugmentHelper {
         builder.put(EntityAttributes.GENERIC_ATTACK_SPEED, new EntityAttributeModifier(AbstractEngineeredTool.getAttackSpeedID(), "Tool modifier", (double)attackSpeed, EntityAttributeModifier.Operation.ADDITION));
 
         return builder.build();
+    }
+
+    public static boolean applyAugment(Augment aug, ItemStack stack) {
+        if (stack.getItem() instanceof AbstractEngineeredTool) {
+            AbstractEngineeredTool tool = (AbstractEngineeredTool) stack.getItem();
+            if (!aug.acceptsTool(tool))
+                return false;
+
+            aug.applyAugment(stack);
+            return true;
+        }
+        return false;
     }
 
 }

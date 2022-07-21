@@ -1,6 +1,7 @@
 package net.pyerter.pootsadditions.item.custom.engineering;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.client.resource.language.TranslationStorage;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -12,6 +13,7 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.pyerter.pootsadditions.PootsAdditions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,17 +42,17 @@ public abstract class Augment extends Item {
 
     public static final int MASK_ATTRIBUTE_PRESENT = MASK_GET_ATTACK_DAMAGE + MASK_GET_MINING_SPEED + MASK_GET_ATTACK_SPEED;
 
-    public static boolean registerAugment(Augment aug) {
-        if (!stringToAugment.containsKey(aug.getAugmentID())) {
-            stringToAugment.put(aug.getAugmentID(), aug);
+    public static boolean registerAugment(Augment aug, String augmentId) {
+        if (!stringToAugment.containsKey(augmentId)) {
+            stringToAugment.put(augmentId, aug);
             return true;
         }
         return false;
     }
 
-    public Augment(Settings settings) {
+    public Augment(Settings settings, String augmentId) {
         super(settings);
-        registerAugment(this);
+        registerAugment(this, augmentId);
     }
 
     /** Used to map the NbtCompound of this augment to the Augment Item **/
@@ -63,6 +65,14 @@ public abstract class Augment extends Item {
         nbt.putString(AUGMENT_NBT_INDICATOR, getAugmentID());
         nbt.putInt(AUGMENT_NBT_MASK_INDICATOR, getAugmentMask());
         return nbt;
+    }
+
+    public String getTranslation() {
+        return TranslationStorage.getInstance().get(getTranslationKey());
+    }
+
+    public boolean acceptsTool(AbstractEngineeredTool tool) {
+        return true;
     }
 
     /** All of the augment methods that can be overriden to apply effects **/
@@ -135,6 +145,24 @@ public abstract class Augment extends Item {
                 augments.add(aug);
         }
         return augments;
+    }
+
+    public boolean applyAugment(ItemStack stack) {
+        NbtList augments = getAugmentsNbtList(stack);
+        boolean contains = false;
+        for (int i = 0; i < augments.size(); i++) {
+            if (augments.getCompound(i).getString(AUGMENT_NBT_INDICATOR).equals(getAugmentID())) {
+                contains = true;
+                break;
+            }
+        }
+        if (!contains) {
+            PootsAdditions.logInfo("Saving augment " + getAugmentID() + " to item");
+            augments.add(getNbtCompound());
+            writeAugmentsToNbt(stack.getOrCreateNbt(), augments);
+            return true;
+        }
+        return false;
     }
 
 }

@@ -25,6 +25,7 @@ import net.pyerter.pootsadditions.item.ModItems;
 import net.pyerter.pootsadditions.item.ModToolMaterials;
 import net.pyerter.pootsadditions.item.custom.engineering.AbstractEngineeredTool;
 import net.pyerter.pootsadditions.item.custom.engineering.AbstractEngineersItem;
+import net.pyerter.pootsadditions.item.custom.engineering.Augment;
 import net.pyerter.pootsadditions.item.custom.engineering.EngineersTrustyHammer;
 import net.pyerter.pootsadditions.item.inventory.ImplementedInventory;
 import net.pyerter.pootsadditions.recipe.EngineeringStationRefineRecipe;
@@ -129,22 +130,33 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
     // Left boolean implies right boolean
     public Pair<Boolean, Boolean> hammerIt(boolean stackCraft) {
         Pair<Optional<ItemStack>, Boolean[]> craftingResult = getCraftingResult();
-        if (!craftingResult.getLeft().isPresent()) {
+        Optional<Pair<Pair<ItemStack, Augment>, Boolean[]>> augmentResult = getAugmentResult();
+        if (!craftingResult.getLeft().isPresent() && !augmentResult.isPresent()) {
             resetHammeredProgress();
             return new Pair<>(false, false);
         }
 
-        boolean shouldStackCraft = stackCraft && !craftingResult.getRight()[0] &&
-                !craftingResult.getRight()[1] && !craftingResult.getRight()[2] &&
+        boolean shouldStackCraft = stackCraft &&
+                craftingResult.getLeft().isPresent() &&
+                !craftingResult.getRight()[0] &&
+                !craftingResult.getRight()[1] &&
+                !craftingResult.getRight()[2] &&
                 craftingResult.getRight()[3];
 
         hammered++;
         if (hammered >= HAMMERS_PER_CRAFT) {
-            if (shouldStackCraft) {
-                craftResultMax(craftingResult.getLeft().get(), craftingResult.getRight());
-                world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_ANVIL_USE, SoundCategory.BLOCKS, 1f, 1f, 0);
+            if (craftingResult.getLeft().isPresent()) {
+                if (shouldStackCraft) {
+                    craftResultMax(craftingResult.getLeft().get(), craftingResult.getRight());
+                    world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_ANVIL_USE, SoundCategory.BLOCKS, 1f, 1f, 0);
+                } else {
+                    craftResult(craftingResult.getLeft().get(), craftingResult.getRight());
+                    world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_ANVIL_PLACE, SoundCategory.BLOCKS, 1f, 1f, 0);
+                }
             } else {
-                craftResult(craftingResult.getLeft().get(), craftingResult.getRight());
+                ItemStack augmentStackResult = augmentResult.get().getLeft().getLeft();
+                if (augmentResult.get().getLeft().getRight().applyAugment(getEngineeringSlot()))
+                    craftResult(ItemStack.EMPTY, augmentResult.get().getRight());
                 world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_ANVIL_PLACE, SoundCategory.BLOCKS, 1f, 1f, 0);
             }
             resetHammeredProgress();
@@ -158,7 +170,7 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
     }
 
     public boolean craftResult(ItemStack stack, Boolean[] usedSlots) {
-        if (stack == null || stack.isEmpty() || usedSlots.length != 4)
+        if (stack == null || usedSlots.length != 4)
             return false;
 
         for (int i = 0; i < 4; i++) {
@@ -166,10 +178,12 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
                 inventory.get(i).decrement(1);
         }
 
-        if (inventory.get(2).isEmpty())
-            inventory.set(2, stack);
-        else if (inventory.get(2).isItemEqual(stack))
-            inventory.get(2).increment(stack.getCount());
+        if (!stack.isEmpty()) {
+            if (inventory.get(2).isEmpty())
+                inventory.set(2, stack);
+            else if (inventory.get(2).isItemEqual(stack))
+                inventory.get(2).increment(stack.getCount());
+        }
         return true;
     }
 
@@ -217,6 +231,7 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
     public Pair<Optional<ItemStack>, Boolean[]> getCraftingResult() {
         // TODO: check if the tool in the tool slot is craftable with the engineers item
         // TODO: check if the engineers tool in the middle is augmentable with mats or augments
+
         Optional<ItemStack> resultingStack;
 
         resultingStack = canEngineerTool(getToolSlot(), getEngineeringSlot());
@@ -236,6 +251,15 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
         }
 
         return new Pair<>(Optional.empty(), null);
+    }
+
+    public Optional<Pair<Pair<ItemStack, Augment>, Boolean[]>> getAugmentResult() {
+        Boolean[] usesSlots = new Boolean[]{false, true, false, false};
+        Optional<Pair<ItemStack, Augment>> augmentResult = canAugmentTool(getEngineeringSlot(), getAugmentSlot());
+        if (augmentResult.isPresent()) {
+            return Optional.of(new Pair<>(augmentResult.get(), usesSlots));
+        }
+        return Optional.empty();
     }
 
     public static Optional<ItemStack> canEngineerTool(ItemStack toolStack, ItemStack engineerStack) {
@@ -302,6 +326,15 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
         return returnMatch ? match : Optional.empty();
     }
 
+    private static Optional<Pair<ItemStack, Augment>> canAugmentTool(ItemStack toolSlot, ItemStack augmentSlot) {
+        if (!augmentSlot.isEmpty() && augmentSlot.getItem() instanceof Augment &&
+                !toolSlot.isEmpty() && toolSlot.getItem() instanceof AbstractEngineeredTool) {
+            Pair<ItemStack, Augment> results = new Pair<>(toolSlot, (Augment)augmentSlot.getItem());
+            return Optional.of(results);
+        }
+        return Optional.empty();
+    }
+
     private static boolean canInsertItemIntoOutputSlot(SimpleInventory inventory, ItemStack output) {
         return inventory.getStack(2).getItem() == output.getItem() || inventory.getStack(2).isEmpty();
     }
@@ -325,7 +358,7 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
 
     /** Slot 1: Augment slot is the right slot **/
     public static boolean acceptsQuickTransferAugmentSlot(ItemStack itemStack) {
-        return false;
+        return itemStack.getItem() instanceof Augment;
     }
     /** Slot 1: Augment slot is the right slot **/
     public ItemStack getAugmentSlot() {

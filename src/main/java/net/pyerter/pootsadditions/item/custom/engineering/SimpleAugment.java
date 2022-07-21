@@ -19,14 +19,14 @@ public class SimpleAugment extends Augment {
     protected float miningSpeedMult = 1;
     protected PostMinePredicate postMinePredicate = null;
 
-    protected SimpleAugment(Settings settings, String augmentID, int augmentMask) {
-        super(settings, augmentID);
+    protected SimpleAugment( String augmentID, int augmentMask) {
+        super(augmentID);
         this.augmentID = augmentID;
         this.augmentMask = augmentMask;
     }
 
-    protected SimpleAugment(Settings settings, String augmentID, int augmentMask, int level, float levelMultiplier, float attackDamage, float attackSpeed, float miningSpeedMult, PostMinePredicate postMinePredicate) {
-        super(settings, augmentID);
+    protected SimpleAugment(String augmentID, int augmentMask, int level, float levelMultiplier, float attackDamage, float attackSpeed, float miningSpeedMult, PostMinePredicate postMinePredicate) {
+        super(augmentID);
         this.augmentID = augmentID;
         this.augmentMask = augmentMask;
         this.level = level;
@@ -58,27 +58,27 @@ public class SimpleAugment extends Augment {
 
     @Override
     public float onGetAttackDamage(ItemStack stack, AbstractEngineeredTool tool) {
-        return attackDamage + (Math.min(0, level - 1) * attackDamage * levelMultiplier);
+        return attackDamage + (Math.max(0, level - 1) * attackDamage * levelMultiplier);
     }
 
     @Override
     public float getAugmentAttackDamage() {
-        return attackDamage + (Math.min(0, level - 1) * attackDamage * levelMultiplier);
+        return attackDamage + (Math.max(0, level - 1) * attackDamage * levelMultiplier);
     }
 
     @Override
     public float onGetMiningSpeedMultiplier(ItemStack stack, AbstractEngineeredTool tool) {
-        return miningSpeedMult + (Math.min(0, level - 1) * miningSpeedMult * levelMultiplier);
+        return miningSpeedMult + (Math.max(0, level - 1) * miningSpeedMult * levelMultiplier);
     }
 
     @Override
     public float getAugmentMiningSpeedMultiplier() {
-        return miningSpeedMult + (Math.min(0, level - 1) * miningSpeedMult * levelMultiplier);
+        return miningSpeedMult + (Math.max(0, level - 1) * miningSpeedMult * levelMultiplier);
     }
 
     @Override
     public float getAugmentAttackSpeed() {
-        return attackSpeed + (Math.min(0, level - 1) * attackSpeed * levelMultiplier);
+        return attackSpeed + (Math.max(0, level - 1) * attackSpeed * levelMultiplier);
     }
 
     @Override
@@ -87,8 +87,6 @@ public class SimpleAugment extends Augment {
     }
 
     public static class Builder {
-
-        protected Settings settings;
         protected String augmentID;
 
         protected int level = 1;
@@ -101,8 +99,7 @@ public class SimpleAugment extends Augment {
         protected float miningSpeedMult = 1;
         PostMinePredicate minePredicate = null;
 
-        public Builder(Settings settings, String augmentID) {
-            this.settings = settings;
+        public Builder(String augmentID) {
             this.augmentID = augmentID;
         }
 
@@ -145,7 +142,15 @@ public class SimpleAugment extends Augment {
         }
 
         public SimpleAugment build() {
-            return new SimpleAugment(settings, augmentID, augmentMask, level, levelMultiplier, attackDamage, attackSpeed, miningSpeedMult, minePredicate);
+            return new SimpleAugment(augmentID, augmentMask, level, levelMultiplier, attackDamage, attackSpeed, miningSpeedMult, minePredicate);
+        }
+
+        public SimpleAugment[] buildLevels(int levels) {
+            SimpleAugment[] augments = new SimpleAugment[levels];
+            for (int i = 1; i <= levels; i++) {
+                augments[i - 1] = new SimpleAugment(augmentID + "_" + i, augmentMask, i, levelMultiplier, attackDamage, attackSpeed, miningSpeedMult, minePredicate);
+            }
+            return augments;
         }
 
     }

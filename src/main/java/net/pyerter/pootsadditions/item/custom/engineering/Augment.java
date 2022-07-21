@@ -15,17 +15,17 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.pyerter.pootsadditions.PootsAdditions;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 // :)
-public abstract class Augment extends Item {
+public abstract class Augment {
     public static final String AUGMENT_NBT_ID = "pootsadditions.augments";
     public static final String AUGMENT_NBT_INDICATOR = "pootsadditions.augment_id";
     public static final String AUGMENT_NBT_MASK_INDICATOR = "pootsadditions.augment_mask";
     public static final Map<String, Augment> stringToAugment = new HashMap<>();
+    public static Collection<Augment> getAllAugments() {
+        return stringToAugment.values();
+    }
 
     public static final int MASK_NADA =                 0;
     public static final int MASK_GET_ATTACK_DAMAGE =    1;
@@ -50,13 +50,28 @@ public abstract class Augment extends Item {
         return false;
     }
 
-    public Augment(Settings settings, String augmentId) {
-        super(settings);
+    public Augment(String augmentId) {
         registerAugment(this, augmentId);
     }
 
     /** Used to map the NbtCompound of this augment to the Augment Item **/
     public abstract String getAugmentID();
+    public String getAugmentIDWithoutLevel() {
+        String augmentId = getAugmentID();
+        StringTokenizer tokenizer = new StringTokenizer(augmentId, "_");
+        String result = "";
+        while (tokenizer.hasMoreTokens()) {
+            String next = tokenizer.nextToken();
+            try {
+                Integer.parseInt(next);
+            } catch (NumberFormatException e) {
+                result += next + "_";
+            }
+        }
+        if (result.length() > 1)
+            result = result.substring(0, result.length() - 1);
+        return result;
+    }
     /** Used to filter augments when only augments with certain implementations are wanted **/
     public abstract int getAugmentMask();
     /** Returns an NbtCompound containing data that maps to the Augment **/
@@ -68,7 +83,7 @@ public abstract class Augment extends Item {
     }
 
     public String getTranslation() {
-        return TranslationStorage.getInstance().get(getTranslationKey());
+        return TranslationStorage.getInstance().get("augment." + PootsAdditions.MOD_ID + "." + getAugmentIDWithoutLevel());
     }
 
     public boolean acceptsTool(AbstractEngineeredTool tool) {

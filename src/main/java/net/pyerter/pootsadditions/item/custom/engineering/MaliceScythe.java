@@ -75,6 +75,7 @@ public class MaliceScythe extends AbstractEngineeredTool implements IChargeable 
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        super.appendTooltip(stack, world, tooltip, context);
         addChargeTooltip(stack, tooltip);
     }
 }

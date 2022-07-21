@@ -65,7 +65,7 @@ public class ModItems {
             new EngineeredAxe(6, -3f, ToolMaterials.STONE,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
     public static final Item ENGINEERED_STONE_HOE = registerItem("engineered_stone_hoe",
-            new EngineeredHoe(-4, 0f, ToolMaterials.STONE,
+            new EngineeredHoe(-1, 0f, ToolMaterials.STONE,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 
     public static final Item ENGINEERED_IRON_SWORD = registerItem("engineered_iron_sword",
@@ -81,7 +81,7 @@ public class ModItems {
             new EngineeredAxe(6, -3f, ToolMaterials.IRON,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
     public static final Item ENGINEERED_IRON_HOE = registerItem("engineered_iron_hoe",
-            new EngineeredHoe(-4, 0f, ToolMaterials.IRON,
+            new EngineeredHoe(-2, 0f, ToolMaterials.IRON,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 
     public static final Item ENGINEERED_GOLDEN_SWORD = registerItem("engineered_golden_sword",
@@ -97,7 +97,7 @@ public class ModItems {
             new EngineeredAxe(6, -3f, ToolMaterials.GOLD,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
     public static final Item ENGINEERED_GOLDEN_HOE = registerItem("engineered_golden_hoe",
-            new EngineeredHoe(-4, 0f, ToolMaterials.GOLD,
+            new EngineeredHoe(0, 0f, ToolMaterials.GOLD,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 
     public static final Item ENGINEERED_DIAMOND_SWORD = registerItem("engineered_diamond_sword",
@@ -113,7 +113,7 @@ public class ModItems {
             new EngineeredAxe(6, -3f, ToolMaterials.DIAMOND,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
     public static final Item ENGINEERED_DIAMOND_HOE = registerItem("engineered_diamond_hoe",
-            new EngineeredHoe(-4, 0f, ToolMaterials.DIAMOND,
+            new EngineeredHoe(-3, 0f, ToolMaterials.DIAMOND,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 
     public static final Item ENGINEERED_NETHERITE_SWORD = registerItem("engineered_netherite_sword",
@@ -145,7 +145,7 @@ public class ModItems {
             new EngineeredAxe(6, -3f, ModToolMaterials.STARMETAL,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
     public static final Item ENGINEERED_STARMETAL_HOE = registerItem("engineered_starmetal_hoe",
-            new EngineeredHoe(-4, 0f, ModToolMaterials.STARMETAL,
+            new EngineeredHoe(-5, 0f, ModToolMaterials.STARMETAL,
                     new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 
     public static final Item LEATHER_JACKET_ARMOR_ITEM = registerItem("leather_jacket_armor",
@@ -155,7 +155,7 @@ public class ModItems {
             new EngineersTrustyHammer(3, -2f, new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 
     public static final Item MALICE_SCYTHE = registerItem("malice_scythe",
-            new MaliceScythe(5f, -1f, new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
+            new MaliceScythe(9f, -1f, new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 
     public static final Item ENGINEERS_BLUPRINT = registerItem("engineers_blueprint",
             new EngineersBlueprintItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).maxCount(1)));
@@ -224,9 +224,8 @@ public class ModItems {
                     .statusEffect(new StatusEffectInstance(StatusEffects.HUNGER, 600, 0), 0.8F)
                     .statusEffect(new StatusEffectInstance(StatusEffects.REGENERATION, 600, 0), 0.5f).build())));
 
-    public static final Item AUGMENT_HONED_EDGE_1 = registerItem("augment_honed_edge_1",
-            (new SimpleAugment.Builder(new FabricItemSettings().group(ModItemGroup.SAPPHIRE), "honed_edge_1"))
-                    .setLevel(1).setLevelMultiplier(0.5f).addAttackDamage(3).build());
+    public static final Item AUGMENTED_TABLET_ITEM = registerItem("augmented_tablet",
+            new AugmentedTabletItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).maxCount(1)));
 
 
     private static Item registerItem(String name, Item item) {
@@ -235,6 +234,7 @@ public class ModItems {
 
     public static void registerModItems() {
         PootsAdditions.LOGGER.debug("Registering Mod Items for " + PootsAdditions.MOD_ID);
+        Augments.registerAugments();
     }
 
     public static void registerPredicateOverrides() {

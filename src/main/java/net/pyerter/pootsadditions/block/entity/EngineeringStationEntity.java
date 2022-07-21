@@ -20,19 +20,14 @@ import net.minecraft.util.Pair;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.item.ModItems;
 import net.pyerter.pootsadditions.item.ModToolMaterials;
-import net.pyerter.pootsadditions.item.custom.engineering.AbstractEngineeredTool;
-import net.pyerter.pootsadditions.item.custom.engineering.AbstractEngineersItem;
-import net.pyerter.pootsadditions.item.custom.engineering.Augment;
-import net.pyerter.pootsadditions.item.custom.engineering.EngineersTrustyHammer;
+import net.pyerter.pootsadditions.item.custom.engineering.*;
 import net.pyerter.pootsadditions.item.inventory.ImplementedInventory;
 import net.pyerter.pootsadditions.recipe.EngineeringStationRefineRecipe;
 import net.pyerter.pootsadditions.screen.handlers.EngineeringStationScreenHandler;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -130,7 +125,7 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
     // Left boolean implies right boolean
     public Pair<Boolean, Boolean> hammerIt(boolean stackCraft) {
         Pair<Optional<ItemStack>, Boolean[]> craftingResult = getCraftingResult();
-        Optional<Pair<Pair<ItemStack, Augment>, Boolean[]>> augmentResult = getAugmentResult();
+        Optional<Pair<Pair<ItemStack, List<Augment>>, Boolean[]>> augmentResult = getAugmentResult();
         if (!craftingResult.getLeft().isPresent() && !augmentResult.isPresent()) {
             resetHammeredProgress();
             return new Pair<>(false, false);
@@ -154,9 +149,7 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
                     world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_ANVIL_PLACE, SoundCategory.BLOCKS, 1f, 1f, 0);
                 }
             } else {
-                ItemStack augmentStackResult = augmentResult.get().getLeft().getLeft();
-                if (augmentResult.get().getLeft().getRight().applyAugment(getEngineeringSlot()))
-                    craftResult(ItemStack.EMPTY, augmentResult.get().getRight());
+                craftAugment(augmentResult.get());
                 world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.BLOCK_ANVIL_PLACE, SoundCategory.BLOCKS, 1f, 1f, 0);
             }
             resetHammeredProgress();
@@ -219,6 +212,24 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
         return true;
     }
 
+    public boolean craftAugment(Pair<Pair<ItemStack, List<Augment>>, Boolean[]> augmentResult) {
+        if (augmentResult.getLeft().getLeft().isEmpty()) {
+            boolean augmentedTool = false;
+            ItemStack augmentStack = getEngineeringSlot();
+
+            for (Augment aug : augmentResult.getLeft().getRight()) {
+                if (aug.applyAugment(augmentStack))
+                    augmentedTool = true;
+            }
+
+            if (augmentedTool) {
+                craftResult(ItemStack.EMPTY, augmentResult.getRight());
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void resetHammeredProgress() {
         hammered = 0;
         successfulBuild--;
@@ -253,11 +264,11 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
         return new Pair<>(Optional.empty(), null);
     }
 
-    public Optional<Pair<Pair<ItemStack, Augment>, Boolean[]>> getAugmentResult() {
+    public Optional<Pair<Pair<ItemStack, List<Augment>>, Boolean[]>> getAugmentResult() {
         Boolean[] usesSlots = new Boolean[]{false, true, false, false};
-        Optional<Pair<ItemStack, Augment>> augmentResult = canAugmentTool(getEngineeringSlot(), getAugmentSlot());
+        Optional<Pair<ItemStack, List<Augment>>> augmentResult = canAugmentTool(getEngineeringSlot(), getAugmentSlot());
         if (augmentResult.isPresent()) {
-            return Optional.of(new Pair<>(augmentResult.get(), usesSlots));
+            return Optional.of(new Pair<>(new Pair<>(ItemStack.EMPTY, augmentResult.get().getRight()), usesSlots));
         }
         return Optional.empty();
     }
@@ -326,10 +337,10 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
         return returnMatch ? match : Optional.empty();
     }
 
-    private static Optional<Pair<ItemStack, Augment>> canAugmentTool(ItemStack toolSlot, ItemStack augmentSlot) {
-        if (!augmentSlot.isEmpty() && augmentSlot.getItem() instanceof Augment &&
+    private static Optional<Pair<ItemStack, List<Augment>>> canAugmentTool(ItemStack toolSlot, ItemStack augmentSlot) {
+        if (!augmentSlot.isEmpty() && augmentSlot.getItem() instanceof AugmentedTabletItem &&
                 !toolSlot.isEmpty() && toolSlot.getItem() instanceof AbstractEngineeredTool) {
-            Pair<ItemStack, Augment> results = new Pair<>(toolSlot, (Augment)augmentSlot.getItem());
+            Pair<ItemStack, List<Augment>> results = new Pair<>(toolSlot, AugmentHelper.getAugments(augmentSlot));
             return Optional.of(results);
         }
         return Optional.empty();
@@ -358,7 +369,7 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
 
     /** Slot 1: Augment slot is the right slot **/
     public static boolean acceptsQuickTransferAugmentSlot(ItemStack itemStack) {
-        return itemStack.getItem() instanceof Augment;
+        return itemStack.getItem() instanceof AugmentedTabletItem;
     }
     /** Slot 1: Augment slot is the right slot **/
     public ItemStack getAugmentSlot() {

@@ -16,6 +16,7 @@ import net.minecraft.world.World;
 import net.pyerter.pootsadditions.PootsAdditions;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 // :)
 public abstract class Augment {
@@ -24,7 +25,7 @@ public abstract class Augment {
     public static final String AUGMENT_NBT_MASK_INDICATOR = "pootsadditions.augment_mask";
     public static final Map<String, Augment> stringToAugment = new HashMap<>();
     public static Collection<Augment> getAllAugments() {
-        return stringToAugment.values();
+        return stringToAugment.values().stream().sorted(Comparator.comparing(Augment::getAugmentID)).collect(Collectors.toList());
     }
 
     public static final int MASK_NADA =                 0;
@@ -98,7 +99,7 @@ public abstract class Augment {
     public float getAugmentAttackSpeed() { return 0; }
     public ActionResult onUseOnBlock(ItemStack stack, AbstractEngineeredTool tool, ItemUsageContext context) { return ActionResult.PASS; }
     public boolean onPostHit(ItemStack stack, AbstractEngineeredTool tool, LivingEntity target, LivingEntity attacker) { return false; }
-    public boolean onPostMine(ItemStack stack, AbstractEngineeredTool tool, World world, BlockState state, BlockPos pos, LivingEntity miner) { return false; }
+    public boolean onPostMine(boolean effectiveMine, ItemStack stack, AbstractEngineeredTool tool, World world, BlockState state, BlockPos pos, LivingEntity miner) { return false; }
     public boolean onUseWeaponAbility(ItemStack stack, AbstractEngineeredTool tool, Entity target, PlayerEntity attacker) { return false; }
     public boolean onInventoryTick(ItemStack stack, AbstractEngineeredTool tool, World world, Entity entity, int slot, boolean selected) { return false; }
     public boolean onItemNoLongerSuitable(ItemStack stack, AbstractEngineeredTool tool) { return false; }

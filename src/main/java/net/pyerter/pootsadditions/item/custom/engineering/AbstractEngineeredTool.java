@@ -274,7 +274,7 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
         return effectiveBlocksList;
     }
 
-    private boolean stateInEffectiveBlocks(BlockState state) {
+    public boolean stateInEffectiveBlocks(BlockState state) {
         for (TagKey<Block> tagKey: effectiveBlocksList) {
             if (state.isIn(tagKey)) {
                 return true;
@@ -284,7 +284,18 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
     }
 
     public float getMiningSpeedMultiplier(ItemStack stack, BlockState state) {
-        return stateInEffectiveBlocks(state) && willNotBreak(stack) ? this.miningSpeed : 1.0F;
+        return stateInEffectiveBlocks(state) && willNotBreak(stack) ? getAugmentedMiningSpeedMultiplier(stack, state) : 1.0F;
+    }
+
+    private float getAugmentedMiningSpeedMultiplier(ItemStack stack, BlockState state) {
+        float augmentedMiningSpeed = this.miningSpeed;
+        float augmentMultiplier = 1f;
+        List<Augment> miningAugments = AugmentHelper.getAugments(stack, Augment.MASK_GET_MINING_SPEED);
+        for (Augment aug: miningAugments) {
+            augmentMultiplier *= aug.getAugmentMiningSpeedMultiplier();
+        }
+        augmentedMiningSpeed *= augmentMultiplier;
+        return augmentedMiningSpeed;
     }
 
     public boolean postHit(ItemStack stack, LivingEntity target, LivingEntity attacker) {
@@ -295,8 +306,9 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
 
     public boolean postMine(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity miner) {
         if (!world.isClient && state.getHardness(world, pos) != 0.0F) {
-            List<Augment> augments = Augment.getAugments(stack, Augment.MASK_POST_MINE);
-            augments.stream().filter(a -> a.onPostMine(stack, this, world, state, pos, miner));
+            boolean effective = stateInEffectiveBlocks(state) && willNotBreak(stack);
+            List<Augment> augments = AugmentHelper.getAugments(stack, Augment.MASK_POST_MINE);
+            augments.stream().forEach(a -> a.onPostMine(effective, stack, this, world, state, pos, miner));
             tryDamageItem(stack, miner);
         }
 

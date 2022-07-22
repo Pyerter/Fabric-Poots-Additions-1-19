@@ -5,6 +5,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.pyerter.pootsadditions.PootsAdditions;
 
 public class SimpleAugment extends Augment {
 
@@ -82,8 +83,9 @@ public class SimpleAugment extends Augment {
     }
 
     @Override
-    public boolean onPostMine(ItemStack stack, AbstractEngineeredTool tool, World world, BlockState state, BlockPos pos, LivingEntity miner) {
-        return postMinePredicate != null ? postMinePredicate.onPostMine(stack, tool, world, state, pos, miner) : false;
+    public boolean onPostMine(boolean effectiveMine, ItemStack stack, AbstractEngineeredTool tool, World world, BlockState state, BlockPos pos, LivingEntity miner) {
+        PootsAdditions.logInfo("Calling post mine");
+        return postMinePredicate != null && effectiveMine ? postMinePredicate.onPostMine(stack, tool, level, world, state, pos, miner) : false;
     }
 
     public static class Builder {
@@ -156,6 +158,6 @@ public class SimpleAugment extends Augment {
     }
 
     public interface PostMinePredicate {
-        boolean onPostMine(ItemStack stack, AbstractEngineeredTool tool, World world, BlockState state, BlockPos pos, LivingEntity miner);
+        boolean onPostMine(ItemStack stack, AbstractEngineeredTool tool, int level, World world, BlockState state, BlockPos pos, LivingEntity miner);
     }
 }

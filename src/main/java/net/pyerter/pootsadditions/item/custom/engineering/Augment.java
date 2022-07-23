@@ -94,7 +94,9 @@ public abstract class Augment {
     public boolean acceptsItem(ItemStack stack) {
         if (stack.getItem() instanceof AbstractEngineeredTool)
             return acceptsTool((AbstractEngineeredTool) stack.getItem());
-        return stack.getItem() == ModItems.AUGMENTED_TABLET_ITEM && AugmentHelper.getAugments(stack).size() == 0;
+        List<Augment> augments = AugmentHelper.getAugments(stack);
+        return stack.getItem() == ModItems.AUGMENTED_TABLET_ITEM &&
+                (augments.size() == 0 || (augments.size() == 1 && augments.get(0) == this));
     }
 
     public int getLevel() { return 1; }
@@ -176,13 +178,14 @@ public abstract class Augment {
         boolean contains = false;
         for (int i = 0; i < augments.size(); i++) {
             Augment temp = Augment.fromNbt(augments.getCompound(i));
-            if (temp.getAugmentID().equals(getAugmentID())) {
+            if (temp.getAugmentIDWithoutLevel().equals(getAugmentIDWithoutLevel())) {
                 if (temp.getLevel() >= getLevel()) {
                     contains = true;
+                    break;
                 } else {
                     augments.remove(i);
+                    i--;
                 }
-                break;
             }
         }
         if (!contains) {

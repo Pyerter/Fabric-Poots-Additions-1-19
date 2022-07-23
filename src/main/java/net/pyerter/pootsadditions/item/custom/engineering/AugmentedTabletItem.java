@@ -4,7 +4,10 @@ import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.LiteralTextContent;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 import net.pyerter.pootsadditions.item.ModItems;
@@ -22,7 +25,7 @@ public class AugmentedTabletItem extends Item {
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         List<Augment> augments = AugmentHelper.getAugments(stack);
         for (Augment aug: augments) {
-            tooltip.add(Text.of(aug.getTranslation()));
+            tooltip.add(MutableText.of(new LiteralTextContent(aug.getTranslation())).formatted(Formatting.GRAY));
         }
     }
 
@@ -33,6 +36,11 @@ public class AugmentedTabletItem extends Item {
                 stacks.add(tabletEntry(aug));
             }
         }
+    }
+
+    @Override
+    public boolean hasGlint(ItemStack stack) {
+        return super.hasGlint(stack) || AugmentHelper.hasAugments(stack);
     }
 
     public static ItemStack tabletEntry(Augment aug) {

@@ -40,6 +40,7 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
     private static List<Item> initializeEngineerItemsList() {
         List<Item> items = new ArrayList<>();
         items.add(ModItems.ENGINEERS_BLUPRINT);
+        items.add(ModItems.AUGMENTED_TABLET_ITEM);
         return items;
     }
     public static final List<Item> acceptedRefiningMaterials = new ArrayList<>();

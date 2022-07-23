@@ -12,12 +12,15 @@ import net.pyerter.pootsadditions.util.WorldUtil;
 
 public class Augments {
 
+    // built with sharpness 5
     public static final Augment[] HONED_EDGE = (new SimpleAugment.Builder("honed_edge"))
             .setLevel(1).setLevelMultiplier(1f).addAttackDamage(3).buildLevels(5);
 
+    // built with efficiency 5
     public static final Augment[] EXPERT_MINING = (new SimpleAugment.Builder("expert_mining"))
             .setLevel(1).setLevelMultiplier(1f).addMiningSpeedMult(1.5f).buildLevels(5);
 
+    // built with blast protection 4
     public static final Augment[] ORE_CROSS_MINING = (new SimpleAugment.Builder("ore_smashing"))
             .setLevel(1).setMinePredicate((ItemStack stack, AbstractEngineeredTool tool, int level, World world, BlockState state, BlockPos pos, LivingEntity miner) -> {
                 tryBreakAdjacentBlocks(tool, stack, world, state, pos, miner, level == 3);

@@ -20,8 +20,11 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.tag.TagKey;
+import net.minecraft.text.LiteralTextContent;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -251,8 +254,13 @@ public abstract class AbstractEngineeredTool extends Item implements Vanishable,
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         List<Augment> augments = AugmentHelper.getAugments(stack);
         for (Augment aug: augments) {
-            tooltip.add(Text.of(aug.getTranslation()));
+            tooltip.add(MutableText.of(new LiteralTextContent(aug.getTranslation())).formatted(Formatting.GRAY));
         }
+    }
+
+    @Override
+    public boolean hasGlint(ItemStack stack) {
+        return super.hasGlint(stack) || AugmentHelper.hasAugments(stack);
     }
 
     /** ToolItem methods **/

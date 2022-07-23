@@ -58,6 +58,12 @@ public class AugmentHelper {
         return augments;
     }
 
+    public static boolean hasAugments(ItemStack stack) {
+        NbtList nbtList = Augment.getAugmentsNbtList(stack);
+
+        return nbtList.size() > 0;
+    }
+
     public static int hasAugment(ItemStack stack, String rawId) {
         NbtList nbtList = Augment.getAugmentsNbtList(stack);
 
@@ -120,30 +126,18 @@ public class AugmentHelper {
     }
 
     public static boolean applyAugment(Augment aug, ItemStack stack) {
-        if (stack.getItem() instanceof AbstractEngineeredTool) {
-            AbstractEngineeredTool tool = (AbstractEngineeredTool) stack.getItem();
-            if (!aug.acceptsTool(tool))
-                return false;
+        if (!aug.acceptsItem(stack))
+            return false;
 
-            aug.applyAugment(stack);
-            return true;
-        }
-        return false;
+        return aug.applyAugment(stack);
     }
 
     public static Augment getResultingAugmentModification(ItemStack stack, Augment aug) {
-        boolean augmentable = false;
-        for (Class c: augmentableClasses) {
-            if (c.isInstance(stack.getItem().getClass())) {
-                augmentable = true;
-                break;
-            }
-        }
-        if (!augmentable || !aug.acceptsItem(stack))
+        if (!aug.acceptsItem(stack))
             return null;
 
         Augment result = getPresentAugment(stack, aug.getAugmentIDWithoutLevel());
-        if (result == null)
+        if (result == null || result.getLevel() < aug.getLevel())
             return aug;
 
         String nextLevel = aug.getAugmentIDWithoutLevel() + "_" + (aug.getLevel() + 1);

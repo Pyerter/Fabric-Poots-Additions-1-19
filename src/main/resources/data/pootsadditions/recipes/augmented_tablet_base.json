@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "E": {
+      "item": "pootsadditions:etched_cover"
+    },
+    "G": {
+      "item": "pootsadditions:glow_ring_binding"
+    },
+    "P": {
+      "item": "pootsadditions:gilded_tablet_pages"
+    }
+  },
+  "pattern": [
+    " E",
+    "GP",
+    " E"
+  ],
+  "result": {
+    "item": "pootsadditions:augmented_tablet"
+  }
+}

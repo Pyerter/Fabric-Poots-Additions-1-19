@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "G": {
+      "item": "pootsadditions:glow_rings"
+    }
+  },
+  "pattern": [
+    "G",
+    "G",
+    "G"
+  ],
+  "result": {
+    "item": "pootsadditions:glow_ring_binding"
+  }
+}

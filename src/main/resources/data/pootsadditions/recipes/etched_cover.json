@@ -1,0 +1,19 @@
+{
+  "type": "pootsadditions:tridi",
+  "ingredients": [
+    {
+      "item": "pootsadditions:treated_leather"
+    },
+    {
+      "item": "pootsadditions:treated_leather"
+    },
+    {
+      "item": "pootsadditions:treated_leather"
+    }
+  ],
+  "output": {
+    "item": "pootsadditions:etched_cover"
+  },
+  "cookTime": 100,
+  "energyCost": 10
+}

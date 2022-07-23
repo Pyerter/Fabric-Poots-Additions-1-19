@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "S": {
+      "item": "minecraft:stone_slab"
+    },
+    "G": {
+      "item": "minecraft:gold_nugget"
+    },
+    "P": {
+      "item": "minecraft:paper"
+    }
+  },
+  "pattern": [
+    " G ",
+    "GPG",
+    " S "
+  ],
+  "result": {
+    "item": "pootsadditions:gilded_tablet_page"
+  }
+}

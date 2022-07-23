@@ -226,6 +226,22 @@ public class ModItems {
 
     public static final Item AUGMENTED_TABLET_ITEM = registerItem("augmented_tablet",
             new AugmentedTabletItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).maxCount(1)));
+    public static final Item GLOW_RING = registerItem("glow_ring",
+            new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
+    public static final Item GLOW_RINGS = registerItem("glow_rings",
+            new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
+    public static final Item GLOW_RING_BINDING = registerItem("glow_ring_binding",
+            new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
+    public static final Item POLISHED_LEATHER = registerItem("polished_leather",
+            new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
+    public static final Item TREATED_LEATHER = registerItem("treated_leather",
+            new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
+    public static final Item ETCHED_COVER = registerItem("etched_cover",
+            new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
+    public static final Item GILDED_TABLET_PAGE = registerItem("gilded_tablet_page",
+            new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
+    public static final Item GILDED_TABLET_PAGES = registerItem("gilded_tablet_pages",
+            new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 
 
     private static Item registerItem(String name, Item item) {

@@ -14,6 +14,21 @@ import java.util.List;
 
 public class AugmentHelper {
 
+    public static List<Class> augmentableClasses = initializeAugmentableClasses();
+    private static List<Class> initializeAugmentableClasses() {
+        List<Class> list = new ArrayList<>();
+        list.add(AbstractEngineeredTool.class);
+        list.add(AugmentedTabletItem.class);
+        return list;
+    }
+    public static boolean tryRegisterAugmentableClass(Class cls) {
+        if (!augmentableClasses.contains(cls)) {
+            augmentableClasses.add(cls);
+            return true;
+        }
+        return false;
+    }
+
     public static List<Augment> getAugments(ItemStack stack) {
         NbtList nbtList = Augment.getAugmentsNbtList(stack);
 
@@ -41,6 +56,30 @@ public class AugmentHelper {
                 augments.add(aug);
         }
         return augments;
+    }
+
+    public static int hasAugment(ItemStack stack, String rawId) {
+        NbtList nbtList = Augment.getAugmentsNbtList(stack);
+
+        for (int i = 0; i < nbtList.size(); i++) {
+            NbtCompound nbt = nbtList.getCompound(i);
+            Augment aug = Augment.fromNbt(nbt);
+            if (aug.getAugmentIDWithoutLevel().equals(rawId))
+                return aug.getLevel();
+        }
+        return -1;
+    }
+
+    public static Augment getPresentAugment(ItemStack stack, String rawId) {
+        NbtList nbtList = Augment.getAugmentsNbtList(stack);
+
+        for (int i = 0; i < nbtList.size(); i++) {
+            NbtCompound nbt = nbtList.getCompound(i);
+            Augment aug = Augment.fromNbt(nbt);
+            if (aug.getAugmentIDWithoutLevel().equals(rawId))
+                return aug;
+        }
+        return null;
     }
 
     public static float getAugmentDamage(ItemStack stack) {
@@ -90,6 +129,28 @@ public class AugmentHelper {
             return true;
         }
         return false;
+    }
+
+    public static Augment getResultingAugmentModification(ItemStack stack, Augment aug) {
+        boolean augmentable = false;
+        for (Class c: augmentableClasses) {
+            if (c.isInstance(stack.getItem().getClass())) {
+                augmentable = true;
+                break;
+            }
+        }
+        if (!augmentable || !aug.acceptsItem(stack))
+            return null;
+
+        Augment result = getPresentAugment(stack, aug.getAugmentIDWithoutLevel());
+        if (result == null)
+            return aug;
+
+        String nextLevel = aug.getAugmentIDWithoutLevel() + "_" + (aug.getLevel() + 1);
+        if (result.getLevel() == aug.getLevel() && Augment.stringToAugment.containsKey(nextLevel))
+            return Augment.stringToAugment.get(nextLevel);
+
+        return null;
     }
 
 }

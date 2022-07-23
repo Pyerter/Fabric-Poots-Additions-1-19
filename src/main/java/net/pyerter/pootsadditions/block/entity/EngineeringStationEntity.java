@@ -338,12 +338,17 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
     }
 
     private static Optional<Pair<ItemStack, List<Augment>>> canAugmentTool(ItemStack toolSlot, ItemStack augmentSlot) {
-        if (!augmentSlot.isEmpty() && augmentSlot.getItem() instanceof AugmentedTabletItem &&
-                !toolSlot.isEmpty() && toolSlot.getItem() instanceof AbstractEngineeredTool) {
-            Pair<ItemStack, List<Augment>> results = new Pair<>(toolSlot, AugmentHelper.getAugments(augmentSlot));
-            return Optional.of(results);
-        }
-        return Optional.empty();
+        if (augmentSlot.isEmpty() || !(augmentSlot.getItem() instanceof AugmentedTabletItem))
+            return Optional.empty();
+
+        List<Augment> augments = AugmentHelper.getAugments(augmentSlot);
+        List<Augment> augmentResults = augments.stream()
+                .map(a -> AugmentHelper.getResultingAugmentModification(toolSlot, a))
+                .filter(a -> a != null).toList();
+        if (augmentResults.size() == 0)
+            return Optional.empty();
+
+        return Optional.of(new Pair<>(toolSlot, augmentResults));
     }
 
     private static boolean canInsertItemIntoOutputSlot(SimpleInventory inventory, ItemStack output) {

@@ -14,6 +14,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.pyerter.pootsadditions.PootsAdditions;
+import net.pyerter.pootsadditions.item.ModItems;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -90,6 +91,13 @@ public abstract class Augment {
     public boolean acceptsTool(AbstractEngineeredTool tool) {
         return true;
     }
+    public boolean acceptsItem(ItemStack stack) {
+        if (stack.getItem() instanceof AbstractEngineeredTool)
+            return acceptsTool((AbstractEngineeredTool) stack.getItem());
+        return stack.getItem() == ModItems.AUGMENTED_TABLET_ITEM && AugmentHelper.getAugments(stack).size() == 0;
+    }
+
+    public int getLevel() { return 1; }
 
     /** All of the augment methods that can be overriden to apply effects **/
     public float onGetAttackDamage(ItemStack stack, AbstractEngineeredTool tool) { return 0; }
@@ -167,8 +175,13 @@ public abstract class Augment {
         NbtList augments = getAugmentsNbtList(stack);
         boolean contains = false;
         for (int i = 0; i < augments.size(); i++) {
-            if (augments.getCompound(i).getString(AUGMENT_NBT_INDICATOR).equals(getAugmentID())) {
-                contains = true;
+            Augment temp = Augment.fromNbt(augments.getCompound(i));
+            if (temp.getAugmentID().equals(getAugmentID())) {
+                if (temp.getLevel() >= getLevel()) {
+                    contains = true;
+                } else {
+                    augments.remove(i);
+                }
                 break;
             }
         }

@@ -32,6 +32,7 @@ public class AugmentedTabletItem extends Item {
     @Override
     public void appendStacks(ItemGroup group, DefaultedList<ItemStack> stacks) {
         if (this.isIn(group)) {
+            stacks.add(new ItemStack(ModItems.AUGMENTED_TABLET_ITEM));
             for (Augment aug : Augment.getAllAugments()) {
                 stacks.add(tabletEntry(aug));
             }

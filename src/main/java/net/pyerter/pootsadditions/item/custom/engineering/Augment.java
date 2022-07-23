@@ -2,6 +2,7 @@ package net.pyerter.pootsadditions.item.custom.engineering;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.resource.language.TranslationStorage;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -11,6 +12,7 @@ import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.pyerter.pootsadditions.PootsAdditions;
@@ -27,6 +29,30 @@ public abstract class Augment {
     public static final Map<String, Augment> stringToAugment = new HashMap<>();
     public static Collection<Augment> getAllAugments() {
         return stringToAugment.values().stream().sorted(Comparator.comparing(Augment::getAugmentID)).collect(Collectors.toList());
+    }
+
+    public static final Map<Pair<Enchantment, Integer>, String> enchantmentToAugmentId = new HashMap<>();
+    public static final List<Pair<Enchantment, Integer>> registeredEnchantmentLevels = new ArrayList<>();
+    public static boolean tryRegisterEnchantmentToAugment(Enchantment enchantment, Integer level, String augmentId) {
+        Optional<Pair<Enchantment, Integer>> existingPair = registeredEnchantmentLevels.stream()
+                .filter(p -> p.getLeft() == enchantment && p.getRight() == level).findFirst();
+        if (!existingPair.isPresent()) {
+            PootsAdditions.logInfo("Registering augment " + augmentId + " from enchantment " + enchantment.getName(level));
+            Pair<Enchantment, Integer> enchantEntry = new Pair<>(enchantment, level);
+            registeredEnchantmentLevels.add(enchantEntry);
+            enchantmentToAugmentId.put(enchantEntry, augmentId);
+            return true;
+        }
+        return false;
+    }
+    public static Optional<Augment> getAugmentFromEnchantment(Enchantment enchantment, Integer level) {
+        Optional<Pair<Enchantment, Integer>> existingPair = registeredEnchantmentLevels.stream()
+                .filter(p -> p.getLeft() == enchantment && p.getRight() == level).findFirst();
+        if (!existingPair.isPresent())
+            return Optional.empty();
+
+        PootsAdditions.logInfo("Found existing enchantment to augment entry");
+        return Optional.of(stringToAugment.get(enchantmentToAugmentId.get(existingPair.get())));
     }
 
     public static final int MASK_NADA =                 0;

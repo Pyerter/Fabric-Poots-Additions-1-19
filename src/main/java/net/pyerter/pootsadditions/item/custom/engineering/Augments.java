@@ -2,6 +2,8 @@ package net.pyerter.pootsadditions.item.custom.engineering;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.OreBlock;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -9,28 +11,59 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.pyerter.pootsadditions.item.ModItemGroup;
 import net.pyerter.pootsadditions.util.WorldUtil;
+import org.checkerframework.checker.units.qual.A;
 
 public class Augments {
 
     // built with sharpness 5
-    public static final Augment[] HONED_EDGE = (new SimpleAugment.Builder("honed_edge"))
-            .setLevel(1).setLevelMultiplier(1f).addAttackDamage(3).buildLevels(5);
+    public static Augment[] HONED_EDGE = registerFirstLevelAugmentRecipe((new SimpleAugment.Builder("honed_edge"))
+            .setLevel(1).setLevelMultiplier(1f).addAttackDamage(3).buildLevels(5), Enchantments.SHARPNESS);
 
     // built with efficiency 5
-    public static final Augment[] EXPERT_MINING = (new SimpleAugment.Builder("expert_mining"))
-            .setLevel(1).setLevelMultiplier(1f).addMiningSpeedMult(1.5f).buildLevels(5);
+    public static Augment[] EXPERT_MINING = registerFirstLevelAugmentRecipe((new SimpleAugment.Builder("expert_mining"))
+            .setLevel(1).setLevelMultiplier(1f).addMiningSpeedMult(1.5f).buildLevels(5), Enchantments.EFFICIENCY);
 
     // built with blast protection 4
-    public static final Augment[] ORE_CROSS_MINING = (new SimpleAugment.Builder("ore_smashing"))
+    public static Augment[] ORE_CROSS_MINING = registerFirstLevelAugmentRecipe((new SimpleAugment.Builder("ore_smashing"))
             .setLevel(1).setMinePredicate((ItemStack stack, AbstractEngineeredTool tool, int level, World world, BlockState state, BlockPos pos, LivingEntity miner) -> {
                 tryBreakAdjacentBlocks(tool, stack, world, state, pos, miner, level == 3);
                 if (level >= 2)
                     tryBreakCornerAdjacentBlocks(tool, stack, world, state, pos, miner, level == 3);
                 return true;
-            }).buildLevels(3);
+            }).buildLevels(3), Enchantments.BLAST_PROTECTION);
 
     public static void registerAugments() {
+        // built with sharpness 5
+        HONED_EDGE = registerFirstLevelAugmentRecipe((new SimpleAugment.Builder("honed_edge"))
+                .setLevel(1).setLevelMultiplier(1f).addAttackDamage(3).buildLevels(5), Enchantments.SHARPNESS);
 
+        // built with efficiency 5
+        EXPERT_MINING = registerFirstLevelAugmentRecipe((new SimpleAugment.Builder("expert_mining"))
+                .setLevel(1).setLevelMultiplier(1f).addMiningSpeedMult(1.5f).buildLevels(5), Enchantments.EFFICIENCY);
+
+        // built with blast protection 4
+        ORE_CROSS_MINING = registerFirstLevelAugmentRecipe((new SimpleAugment.Builder("ore_smashing"))
+                .setLevel(1).setMinePredicate((ItemStack stack, AbstractEngineeredTool tool, int level, World world, BlockState state, BlockPos pos, LivingEntity miner) -> {
+                    tryBreakAdjacentBlocks(tool, stack, world, state, pos, miner, level == 3);
+                    if (level >= 2)
+                        tryBreakCornerAdjacentBlocks(tool, stack, world, state, pos, miner, level == 3);
+                    return true;
+                }).buildLevels(3), Enchantments.BLAST_PROTECTION);
+    }
+
+    public static Augment[] registerFirstLevelAugmentRecipe(Augment[] augments, Enchantment enchantment) {
+        for (Augment aug: augments) {
+            if (aug.getLevel() == 1) {
+                registerEnchantmentToAugmentRecipe(aug, enchantment);
+                break;
+            }
+        }
+        return augments;
+    }
+
+    public static Augment registerEnchantmentToAugmentRecipe(Augment augment, Enchantment enchantment) {
+        Augment.tryRegisterEnchantmentToAugment(enchantment, enchantment.getMaxLevel(), augment.getAugmentID());
+        return augment;
     }
 
     public static void tryBreakAdjacentBlocks(AbstractEngineeredTool tool, ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity miner, boolean mineExtraCorners) {

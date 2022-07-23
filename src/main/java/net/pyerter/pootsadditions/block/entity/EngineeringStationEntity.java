@@ -2,12 +2,15 @@ package net.pyerter.pootsadditions.block.entity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
@@ -16,10 +19,12 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.LiteralTextContent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.pyerter.pootsadditions.PootsAdditions;
 import net.pyerter.pootsadditions.item.ModItems;
 import net.pyerter.pootsadditions.item.ModToolMaterials;
 import net.pyerter.pootsadditions.item.custom.engineering.*;
@@ -30,6 +35,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class EngineeringStationEntity extends BlockEntity implements NamedScreenHandlerFactory, ImplementedInventory {
@@ -227,6 +233,8 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
                 craftResult(ItemStack.EMPTY, augmentResult.getRight());
                 return true;
             }
+        } else if (augmentResult.getLeft().getRight() == null) {
+            return craftResult(augmentResult.getLeft().getLeft(), augmentResult.getRight());
         }
         return false;
     }
@@ -266,11 +274,19 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
     }
 
     public Optional<Pair<Pair<ItemStack, List<Augment>>, Boolean[]>> getAugmentResult() {
-        Boolean[] usesSlots = new Boolean[]{false, true, false, false};
+        Boolean[] augmentToolUses = new Boolean[]{false, true, false, false};
         Optional<Pair<ItemStack, List<Augment>>> augmentResult = canAugmentTool(getEngineeringSlot(), getAugmentSlot());
         if (augmentResult.isPresent()) {
-            return Optional.of(new Pair<>(new Pair<>(ItemStack.EMPTY, augmentResult.get().getRight()), usesSlots));
+            return Optional.of(new Pair<>(new Pair<>(ItemStack.EMPTY, augmentResult.get().getRight()), augmentToolUses));
         }
+
+        PootsAdditions.logInfo("Checking if can forge augment");
+        Boolean[] forgedAugmentUses = new Boolean[]{ false, true, false, true };
+        Optional<ItemStack> forgedAugment = canForgeAugment(getMaterialSlot(), getAugmentSlot(), getEngineeringSlot());
+        if (forgedAugment.isPresent()) {
+            return Optional.of(new Pair<>(new Pair<>(forgedAugment.get(), null), forgedAugmentUses));
+        }
+
         return Optional.empty();
     }
 
@@ -339,7 +355,7 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
     }
 
     private static Optional<Pair<ItemStack, List<Augment>>> canAugmentTool(ItemStack toolSlot, ItemStack augmentSlot) {
-        if (augmentSlot.isEmpty() || !(augmentSlot.getItem() instanceof AugmentedTabletItem))
+        if (augmentSlot.isEmpty() || !(augmentSlot.getItem() instanceof AugmentedTabletItem) || toolSlot.isEmpty())
             return Optional.empty();
 
         List<Augment> augments = AugmentHelper.getAugments(augmentSlot);
@@ -350,6 +366,28 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
             return Optional.empty();
 
         return Optional.of(new Pair<>(toolSlot, augmentResults));
+    }
+
+    private static Optional<ItemStack> canForgeAugment(ItemStack materialSlot, ItemStack augmentSlot, ItemStack engineeringSlot) {
+        if (!engineeringSlot.isEmpty() || materialSlot.isEmpty() || augmentSlot.isEmpty())
+            return Optional.empty();
+
+        if (!(augmentSlot.getItem() instanceof AugmentedTabletItem) || !(materialSlot.getItem() instanceof EnchantedBookItem) || AugmentHelper.getAugments(augmentSlot).size() > 0)
+            return Optional.empty();
+
+        Map<Enchantment, Integer> enchantments = EnchantmentHelper.fromNbt(EnchantedBookItem.getEnchantmentNbt(materialSlot));
+
+        Optional<Augment> resultAugment = enchantments.entrySet().stream()
+                .map(e -> Augment.getAugmentFromEnchantment(e.getKey(), e.getValue()))
+                .filter(o -> o.isPresent()).map(o -> o.get()).findFirst();
+
+        if (resultAugment.isPresent()) {
+            ItemStack result = new ItemStack(ModItems.AUGMENTED_TABLET_ITEM);
+            resultAugment.get().applyAugment(result);
+            return Optional.of(result);
+        }
+
+        return Optional.empty();
     }
 
     private static boolean canInsertItemIntoOutputSlot(SimpleInventory inventory, ItemStack output) {
@@ -393,7 +431,7 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
 
     /** Slot 3: Materials slot is the top slot **/
     public static boolean acceptsQuickTransferMaterialSlot(ItemStack itemStack) {
-        return acceptedRefiningMaterials.contains(itemStack.getItem()) || AbstractEngineeredTool.isAcceptedToolIngredient(itemStack);
+        return acceptedRefiningMaterials.contains(itemStack.getItem()) || AbstractEngineeredTool.isAcceptedToolIngredient(itemStack) || itemStack.getItem() instanceof EnchantedBookItem;
     }
     /** Slot 3: Materials slot is the top slot **/
     public ItemStack getMaterialSlot() {

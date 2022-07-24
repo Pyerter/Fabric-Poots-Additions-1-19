@@ -186,6 +186,10 @@ public class ModItems {
     public static final Item CATALYST_ENHANCER_ENGRAVING = registerItem("catalyst_enhancer_engraving",
             new RecipeWithstandingItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).fireproof().maxCount(1),
             DescriptiveItem.DescriptionBuilder.start().add("Engraving", Formatting.AQUA, Formatting.ITALIC).add("Used with: Makeshift Catalyst", Formatting.GRAY).build()));
+    public static final Item STORM_CORE = registerItem("storm_core",
+            new StormCore(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).fireproof().maxCount(1)));
+    public static final Item STORM_CATALYST = registerItem("storm_catalyst",
+            new RecipeWithstandingItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).fireproof().maxCount(1)));
 
 
     public static final Item HEALTH_FLASK = registerItem("health_flask",
@@ -264,11 +268,11 @@ public class ModItems {
     public static void registerPredicateOverrides() {
         ModelPredicateProviderRegistry.register(ModItems.MAKESHIFT_CORE, new Identifier("charge"), new AbstractPowerCore.ChargePredicateProvider(
                 (stack, chargeable) -> chargeable.getOverridePredicateChargeValue(stack)));
+        ModelPredicateProviderRegistry.register(ModItems.STORM_CORE, new Identifier("charge"), new AbstractPowerCore.ChargePredicateProvider(
+                (stack, chargeable) -> chargeable.getOverridePredicateChargeValue(stack)));
         ModelPredicateProviderRegistry.register(ModItems.MALICE_SCYTHE, new Identifier("charge"), new AbstractPowerCore.ChargePredicateProvider(
                 (stack, chargeable) -> chargeable.getOverridePredicateChargeValue(stack)));
 
-        ModelPredicateProviderRegistry.register(ModItems.HEALTH_FLASK, new Identifier("charge"), new HealthFlaskItem.FlaskChargePredicateProvider(
-                (stack, flaskItem) -> flaskItem.getOverridePredicateChargeValue(stack)));
         ModelPredicateProviderRegistry.register(ModItems.HEALTH_FLASK, new Identifier("charge"), new HealthFlaskItem.FlaskChargePredicateProvider(
                 (stack, flaskItem) -> flaskItem.getOverridePredicateChargeValue(stack)));
     }

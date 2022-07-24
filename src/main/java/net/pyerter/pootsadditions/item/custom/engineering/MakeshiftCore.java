@@ -35,7 +35,7 @@ public class MakeshiftCore extends AbstractPowerCore {
 
     @Override
     public int getMaxCharge() {
-        return 1210;
+        return MAX_CHARGE;
     }
 
     @Override

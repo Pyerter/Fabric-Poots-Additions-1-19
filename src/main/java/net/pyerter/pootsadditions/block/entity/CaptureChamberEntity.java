@@ -32,7 +32,7 @@ import java.util.List;
 
 public class CaptureChamberEntity extends BlockEntity implements NamedScreenHandlerFactory, ImplementedInventory {
     private static final String DISPLAY_NAME = "Capture Chamber";
-    private static final List<Item> acceptedQuickTransfers = List.of(ModItems.MAKESHIFT_CORE);
+    //private static final List<Item> acceptedQuickTransfers = List.of(ModItems.MAKESHIFT_CORE, ModItems.STORM_CORE);
     private final DefaultedList<ItemStack> inventory =
             DefaultedList.ofSize(3, ItemStack.EMPTY);
 
@@ -320,7 +320,7 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
     }
 
     public static boolean acceptsQuickTransfer(ItemStack itemStack) {
-        return acceptedQuickTransfers.contains(itemStack.getItem());
+        return AbstractPowerCore.isCoreFuelItem(itemStack);
     }
 
     public static boolean acceptsQuickTransferFuel(ItemStack itemStack) {

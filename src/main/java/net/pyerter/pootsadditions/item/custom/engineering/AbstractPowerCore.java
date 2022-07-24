@@ -32,6 +32,9 @@ import java.util.function.BiFunction;
 public abstract class AbstractPowerCore extends Item implements IChargeable, AccessoryItem {
 
     public static final List<Item> REGISTERED_CORES = new ArrayList<>();
+    public static boolean isCoreFuelItem(ItemStack stack) {
+        return REGISTERED_CORES.contains(stack.getItem());
+    }
     public static final String CHARGE_NBT_ID = "pootsadditions.core_charge";
 
     public AbstractPowerCore(Settings settings) {

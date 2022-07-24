@@ -26,6 +26,7 @@ import net.pyerter.pootsadditions.item.custom.engineering.MakeshiftCore;
 import net.pyerter.pootsadditions.item.inventory.ImplementedInventory;
 import net.pyerter.pootsadditions.recipe.TridiRecipe;
 import net.pyerter.pootsadditions.screen.handlers.TridiScreenHandler;
+import net.pyerter.pootsadditions.util.InventoryUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -179,11 +180,17 @@ public class TridiBlockEntity extends BlockEntity implements NamedScreenHandlerF
     }
 
     private static void craftItem(TridiBlockEntity entity, TridiRecipe recipe) {
-        entity.removeStack(0, 1);
-        entity.removeStack(1,1);
-        entity.removeStack(2,1);
-        entity.removeStack(3, 1);
-        entity.removeStack(4, 1);
+        boolean[] usedStacks = InventoryUtil.filterContainerItems(entity.inventory, new boolean[]{ true, true, true, true, true });
+        if (usedStacks[0])
+            entity.removeStack(0, 1);
+        if (usedStacks[1])
+            entity.removeStack(1,1);
+        if (usedStacks[2])
+            entity.removeStack(2,1);
+        if (usedStacks[3])
+            entity.removeStack(3, 1);
+        if (usedStacks[4])
+            entity.removeStack(4, 1);
 
         consumeFuel(entity, recipe.getEnergyCost());
 

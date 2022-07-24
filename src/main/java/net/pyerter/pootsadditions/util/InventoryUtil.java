@@ -1,5 +1,6 @@
 package net.pyerter.pootsadditions.util;
 
+import com.mojang.datafixers.types.Func;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -7,6 +8,8 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.collection.DefaultedList;
+
+import java.util.function.Function;
 
 public class InventoryUtil {
     public static final String DEFAULT_INVENTORY_NBT_ID = "InvItems";
@@ -121,6 +124,28 @@ public class InventoryUtil {
             i++;
         }
         return i == stackInto.size();
+    }
+
+    public static boolean[] filterContainerItems(DefaultedList<ItemStack> inventory, boolean[] usedSlots) {
+        return filterContainerItems(inventory, usedSlots, i -> i);
+    }
+
+    public static boolean[] filterContainerItems(DefaultedList<ItemStack> inventory, boolean[] usedSlots, Function<Integer, Integer> indexToSlot) {
+        boolean[] filteredSlots = new boolean[usedSlots.length];
+        for (int i = 0; i < usedSlots.length; i++) {
+            if (usedSlots[i]) {
+                int slot = indexToSlot.apply(i);
+                ItemStack usedStack = inventory.get(slot);
+                if (usedStack.getItem().hasRecipeRemainder()) {
+                    inventory.set(slot, new ItemStack(usedStack.getItem().getRecipeRemainder()));
+                } else {
+                    filteredSlots[i] = true;
+                    continue;
+                }
+            }
+            filteredSlots[i] = false;
+        }
+        return filteredSlots;
     }
 
 }

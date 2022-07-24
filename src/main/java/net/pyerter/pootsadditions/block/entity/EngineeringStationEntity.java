@@ -249,8 +249,6 @@ public class EngineeringStationEntity extends BlockEntity implements NamedScreen
     }
 
     public Pair<Optional<ItemStack>, Boolean[]> getCraftingResult() {
-        // TODO: check if the tool in the tool slot is craftable with the engineers item
-        // TODO: check if the engineers tool in the middle is augmentable with mats or augments
 
         Optional<ItemStack> resultingStack;
 

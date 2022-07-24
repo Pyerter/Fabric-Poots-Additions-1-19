@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "S": {
+      "item": "pootsadditions:screw_item"
+    },
+    "C": {
+      "item": "pootsadditions:copper_wire_item"
+    },
+    "A": {
+      "item": "minecraft:andesite"
+    }
+  },
+  "pattern": [
+    "SCS",
+    "ACA",
+    "SCS"
+  ],
+  "result": {
+    "item": "pootsadditions:capture_chamber_provider"
+  }
+}

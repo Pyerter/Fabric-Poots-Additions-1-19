@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "S": {
+      "item": "pootsadditions:screw_item"
+    },
+    "C": {
+      "item": "pootsadditions:copper_wire_item"
+    },
+    "A": {
+      "item": "minecraft:andesite"
+    },
+    "M": {
+      "item": "pootsadditions:makeshift_core"
+    }
+  },
+  "pattern": [
+    "SIS",
+    "CMC",
+    "AIA"
+  ],
+  "result": {
+    "item": "pootsadditions:tridi"
+  }
+}

@@ -2,7 +2,7 @@
   "type": "pootsadditions:kitchen_stove_station",
   "ingredients": [
     {
-      "item": "minecraft:wheat"
+      "item": "pootsadditions:dough_item"
     }
   ],
   "output": {

@@ -7,16 +7,16 @@
     "S": {
       "item": "minecraft:stick"
     },
-    "P": {
-      "item": "pootsadditions:pyrifera_insulation_goo"
+    "C": {
+      "item": "minecraft:cookie"
     }
   },
   "pattern": [
-    "  I",
-    "PI ",
+    " I ",
+    " CI",
     "S  "
   ],
   "result": {
-    "item": "pootsadditions:bread_knife_item"
+    "item": "pootsadditions:cookie_cutter_item"
   }
 }

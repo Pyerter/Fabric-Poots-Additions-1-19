@@ -157,6 +157,8 @@ public class ModItems {
     public static final Item MALICE_SCYTHE = registerItem("malice_scythe",
             new MaliceScythe(9f, -1f, new FabricItemSettings().group(ModItemGroup.SAPPHIRE)));
 
+    public static final Item EMPTY_BLUEPRINT = registerItem("empty_blueprint",
+            new Item(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).maxCount(16)));
     public static final Item ENGINEERS_BLUPRINT = registerItem("engineers_blueprint",
             new EngineersBlueprintItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).maxCount(1)));
     public static final Item ENGINEERS_REPAIR_KIT = registerItem("engineers_repair_kit",

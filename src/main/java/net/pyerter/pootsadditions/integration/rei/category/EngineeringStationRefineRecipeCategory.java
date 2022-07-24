@@ -9,11 +9,14 @@ import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.client.registry.display.DisplayCategory;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
+import me.shedaniel.rei.api.common.util.EntryIngredients;
 import me.shedaniel.rei.api.common.util.EntryStacks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.pyerter.pootsadditions.block.ModBlocks;
 import net.pyerter.pootsadditions.integration.REIPootsAdditionsPlugin;
 import net.pyerter.pootsadditions.integration.rei.display.EngineeringStationRefineRecipeDisplay;
+import net.pyerter.pootsadditions.item.ModItems;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,11 +43,36 @@ public class EngineeringStationRefineRecipeCategory implements DisplayCategory<E
 
     @Override
     public List<Widget> setupDisplay(EngineeringStationRefineRecipeDisplay display, Rectangle bounds) {
-        Point startPoint = new Point(bounds.getCenterX() - 31, bounds.getCenterY() - 13);
+        Point startPoint = new Point(bounds.getCenterX() - 20, bounds.getCenterY() - 9);
         List<Widget> widgets = new ArrayList<>();
 
         widgets.add(Widgets.createRecipeBase(bounds));
 
-        return DisplayCategory.super.setupDisplay(display, bounds);
+        Point current = startPoint.clone();
+        current.y -= 14;
+        widgets.add(Widgets.createSlot(current)
+                .entries(display.getInputEntries().size() > 0 ? display.getInputEntries().get(0) : EntryIngredients.of(ItemStack.EMPTY))
+                .markInput());
+
+        current.y += 28;
+        widgets.add(Widgets.createSlot(current)
+                .entries(display.getInputEntries().size() > 1 ? display.getInputEntries().get(1) : EntryIngredients.of(ItemStack.EMPTY))
+                .markInput());
+
+        current.y -= 14;
+        current.x += 24;
+        widgets.add(Widgets.createArrow(current));
+
+        current.x += 36;
+        widgets.add(Widgets.createSlot(current)
+                .entries(display.getOutputEntries().size() > 0 ? display.getOutputEntries().get(0) : EntryIngredients.of(ItemStack.EMPTY))
+                .markOutput());
+
+        current.x = bounds.getCenterX() - 60;
+        widgets.add(Widgets.createSlot(current)
+                .entries(EntryIngredients.of(new ItemStack(ModItems.ENGINEERS_TRUSTY_HAMMER)))
+                .markInput());
+
+        return widgets;
     }
 }

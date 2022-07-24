@@ -86,6 +86,16 @@ public class EngineeringStationRefineRecipe implements Recipe<SimpleInventory> {
     }
 
     @Override
+    public DefaultedList<Ingredient> getIngredients() {
+        DefaultedList<Ingredient> list = DefaultedList.ofSize(2, Ingredient.EMPTY);
+        if (ingredients.size() > 0)
+            list.set(0, ingredients.get(0));
+        if (!engineerIngredient.isEmpty())
+            list.set(1, engineerIngredient);
+        return list;
+    }
+
+    @Override
     public Identifier getId() {
         return id;
     }

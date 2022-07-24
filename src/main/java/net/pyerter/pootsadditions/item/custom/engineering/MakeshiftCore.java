@@ -8,12 +8,14 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.pyerter.pootsadditions.block.entity.CaptureChamberEntity;
@@ -34,5 +36,15 @@ public class MakeshiftCore extends AbstractPowerCore {
     @Override
     public int getMaxCharge() {
         return 1210;
+    }
+
+    @Override
+    public void appendStacks(ItemGroup group, DefaultedList<ItemStack> stacks) {
+        if (this.isIn(group)) {
+            stacks.add(new ItemStack(this));
+            ItemStack chargedStack = new ItemStack(this);
+            tryCharge(chargedStack, getMaxCharge());
+            stacks.add(chargedStack);
+        }
     }
 }

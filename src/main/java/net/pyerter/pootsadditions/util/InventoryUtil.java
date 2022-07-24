@@ -137,7 +137,9 @@ public class InventoryUtil {
                 int slot = indexToSlot.apply(i);
                 ItemStack usedStack = inventory.get(slot);
                 if (usedStack.getItem().hasRecipeRemainder()) {
-                    inventory.set(slot, new ItemStack(usedStack.getItem().getRecipeRemainder()));
+                    Item recipeRemainder = usedStack.getItem().getRecipeRemainder();
+                    if (recipeRemainder != usedStack.getItem())
+                        inventory.set(slot, new ItemStack(usedStack.getItem().getRecipeRemainder()));
                 } else {
                     filteredSlots[i] = true;
                     continue;

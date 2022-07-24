@@ -65,6 +65,8 @@
   "item.pootsadditions.pyrifera_insulation_goo": "Pyrifera Insulation Goo",
 
   "item.pootsadditions.makeshift_core": "Makeshift Core",
+  "item.pootsadditions.makeshift_catalyst": "Makeshift Catalyst",
+  "item.pootsadditions.catalyst_enhancer_engraving": "Catalyst Enhancer",
 
   "item.pootsadditions.health_flask": "Health Flask",
 
@@ -101,6 +103,15 @@
   "item.pootsadditions.garlic_item": "Garlic",
 
   "item.pootsadditions.enduring_flesh": "Enduring Flesh",
+
+  "item.pootsadditions.glow_ring": "Glow Ring",
+  "item.pootsadditions.glow_rings": "Glow Rings",
+  "item.pootsadditions.glow_ring_binding": "Glow Ring Binding",
+  "item.pootsadditions.polished_leather": "Polished Leather",
+  "item.pootsadditions.treated_leather": "Treated Leather",
+  "item.pootsadditions.etched_cover": "Etched Cover",
+  "item.pootsadditions.gilded_tablet_page": "Gilded Tablet Page",
+  "item.pootsadditions.gilded_tablet_pages": "Gilded Tablet Pages",
 
   "item.pootsadditions.augmented_tablet": "Augmented Tablet",
   "augment.pootsadditions.honed_edge": "Augment - Honed Edge",

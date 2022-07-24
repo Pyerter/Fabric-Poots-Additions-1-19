@@ -9,6 +9,12 @@
     },
     {
       "item": "pootsadditions:treated_leather"
+    },
+    {
+      "item": "pootsadditions:catalyst_enhancer_engraving"
+    },
+    {
+      "item": "pootsadditions:makeshift_catalyst"
     }
   ],
   "output": {

@@ -198,13 +198,17 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
         BlockEntity targetEntity = world.getBlockEntity(addPoint);
         if (targetEntity instanceof CaptureChamberEntity) {
             CaptureChamberEntity targetChamber = (CaptureChamberEntity) targetEntity;
-            if (!forcePriority && targetChamber.receivingPriority > priority)
+            if (!forcePriority && (targetChamber.receivingPriority > priority || (targetChamber.receivingPriority == priority && targetChamber.transferStrength >= strength)))
                 return;
 
             targetChamber.transferStrength = strength;
             targetChamber.receivingPriority = priority;
             if (from.getHorizontal() != -1)
                 targetChamber.directionTransferring = from.getHorizontal();
+
+            if (forcePriority && shouldStopTransferring(world, targetChamber)) {
+                targetChamber.directionTransferring = -1;
+            }
 
             if (strength > 1) {
                 for (Direction dir: Util.HORIZONTAL_DIRECTIONS) {
@@ -213,6 +217,32 @@ public class CaptureChamberEntity extends BlockEntity implements NamedScreenHand
                 }
             }
         }
+    }
+
+    /**
+     * Returns true if and only if the passed entity is transferring power and it should stop
+     * transferring power to that direction.
+     * @param world
+     * @param entity
+     * @return
+     */
+    public static boolean shouldStopTransferring(World world, CaptureChamberEntity entity) {
+        if (entity.directionTransferring == -1)
+            return false;
+
+        Direction dir = Util.numbToDirection(entity.directionTransferring);
+        BlockPos targetPos = Util.addBlockPos(entity.getPos(), dir);
+        BlockEntity targetEntity = world.getBlockEntity(targetPos);
+        if (targetEntity == null || !(targetEntity instanceof CaptureChamberEntity)) {
+            return true;
+        }
+
+        CaptureChamberEntity targetChamber = (CaptureChamberEntity) targetEntity;
+        if (targetChamber.receivingPriority == DEFAULT_PRIORITY || targetChamber.transferStrength == 0 || targetChamber.receivingPriority <= entity.receivingPriority) {
+            return true;
+        }
+
+        return false;
     }
 
     public static void assertStillHaveStrengthPriority(World world, BlockPos pos, CaptureChamberEntity entity) {

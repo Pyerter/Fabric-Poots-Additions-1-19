@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "A": {
+      "item": "minecraft:andesite"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "P": {
+      "item": "pootsadditions:pyrifera_insulation_goo"
+    },
+    "C": {
+      "item": "pootsadditions:copper_wire_item"
+    }
+  },
+  "pattern": [
+    " P ",
+    "ACP",
+    "IA "
+  ],
+  "result": {
+    "item": "pootsadditions:catalyst_enhancer_engraving"
+  }
+}

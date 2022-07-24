@@ -179,6 +179,12 @@ public class ModItems {
 
     public static final Item MAKESHIFT_CORE = registerItem("makeshift_core",
             new MakeshiftCore(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).fireproof().maxCount(1)));
+    public static final Item MAKESHIFT_CATALYST = registerItem("makeshift_catalyst",
+            new RecipeWithstandingItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).fireproof().maxCount(1)));
+    public static final Item CATALYST_ENHANCER_ENGRAVING = registerItem("catalyst_enhancer_engraving",
+            new RecipeWithstandingItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).fireproof().maxCount(1),
+            DescriptiveItem.DescriptionBuilder.start().add("Engraving", Formatting.AQUA, Formatting.ITALIC).add("Used with: Makeshift Catalyst", Formatting.GRAY).build()));
+
 
     public static final Item HEALTH_FLASK = registerItem("health_flask",
             new HealthFlaskItem(new FabricItemSettings().group(ModItemGroup.SAPPHIRE).fireproof().maxCount(1)));

@@ -94,6 +94,11 @@ public class TridiRecipe implements Recipe<SimpleInventory> {
     }
 
     @Override
+    public DefaultedList<Ingredient> getIngredients() {
+        return ingredients;
+    }
+
+    @Override
     public Identifier getId() {
         return id;
     }
